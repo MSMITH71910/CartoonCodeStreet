@@ -1,14 +1,23 @@
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import Street from "./Street";
 import Character from "./Character";
 import { usePortfolio } from "../lib/stores/usePortfolio";
+import { useAudio } from "../lib/stores/useAudio";
 
 const Experience = () => {
   const { camera } = useThree();
   const { characterRef, cameraTarget, isViewingProject } = usePortfolio();
+  const { playHit } = useAudio();
+  const [signHovered, setSignHovered] = useState(false);
+  const [showSignInfo, setShowSignInfo] = useState(false);
+  
+  const handleSignClick = () => {
+    setShowSignInfo(!showSignInfo);
+    playHit();
+  };
 
   // Set up camera following logic
   useFrame(() => {
@@ -161,10 +170,17 @@ const Experience = () => {
           <meshStandardMaterial color="#8B4513" />
         </mesh>
         
-        {/* Sign board */}
-        <mesh castShadow position={[0, 3.5, 0]} receiveShadow>
+        {/* Sign board - interactive */}
+        <mesh 
+          castShadow 
+          position={[0, 3.5, 0]} 
+          receiveShadow
+          onPointerOver={() => setSignHovered(true)}
+          onPointerOut={() => setSignHovered(false)}
+          onClick={handleSignClick}
+        >
           <boxGeometry args={[5, 1.8, 0.2]} />
-          <meshStandardMaterial color="#1E88E5" />
+          <meshStandardMaterial color={signHovered ? "#4285F4" : "#1E88E5"} />
         </mesh>
         
         {/* Sign text area */}
@@ -172,6 +188,79 @@ const Experience = () => {
           <boxGeometry args={[4.5, 1.5, 0.05]} />
           <meshStandardMaterial color="#FFFFFF" />
         </mesh>
+        
+        {/* Sign text - Top Section */}
+        <mesh position={[0, 3.7, 0.15]}>
+          <planeGeometry args={[4, 0.6]} />
+          <meshBasicMaterial color="#0D47A1" />
+        </mesh>
+        
+        {/* Sign text - Bottom Section */}
+        <mesh position={[0, 3.3, 0.15]}>
+          <planeGeometry args={[4, 0.6]} />
+          <meshBasicMaterial color="#1565C0" />
+        </mesh>
+        
+        {/* Create white bars to represent text */}
+        <mesh position={[0, 3.7, 0.16]}>
+          <planeGeometry args={[3.5, 0.1]} />
+          <meshBasicMaterial color="#FFFFFF" />
+        </mesh>
+        
+        <mesh position={[0, 3.3, 0.16]}>
+          <planeGeometry args={[3, 0.1]} />
+          <meshBasicMaterial color="#FFFFFF" />
+        </mesh>
+        
+        {/* Info panel when clicked */}
+        {showSignInfo && (
+          <group position={[0, 3.5, 1]}>
+            {/* Background panel */}
+            <mesh receiveShadow>
+              <boxGeometry args={[6, 4, 0.1]} />
+              <meshStandardMaterial color="#333333" transparent opacity={0.9} />
+            </mesh>
+            
+            {/* Header bar */}
+            <mesh position={[0, 1.7, 0.06]}>
+              <boxGeometry args={[5.8, 0.6, 0.02]} />
+              <meshStandardMaterial color="#1A237E" />
+            </mesh>
+            
+            {/* Border */}
+            <mesh position={[0, 0, 0.06]}>
+              <boxGeometry args={[5.9, 3.9, 0.01]} />
+              <meshStandardMaterial color="#555555" />
+            </mesh>
+            
+            {/* Text indicators represented by colored bars */}
+            <mesh position={[0, 1.7, 0.07]}>
+              <boxGeometry args={[3, 0.3, 0.01]} />
+              <meshStandardMaterial color="#FFEB3B" />
+            </mesh>
+            
+            <mesh position={[0, 0.8, 0.07]}>
+              <boxGeometry args={[5, 0.8, 0.01]} />
+              <meshStandardMaterial color="#FFFFFF" />
+            </mesh>
+            
+            <mesh position={[0, -0.3, 0.07]}>
+              <boxGeometry args={[5, 0.8, 0.01]} />
+              <meshStandardMaterial color="#E0E0E0" />
+            </mesh>
+            
+            {/* Footer */}
+            <mesh position={[0, -1.7, 0.06]}>
+              <boxGeometry args={[5.8, 0.6, 0.02]} />
+              <meshStandardMaterial color="#1A237E" />
+            </mesh>
+            
+            <mesh position={[0, -1.7, 0.07]}>
+              <boxGeometry args={[4, 0.3, 0.01]} />
+              <meshStandardMaterial color="#4FC3F7" />
+            </mesh>
+          </group>
+        )}
       </group>
       
       {/* Camera controls - always enabled to allow viewing from different angles */}
