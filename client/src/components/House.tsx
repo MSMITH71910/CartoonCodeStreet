@@ -134,8 +134,28 @@ const House = ({ position, rotation, project }: HouseProps) => {
     console.log(`House for project "${project.title}" mounted at position:`, position);
   }, [project.title, position]);
 
+  // Handler for direct mouse clicks on house
+  const handleClick = () => {
+    console.log(`Mouse click on house: ${project.title}`);
+    setDoorOpen(true);
+    playSuccess();
+    setActiveProject(project);
+    
+    // Reset door after 2 seconds
+    setTimeout(() => {
+      setDoorOpen(false);
+    }, 2000);
+  };
+
   return (
-    <group ref={houseRef} position={position} rotation={rotation}>
+    <group 
+      ref={houseRef} 
+      position={position} 
+      rotation={rotation}
+      onClick={handleClick}
+      onPointerOver={() => setIsHovered(true)}
+      onPointerOut={() => setIsHovered(false)}
+    >
       {/* Base/foundation */}
       <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
         <boxGeometry args={[4, 1, 3]} />
