@@ -17,6 +17,9 @@ const keyboardMap = [
   { name: ControlName.leftward, keys: ["KeyA", "ArrowLeft"] },
   { name: ControlName.rightward, keys: ["KeyD", "ArrowRight"] },
   { name: ControlName.interact, keys: ["KeyE", "Space"] },
+  { name: ControlName.dance, keys: ["KeyZ"] },         // Z to dance
+  { name: ControlName.waveLeft, keys: ["KeyQ"] },      // Q to wave left arm
+  { name: ControlName.waveRight, keys: ["KeyR"] },     // R to wave right arm
 ];
 
 // Main App component
@@ -82,6 +85,14 @@ function App() {
         <p>D/→ - Turn right</p>
         <p>E/Space - Interact with objects</p>
         <p className="text-yellow-300">Click and hold left mouse button to look around</p>
+        
+        <div className="mt-2 border-t pt-2 border-gray-600">
+          <p className="font-semibold text-green-300">Character Animations:</p>
+          <p>Z - Make character dance</p>
+          <p>Q - Wave left arm</p>
+          <p>R - Wave right arm</p>
+        </div>
+        
         <div className="mt-2 border-t pt-2 border-gray-600">
           <p className="font-semibold">Interactions:</p>
           <p>• Click houses to view projects</p>

@@ -39,6 +39,11 @@ const Character = () => {
   const leftward = useKeyboardControls((state) => state[ControlName.leftward]);
   const rightward = useKeyboardControls((state) => state[ControlName.rightward]);
   const interact = useKeyboardControls((state) => state[ControlName.interact]);
+  
+  // Animation keyboard controls
+  const danceKey = useKeyboardControls((state) => state[ControlName.dance]);
+  const waveLeftKey = useKeyboardControls((state) => state[ControlName.waveLeft]);
+  const waveRightKey = useKeyboardControls((state) => state[ControlName.waveRight]);
 
   // Register character reference to the store
   useEffect(() => {
@@ -154,6 +159,35 @@ const Character = () => {
   useEffect(() => {
     console.log(`Controls: forward=${forward}, backward=${backward}, left=${leftward}, right=${rightward}, interact=${interact}`);
   }, [forward, backward, leftward, rightward, interact]);
+  
+  // Handle animation key presses
+  useEffect(() => {
+    // Handle dancing with Z key
+    if (danceKey && !isMoving && !isDancing && !isWaving && interactionType === "none") {
+      console.log("Dance animation triggered by keyboard!");
+      setIsDancing(true);
+      setAnimationTime(0);
+      playSuccess();
+    }
+    
+    // Handle left arm wave with Q key
+    if (waveLeftKey && !isMoving && !isDancing && !isWaving && interactionType === "none") {
+      console.log("Left arm wave animation triggered by keyboard!");
+      setIsWaving(true);
+      setWaveArm('left');
+      setAnimationTime(0);
+      playHit();
+    }
+    
+    // Handle right arm wave with R key
+    if (waveRightKey && !isMoving && !isDancing && !isWaving && interactionType === "none") {
+      console.log("Right arm wave animation triggered by keyboard!");
+      setIsWaving(true);
+      setWaveArm('right');
+      setAnimationTime(0);
+      playHit();
+    }
+  }, [danceKey, waveLeftKey, waveRightKey, isMoving, isDancing, isWaving, interactionType, playSuccess, playHit]);
   
   // Update animation time for dancing/waving animations
   useFrame((state, delta) => {
@@ -390,11 +424,11 @@ const Character = () => {
             </mesh>
           </group>
           
-          {/* Visible click area for legs - one big hitbox for both legs */}
+          {/* Click area for legs - invisible since we're using keyboard controls now */}
           <mesh
             position={[0, 0.1, 0]}
             onClick={handleLegClick}
-            visible={true} // Make visible during debugging, then set to false
+            visible={false}
           >
             <boxGeometry args={[0.7, 0.3, 0.7]} />
             <meshBasicMaterial color="red" transparent opacity={0.5} />
@@ -430,21 +464,21 @@ const Character = () => {
             </mesh>
           </group>
           
-          {/* Right arm clickable area */}
+          {/* Right arm clickable area - hidden since we're using keyboard now */}
           <mesh
             position={[0.5, 1.0, 0]}
             onClick={handleRightArmClick}
-            visible={true} // Make visible during debugging, then set to false
+            visible={false}
           >
             <boxGeometry args={[0.25, 0.8, 0.25]} />
             <meshBasicMaterial color="blue" transparent opacity={0.5} />
           </mesh>
           
-          {/* Left arm clickable area */}
+          {/* Left arm clickable area - hidden since we're using keyboard now */}
           <mesh
             position={[-0.5, 1.0, 0]}
             onClick={handleLeftArmClick}
-            visible={true} // Make visible during debugging, then set to false
+            visible={false}
           >
             <boxGeometry args={[0.25, 0.8, 0.25]} />
             <meshBasicMaterial color="blue" transparent opacity={0.5} />

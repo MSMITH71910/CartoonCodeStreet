@@ -4,7 +4,10 @@ export enum ControlName {
   backward = "backward",
   leftward = "leftward",
   rightward = "rightward",
-  interact = "interact"
+  interact = "interact",
+  dance = "dance",     // For dancing animation
+  waveLeft = "waveLeft",  // For left arm wave
+  waveRight = "waveRight" // For right arm wave
 }
 
 // Physics constants
