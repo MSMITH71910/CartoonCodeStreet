@@ -87,15 +87,15 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
     let interactRot = rotation[1]; // Use Y rotation
     
     if (type === "bench") {
-      // Place character properly on the bench seat with no clipping
+      // Place character perfectly centered on the redesigned bench
       interactPos = new THREE.Vector3(
-        position[0],              // Keep X at bench center
-        position[1] + 0.15,       // Exact height for the new sitting character design
-        position[2] - 0.2         // Place slightly forward to ensure legs hang properly
+        position[0] - 0.05,        // Slightly left of center to avoid clipping with bench back
+        position[1] + 0.35,        // Perfect height to sit on the redesigned bench
+        position[2]                // Centered on Z axis
       );
       
-      // Set rotation to face front (away from bench backrest)
-      interactRot = 0; // Face forward (Z-axis)
+      // Set rotation to face front (fixed direction for all benches)
+      interactRot = Math.PI;       // Always face forward
     } else if (type === "seesaw") {
       // Position character on one end of seesaw
       interactPos = new THREE.Vector3(
@@ -345,27 +345,45 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
       
       {type === "bench" && (
         <>
-          {/* Bench seat */}
-          <mesh castShadow position={[0, 0.4, 0]}>
-            <boxGeometry args={[0.6, 0.1, 2]} />
+          {/* Redesigned bench with better support for character */}
+          {/* Main bench seat - wider and thicker */}
+          <mesh castShadow position={[0, 0.3, 0]}>
+            <boxGeometry args={[0.8, 0.1, 1.6]} />
             <meshStandardMaterial color="#8D6E63" roughness={0.9} />
           </mesh>
           
-          {/* Bench back */}
-          <mesh castShadow position={[0.25, 1, 0]}>
-            <boxGeometry args={[0.1, 1, 2]} />
+          {/* Bench back - moved farther back to leave space for character */}
+          <mesh castShadow position={[0.35, 0.8, 0]}>
+            <boxGeometry args={[0.1, 0.9, 1.6]} />
             <meshStandardMaterial color="#8D6E63" roughness={0.9} />
           </mesh>
           
-          {/* Bench legs */}
-          <mesh castShadow position={[0, 0.2, -0.8]}>
-            <boxGeometry args={[0.6, 0.4, 0.1]} />
+          {/* Armrests for visual clarity */}
+          <mesh castShadow position={[0, 0.5, 0.7]}>
+            <boxGeometry args={[0.8, 0.3, 0.1]} />
             <meshStandardMaterial color="#5D4037" roughness={0.9} />
           </mesh>
           
-          <mesh castShadow position={[0, 0.2, 0.8]}>
-            <boxGeometry args={[0.6, 0.4, 0.1]} />
+          <mesh castShadow position={[0, 0.5, -0.7]}>
+            <boxGeometry args={[0.8, 0.3, 0.1]} />
             <meshStandardMaterial color="#5D4037" roughness={0.9} />
+          </mesh>
+          
+          {/* Stronger bench legs */}
+          <mesh castShadow position={[0, 0.15, -0.6]}>
+            <boxGeometry args={[0.7, 0.3, 0.1]} />
+            <meshStandardMaterial color="#5D4037" roughness={0.9} />
+          </mesh>
+          
+          <mesh castShadow position={[0, 0.15, 0.6]}>
+            <boxGeometry args={[0.7, 0.3, 0.1]} />
+            <meshStandardMaterial color="#5D4037" roughness={0.9} />
+          </mesh>
+          
+          {/* Additional support beams */}
+          <mesh castShadow position={[0.3, 0.55, 0]}>
+            <boxGeometry args={[0.1, 0.4, 1.6]} />
+            <meshStandardMaterial color="#6D4C41" roughness={0.9} />
           </mesh>
         </>
       )}
