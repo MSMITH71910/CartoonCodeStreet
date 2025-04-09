@@ -192,7 +192,12 @@ const Character = () => {
   }, [isMoving, isDancing, isWaving]);
   
   // Click handlers for character parts
-  const handleLegClick = () => {
+  const handleLegClick = (e: any) => {
+    // Try to stop event propagation
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation();
+    }
+    
     if (!isMoving && !isDancing && !isWaving && interactionType === "none") {
       console.log("Dancing animation triggered!");
       setIsDancing(true);
@@ -201,7 +206,12 @@ const Character = () => {
     }
   };
   
-  const handleLeftArmClick = () => {
+  const handleLeftArmClick = (e: any) => {
+    // Try to stop event propagation
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation();
+    }
+    
     if (!isMoving && !isDancing && !isWaving && interactionType === "none") {
       console.log("Left arm wave animation triggered!");
       setIsWaving(true);
@@ -211,7 +221,12 @@ const Character = () => {
     }
   };
   
-  const handleRightArmClick = () => {
+  const handleRightArmClick = (e: any) => {
+    // Try to stop event propagation
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation();
+    }
+    
     if (!isMoving && !isDancing && !isWaving && interactionType === "none") {
       console.log("Right arm wave animation triggered!");
       setIsWaving(true);
@@ -324,10 +339,7 @@ const Character = () => {
           </mesh>
           
           {/* Left rollerblade with dancing animation */}
-          <group 
-            position={[-0.2, isDancing ? Math.sin(animationTime) * 0.3 : 0, 0]}
-            onClick={handleLegClick}
-          >
+          <group position={[-0.2, isDancing ? Math.sin(animationTime) * 0.3 : 0, 0]}>
             <mesh 
               castShadow 
               position={[0, 0.05, 0]} 
@@ -353,10 +365,7 @@ const Character = () => {
           </group>
           
           {/* Right rollerblade with dancing animation */}
-          <group 
-            position={[0.2, isDancing ? -Math.sin(animationTime) * 0.3 : 0, 0]}
-            onClick={handleLegClick}
-          >
+          <group position={[0.2, isDancing ? -Math.sin(animationTime) * 0.3 : 0, 0]}>
             <mesh 
               castShadow 
               position={[0, 0.05, 0]} 
@@ -381,34 +390,64 @@ const Character = () => {
             </mesh>
           </group>
           
-          {/* Right arm with waving animation */}
-          <mesh 
-            castShadow 
-            position={[0.5, 1.0, 0]} 
-            rotation={[
-              isWaving && waveArm === 'right' ? Math.sin(animationTime) * 0.8 : 0,
-              0, 
-              isMoving ? Math.sin(animationTime) * 0.5 : 0
-            ]}
-            onClick={handleRightArmClick}
+          {/* Visible click area for legs - one big hitbox for both legs */}
+          <mesh
+            position={[0, 0.1, 0]}
+            onClick={handleLegClick}
+            visible={true} // Make visible during debugging, then set to false
           >
-            <capsuleGeometry args={[0.1, 0.6, 4, 8]} />
-            <meshStandardMaterial color="#4285F4" />
+            <boxGeometry args={[0.7, 0.3, 0.7]} />
+            <meshBasicMaterial color="red" transparent opacity={0.5} />
           </mesh>
           
+          {/* Right arm with waving animation */}
+          <group position={[0.5, 1.0, 0]}>
+            <mesh 
+              castShadow 
+              rotation={[
+                isWaving && waveArm === 'right' ? Math.sin(animationTime) * 0.8 : 0,
+                0, 
+                isMoving ? Math.sin(animationTime) * 0.5 : 0
+              ]}
+            >
+              <capsuleGeometry args={[0.1, 0.6, 4, 8]} />
+              <meshStandardMaterial color="#4285F4" />
+            </mesh>
+          </group>
+          
           {/* Left arm with waving animation */}
-          <mesh 
-            castShadow 
-            position={[-0.5, 1.0, 0]} 
-            rotation={[
-              isWaving && waveArm === 'left' ? Math.sin(animationTime) * 0.8 : 0,
-              0, 
-              isMoving ? -Math.sin(animationTime) * 0.5 : 0
-            ]}
-            onClick={handleLeftArmClick}
+          <group position={[-0.5, 1.0, 0]}>
+            <mesh 
+              castShadow 
+              rotation={[
+                isWaving && waveArm === 'left' ? Math.sin(animationTime) * 0.8 : 0,
+                0, 
+                isMoving ? -Math.sin(animationTime) * 0.5 : 0
+              ]}
+            >
+              <capsuleGeometry args={[0.1, 0.6, 4, 8]} />
+              <meshStandardMaterial color="#4285F4" />
+            </mesh>
+          </group>
+          
+          {/* Right arm clickable area */}
+          <mesh
+            position={[0.5, 1.0, 0]}
+            onClick={handleRightArmClick}
+            visible={true} // Make visible during debugging, then set to false
           >
-            <capsuleGeometry args={[0.1, 0.6, 4, 8]} />
-            <meshStandardMaterial color="#4285F4" />
+            <boxGeometry args={[0.25, 0.8, 0.25]} />
+            <meshBasicMaterial color="blue" transparent opacity={0.5} />
+          </mesh>
+          
+          {/* Left arm clickable area */}
+          <mesh
+            position={[-0.5, 1.0, 0]}
+            onClick={handleLeftArmClick}
+            visible={true} // Make visible during debugging, then set to false
+          >
+            <boxGeometry args={[0.25, 0.8, 0.25]} />
+            <meshBasicMaterial color="blue" transparent opacity={0.5} />
           </mesh>
         </group>
       )}
