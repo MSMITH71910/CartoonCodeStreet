@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, PerspectiveCamera, Text } from "@react-three/drei";
 import * as THREE from "three";
 import Street from "./Street";
 import Character from "./Character";
+import StreetSignInfo from "./StreetSignInfo";
 import { usePortfolio } from "../lib/stores/usePortfolio";
 import { useAudio } from "../lib/stores/useAudio";
 
@@ -254,247 +255,82 @@ const Experience = () => {
         </mesh>
         
         {/* Front text for "Michael R. Smith" - Top line */}
-        <mesh position={[0, 3.8, 0.16]}>
-          <planeGeometry args={[3.8, 0.15]} />
-          <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-        </mesh>
+        <Text 
+          position={[0, 3.8, 0.16]} 
+          fontSize={0.25}
+          color="white"
+          font="/fonts/Inter-Bold.woff"
+          anchorX="center"
+          anchorY="middle"
+        >
+          Michael R. Smith
+        </Text>
         
         {/* Front text for "Portfolio Street" - Bottom line */}
-        <mesh position={[0, 3.6, 0.16]}>
-          <planeGeometry args={[3.5, 0.15]} />
-          <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-        </mesh>
+        <Text 
+          position={[0, 3.6, 0.16]} 
+          fontSize={0.22}
+          color="white"
+          font="/fonts/Inter-Bold.woff"
+          anchorX="center"
+          anchorY="middle"
+        >
+          Portfolio Street
+        </Text>
         
         {/* Front text for "Click for info" - Bottom section */}
-        <mesh position={[0, 3.3, 0.16]}>
-          <planeGeometry args={[3, 0.15]} />
-          <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-        </mesh>
+        <Text 
+          position={[0, 3.3, 0.16]} 
+          fontSize={0.20}
+          color="white"
+          font="/fonts/Inter-Regular.woff"
+          anchorX="center"
+          anchorY="middle"
+        >
+          Click for info
+        </Text>
         
         {/* Back text for "Michael R. Smith" - Top line */}
-        <mesh position={[0, 3.8, -0.16]} rotation={[0, Math.PI, 0]}>
-          <planeGeometry args={[3.8, 0.15]} />
-          <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-        </mesh>
+        <Text 
+          position={[0, 3.8, -0.16]} 
+          fontSize={0.25}
+          color="white"
+          font="/fonts/Inter-Bold.woff"
+          anchorX="center"
+          anchorY="middle"
+          rotation={[0, Math.PI, 0]}
+        >
+          Michael R. Smith
+        </Text>
         
         {/* Back text for "Portfolio Street" - Bottom line */}
-        <mesh position={[0, 3.6, -0.16]} rotation={[0, Math.PI, 0]}>
-          <planeGeometry args={[3.5, 0.15]} />
-          <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-        </mesh>
+        <Text 
+          position={[0, 3.6, -0.16]} 
+          fontSize={0.22}
+          color="white"
+          font="/fonts/Inter-Bold.woff"
+          anchorX="center"
+          anchorY="middle"
+          rotation={[0, Math.PI, 0]}
+        >
+          Portfolio Street
+        </Text>
         
         {/* Back text for "Click for info" - Bottom section */}
-        <mesh position={[0, 3.3, -0.16]} rotation={[0, Math.PI, 0]}>
-          <planeGeometry args={[3, 0.15]} />
-          <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-        </mesh>
+        <Text 
+          position={[0, 3.3, -0.16]} 
+          fontSize={0.20}
+          color="white"
+          font="/fonts/Inter-Regular.woff"
+          anchorX="center"
+          anchorY="middle"
+          rotation={[0, Math.PI, 0]}
+        >
+          Click for info
+        </Text>
         
         {/* Info panel when clicked - visible from both sides */}
-        {showSignInfo && (
-          <>
-            {/* Front side panel */}
-            <group position={[0, 3.5, 1]}>
-              {/* Background panel */}
-              <mesh receiveShadow>
-                <boxGeometry args={[6, 4, 0.1]} />
-                <meshStandardMaterial color="#333333" transparent opacity={0.9} side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Header bar - About This Portfolio */}
-              <mesh position={[0, 1.7, 0.06]}>
-                <boxGeometry args={[5.8, 0.6, 0.02]} />
-                <meshStandardMaterial color="#1A237E" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Border */}
-              <mesh position={[0, 0, 0.06]}>
-                <boxGeometry args={[5.9, 3.9, 0.01]} />
-                <meshStandardMaterial color="#555555" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Title - About This Portfolio */}
-              <mesh position={[0, 1.7, 0.07]}>
-                <boxGeometry args={[5, 0.3, 0.01]} />
-                <meshStandardMaterial color="#FFEB3B" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Core Technologies Section */}
-              <mesh position={[0, 1.1, 0.07]}>
-                <boxGeometry args={[5.5, 0.4, 0.01]} />
-                <meshStandardMaterial color="#2196F3" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Core Technologies Label */}
-              <mesh position={[0, 1.1, 0.08]}>
-                <planeGeometry args={[5, 0.25]} />
-                <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Main Frameworks Section */}
-              <mesh position={[0, 0.5, 0.07]}>
-                <boxGeometry args={[5.5, 0.8, 0.01]} />
-                <meshStandardMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Framework Text Lines */}
-              <mesh position={[0, 0.7, 0.08]}>
-                <planeGeometry args={[5, 0.18]} />
-                <meshBasicMaterial color="#000000" side={THREE.DoubleSide} />
-              </mesh>
-              
-              <mesh position={[0, 0.4, 0.08]}>
-                <planeGeometry args={[5, 0.18]} />
-                <meshBasicMaterial color="#000000" side={THREE.DoubleSide} />
-              </mesh>
-              
-              <mesh position={[0, 0.1, 0.08]}>
-                <planeGeometry args={[5, 0.18]} />
-                <meshBasicMaterial color="#000000" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* 3D Features Section */}
-              <mesh position={[0, -0.6, 0.07]}>
-                <boxGeometry args={[5.5, 0.8, 0.01]} />
-                <meshStandardMaterial color="#E0E0E0" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* 3D Features Text Lines */}
-              <mesh position={[0, -0.4, 0.08]}>
-                <planeGeometry args={[5, 0.18]} />
-                <meshBasicMaterial color="#000000" side={THREE.DoubleSide} />
-              </mesh>
-              
-              <mesh position={[0, -0.7, 0.08]}>
-                <planeGeometry args={[5, 0.18]} />
-                <meshBasicMaterial color="#000000" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Interactive Features Section */}
-              <mesh position={[0, -1.2, 0.07]}>
-                <boxGeometry args={[5.5, 0.5, 0.01]} />
-                <meshStandardMaterial color="#4CAF50" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Interactive Features Text */}
-              <mesh position={[0, -1.2, 0.08]}>
-                <planeGeometry args={[5, 0.3]} />
-                <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Footer */}
-              <mesh position={[0, -1.7, 0.06]}>
-                <boxGeometry args={[5.8, 0.6, 0.02]} />
-                <meshStandardMaterial color="#1A237E" side={THREE.DoubleSide} />
-              </mesh>
-              
-              <mesh position={[0, -1.7, 0.07]}>
-                <boxGeometry args={[4, 0.3, 0.01]} />
-                <meshStandardMaterial color="#4FC3F7" side={THREE.DoubleSide} />
-              </mesh>
-            </group>
-            
-            {/* Back side panel */}
-            <group position={[0, 3.5, -1]} rotation={[0, Math.PI, 0]}>
-              {/* Background panel */}
-              <mesh receiveShadow>
-                <boxGeometry args={[6, 4, 0.1]} />
-                <meshStandardMaterial color="#333333" transparent opacity={0.9} side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Header bar - About This Portfolio */}
-              <mesh position={[0, 1.7, 0.06]}>
-                <boxGeometry args={[5.8, 0.6, 0.02]} />
-                <meshStandardMaterial color="#1A237E" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Border */}
-              <mesh position={[0, 0, 0.06]}>
-                <boxGeometry args={[5.9, 3.9, 0.01]} />
-                <meshStandardMaterial color="#555555" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Title - About This Portfolio */}
-              <mesh position={[0, 1.7, 0.07]}>
-                <boxGeometry args={[5, 0.3, 0.01]} />
-                <meshStandardMaterial color="#FFEB3B" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Core Technologies Section */}
-              <mesh position={[0, 1.1, 0.07]}>
-                <boxGeometry args={[5.5, 0.4, 0.01]} />
-                <meshStandardMaterial color="#2196F3" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Core Technologies Label */}
-              <mesh position={[0, 1.1, 0.08]}>
-                <planeGeometry args={[5, 0.25]} />
-                <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Main Frameworks Section */}
-              <mesh position={[0, 0.5, 0.07]}>
-                <boxGeometry args={[5.5, 0.8, 0.01]} />
-                <meshStandardMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Framework Text Lines */}
-              <mesh position={[0, 0.7, 0.08]}>
-                <planeGeometry args={[5, 0.18]} />
-                <meshBasicMaterial color="#000000" side={THREE.DoubleSide} />
-              </mesh>
-              
-              <mesh position={[0, 0.4, 0.08]}>
-                <planeGeometry args={[5, 0.18]} />
-                <meshBasicMaterial color="#000000" side={THREE.DoubleSide} />
-              </mesh>
-              
-              <mesh position={[0, 0.1, 0.08]}>
-                <planeGeometry args={[5, 0.18]} />
-                <meshBasicMaterial color="#000000" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* 3D Features Section */}
-              <mesh position={[0, -0.6, 0.07]}>
-                <boxGeometry args={[5.5, 0.8, 0.01]} />
-                <meshStandardMaterial color="#E0E0E0" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* 3D Features Text Lines */}
-              <mesh position={[0, -0.4, 0.08]}>
-                <planeGeometry args={[5, 0.18]} />
-                <meshBasicMaterial color="#000000" side={THREE.DoubleSide} />
-              </mesh>
-              
-              <mesh position={[0, -0.7, 0.08]}>
-                <planeGeometry args={[5, 0.18]} />
-                <meshBasicMaterial color="#000000" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Interactive Features Section */}
-              <mesh position={[0, -1.2, 0.07]}>
-                <boxGeometry args={[5.5, 0.5, 0.01]} />
-                <meshStandardMaterial color="#4CAF50" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Interactive Features Text */}
-              <mesh position={[0, -1.2, 0.08]}>
-                <planeGeometry args={[5, 0.3]} />
-                <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Footer */}
-              <mesh position={[0, -1.7, 0.06]}>
-                <boxGeometry args={[5.8, 0.6, 0.02]} />
-                <meshStandardMaterial color="#1A237E" side={THREE.DoubleSide} />
-              </mesh>
-              
-              <mesh position={[0, -1.7, 0.07]}>
-                <boxGeometry args={[4, 0.3, 0.01]} />
-                <meshStandardMaterial color="#4FC3F7" side={THREE.DoubleSide} />
-              </mesh>
-            </group>
-          </>
-        )}
+        <StreetSignInfo showInfo={showSignInfo} />
       </group>
       
       {/* Camera controls - always enabled to allow viewing from different angles */}
