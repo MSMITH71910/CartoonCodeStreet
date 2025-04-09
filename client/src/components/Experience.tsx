@@ -13,10 +13,10 @@ const Experience = () => {
   const { characterRef, cameraTarget, isViewingProject } = usePortfolio();
   const { playHit } = useAudio();
   const [signHovered, setSignHovered] = useState(false);
-  const { toggleDetails } = useStreetSign();
+  const { openAboutInfo } = useStreetSign();
   
   const handleSignClick = () => {
-    toggleDetails();
+    openAboutInfo();
     playHit();
   };
 
@@ -252,11 +252,11 @@ const Experience = () => {
                 ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
                 
                 // Text - HUGE and bright yellow
-                ctx.font = "bold 96px Arial";
+                ctx.font = "bold 84px Arial";
                 ctx.fillStyle = "yellow";
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
-                ctx.fillText("PORTFOLIO STREET", canvas.width / 2, canvas.height / 2);
+                ctx.fillText("MICHAEL R. SMITH", canvas.width / 2, canvas.height / 2);
               }
               
               return canvas;
@@ -284,7 +284,7 @@ const Experience = () => {
                 ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
                 
                 // Text - HUGE and bright yellow
-                ctx.font = "bold 96px Arial";
+                ctx.font = "bold 84px Arial";
                 ctx.fillStyle = "yellow";
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";

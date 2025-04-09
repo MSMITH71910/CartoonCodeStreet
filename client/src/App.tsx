@@ -7,7 +7,7 @@ import Experience from "./components/Experience";
 import ProjectDetails from "./components/ProjectDetails";
 import AudioControls from "./components/ui/AudioControls";
 import GameUI from "./components/games/GameUI";
-import StreetSignOverlay from "./components/ui/StreetSignOverlay";
+import AboutInfoDialog from "./components/ui/AboutInfoDialog";
 import { usePortfolio } from "./lib/stores/usePortfolio";
 import { useStreetSign } from "./lib/stores/useStreetSign";
 import { ControlName } from "./lib/constants";
@@ -141,7 +141,11 @@ function App() {
       {/* Mini-games UI */}
       <GameUI />
       
-      {/* We're using sprites directly on the sign now instead of the overlay */}
+      {/* About Info Dialog */}
+      <AboutInfoDialog 
+        isOpen={useStreetSign(state => state.showAboutInfo)}
+        onClose={useStreetSign(state => state.closeAboutInfo)}
+      />
     </div>
   );
 }
