@@ -6,6 +6,8 @@ export interface Project {
   features?: string[];
   challenges?: string;
   url?: string;
+  githubUrl?: string;
+  color?: string; // House color for identification
 }
 
 export const projects: Project[] = [
@@ -22,7 +24,9 @@ export const projects: Project[] = [
       "Order history and tracking"
     ],
     challenges: "Implementing a secure and intuitive checkout process while handling payment gateway integration was challenging but rewarding.",
-    url: "https://example.com/ecommerce"
+    url: "https://example.com/ecommerce",
+    githubUrl: "https://github.com/myusername/ecommerce-platform",
+    color: "#E53935" // Red
   },
   {
     id: "2",
@@ -36,7 +40,9 @@ export const projects: Project[] = [
       "Location search and favorites",
       "Weather alerts and notifications"
     ],
-    challenges: "Optimizing the performance of the application while fetching and displaying large amounts of weather data in real-time."
+    challenges: "Optimizing the performance of the application while fetching and displaying large amounts of weather data in real-time.",
+    githubUrl: "https://github.com/myusername/weather-dashboard",
+    color: "#1E88E5" // Blue
   },
   {
     id: "3",
@@ -50,7 +56,9 @@ export const projects: Project[] = [
       "File attachments and comments",
       "Progress reporting and analytics"
     ],
-    url: "https://example.com/taskmanager"
+    url: "https://example.com/taskmanager",
+    githubUrl: "https://github.com/myusername/task-manager",
+    color: "#43A047" // Green
   },
   {
     id: "4",
@@ -64,7 +72,9 @@ export const projects: Project[] = [
       "Goal setting and achievements",
       "Integration with wearable devices"
     ],
-    challenges: "Creating a seamless cross-platform experience while handling complex health data visualization and integration with external devices."
+    challenges: "Creating a seamless cross-platform experience while handling complex health data visualization and integration with external devices.",
+    githubUrl: "https://github.com/myusername/fitness-tracker",
+    color: "#8E24AA" // Purple
   },
   {
     id: "5",
@@ -78,20 +88,8 @@ export const projects: Project[] = [
       "Content calendar and planning tools",
       "Automated reporting"
     ],
-    url: "https://example.com/socialdashboard"
-  },
-  {
-    id: "6",
-    title: "Virtual Event Platform",
-    description: "A virtual event platform for hosting conferences, webinars, and workshops with interactive features for attendees.",
-    technologies: ["React", "WebRTC", "Socket.io", "Node.js"],
-    features: [
-      "Live streaming and recording",
-      "Virtual networking and breakout rooms",
-      "Interactive Q&A and polling",
-      "Exhibitor booths and sponsor showcases",
-      "Attendee engagement tracking"
-    ],
-    challenges: "Building a robust real-time communication system that could handle hundreds of concurrent users while maintaining video and audio quality."
+    url: "https://example.com/socialdashboard",
+    githubUrl: "https://github.com/myusername/social-dashboard",
+    color: "#FB8C00" // Orange
   }
 ];

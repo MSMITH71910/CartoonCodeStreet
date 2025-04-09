@@ -105,6 +105,51 @@ const Street = () => {
       });
     }
     
+    // Add basketball courts
+    positions.push({
+      type: "basketball",
+      position: [-14, 0, -15],
+      rotation: [0, Math.PI / 4, 0],
+      scale: [1.2, 1.2, 1.2]
+    });
+    
+    positions.push({
+      type: "basketball",
+      position: [14, 0, 28],
+      rotation: [0, -Math.PI / 4, 0],
+      scale: [1.2, 1.2, 1.2]
+    });
+    
+    // Add seesaws (playground)
+    positions.push({
+      type: "seesaw",
+      position: [-15, 0, 0],
+      rotation: [0, Math.PI / 6, 0],
+      scale: [1, 1, 1]
+    });
+    
+    positions.push({
+      type: "seesaw",
+      position: [15, 0, -18],
+      rotation: [0, -Math.PI / 6, 0],
+      scale: [1, 1, 1]
+    });
+    
+    // Add fountain
+    positions.push({
+      type: "fountain",
+      position: [0, 0, -25],
+      rotation: [0, 0, 0],
+      scale: [1.5, 1.5, 1.5]
+    });
+    
+    positions.push({
+      type: "fountain",
+      position: [0, 0, 25],
+      rotation: [0, 0, 0],
+      scale: [1.5, 1.5, 1.5]
+    });
+    
     return positions;
   }, []);
   

@@ -26,8 +26,13 @@ const House = ({ position, rotation, project }: HouseProps) => {
   
   const { playHit, playSuccess } = useAudio();
   
-  // Generate a unique color for this house based on project id
+  // Use project's color or generate a color based on project ID
   const houseColor = useMemo(() => {
+    if (project.color) {
+      return project.color;
+    }
+    
+    // Fallback colors if project.color is not provided
     const colors = [
       "#E53935", // Red
       "#43A047", // Green
@@ -44,7 +49,7 @@ const House = ({ position, rotation, project }: HouseProps) => {
     // Use project id to select a color
     const colorIndex = parseInt(project.id) % colors.length;
     return colors[colorIndex];
-  }, [project.id]);
+  }, [project.id, project.color]);
   
   // Animation for hovering and door opening
   useFrame((state, delta) => {
@@ -178,13 +183,64 @@ const House = ({ position, rotation, project }: HouseProps) => {
         <meshStandardMaterial color="#B3E5FC" roughness={0.2} metalness={0.2} />
       </mesh>
       
-      {/* Project title indicator (we'll add proper text later) */}
-      {isNearby && (
-        <mesh position={[0, 4.5, 0]}>
-          <boxGeometry args={[2, 0.5, 0.1]} />
-          <meshStandardMaterial color="white" />
+      {/* Project sign - always visible */}
+      <group position={[0, 4.5, 0]}>
+        {/* Sign board */}
+        <mesh castShadow>
+          <boxGeometry args={[2.5, 0.8, 0.1]} />
+          <meshStandardMaterial color="#FFD700" />
         </mesh>
-      )}
+        
+        {/* Sign post */}
+        <mesh position={[0, -1, 0]} castShadow>
+          <boxGeometry args={[0.15, 1.5, 0.15]} />
+          <meshStandardMaterial color="#8B4513" roughness={0.9} />
+        </mesh>
+        
+        {/* Project name (canvas texture with text) */}
+        <mesh position={[0, 0, 0.06]}>
+          <planeGeometry args={[2.2, 0.5]} />
+          <meshStandardMaterial 
+            color="#8B0000" 
+            emissive="#8B0000" 
+            emissiveIntensity={0.2}
+          >
+            {/* Create dynamic canvas texture with project name */}
+            {(() => {
+              // Create a canvas for the texture
+              const canvas = document.createElement('canvas');
+              canvas.width = 256;
+              canvas.height = 64;
+              const context = canvas.getContext('2d');
+              
+              if (context) {
+                // Background
+                context.fillStyle = '#8B0000';
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Text
+                context.font = 'bold 28px Arial';
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                context.fillStyle = '#FFFFFF';
+                
+                // Add project name, truncate if too long
+                let displayName = project.title;
+                if (displayName.length > 18) {
+                  displayName = displayName.substring(0, 16) + "...";
+                }
+                context.fillText(displayName, canvas.width / 2, canvas.height / 2);
+                
+                // Create texture from canvas
+                const texture = new THREE.CanvasTexture(canvas);
+                return <primitive attach="map" object={texture} />;
+              }
+              
+              return null;
+            })()}
+          </meshStandardMaterial>
+        </mesh>
+      </group>
       
       {/* Interactive indicator when player is nearby */}
       {isNearby && (
