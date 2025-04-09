@@ -143,23 +143,21 @@ export const useAudio = create<AudioState>((set, get) => ({
     // Update state
     set({ isMusicMuted: newMusicMutedState });
     
-    // If sound is not fully muted, handle music toggle
-    if (!isMuted) {
-      if (newMusicMutedState) {
-        // Music muting - pause all music
-        if (backgroundMusic) backgroundMusic.pause();
-        if (currentActivityMusic) currentActivityMusic.pause();
-      } else {
-        // Music unmuting - play appropriate music
-        if (currentActivityMusic) {
-          currentActivityMusic.play().catch(error => {
-            console.log("Activity music play prevented:", error);
-          });
-        } else if (backgroundMusic) {
-          backgroundMusic.play().catch(error => {
-            console.log("Background music play prevented:", error);
-          });
-        }
+    // Always handle music toggle, regardless of isMuted state
+    if (newMusicMutedState) {
+      // Music muting - pause all music
+      if (backgroundMusic) backgroundMusic.pause();
+      if (currentActivityMusic) currentActivityMusic.pause();
+    } else if (!isMuted) {
+      // Music unmuting (only if sound is not fully muted) - play appropriate music
+      if (currentActivityMusic) {
+        currentActivityMusic.play().catch(error => {
+          console.log("Activity music play prevented:", error);
+        });
+      } else if (backgroundMusic) {
+        backgroundMusic.play().catch(error => {
+          console.log("Background music play prevented:", error);
+        });
       }
     }
     

@@ -510,6 +510,21 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
             </mesh>
           )}
           
+          {/* Instruction for basketball */}
+          {hovered && !ballPosition && (
+            <group position={[0, 2, 1.5]}>
+              <mesh>
+                <planeGeometry args={[1.2, 0.4]} />
+                <meshBasicMaterial color="black" transparent opacity={0.8} />
+              </mesh>
+              <mesh position={[0, 0, 0.01]}>
+                <planeGeometry args={[1, 0.3]} />
+                <meshBasicMaterial color="#333" transparent opacity={0.9} />
+              </mesh>
+              <pointLight position={[0, 0, 0.5]} intensity={0.2} distance={1} />
+            </group>
+          )}
+          
           {/* Score display */}
           <group position={[0, 4, 0]}>
             <mesh>
@@ -529,11 +544,15 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
             <mesh 
               position={[0, 1, 1]} 
               onClick={(e: any) => {
-                if (e.stopPropagation) e.stopPropagation();
-                const angle = Math.PI / 4; // 45 degrees
+                e.stopPropagation();
+                // Launch the basketball
                 setBallPosition(new THREE.Vector3(0, 1, 1));
-                setBallVelocity(new THREE.Vector3(0, 3, -3));
+                setBallVelocity(new THREE.Vector3(0, 5, -5)); // Increase velocity for better arc
+                
+                // Play sound and activity music
                 playHit();
+                const musicType = getActivityMusicType();
+                if (musicType) playActivityMusic(musicType);
               }}
             >
               <sphereGeometry args={[0.2, 16, 16]} />
