@@ -7,8 +7,24 @@ const AudioControls: React.FC = () => {
     isMusicMuted, 
     toggleMute, 
     toggleMusicMute,
-    currentActivityMusic
+    currentActivityMusic,
+    basketballMusic,
+    chessMusicOrSimilar,
+    fountainMusic,
+    seesawMusic
   } = useAudio();
+  
+  // Helper function to determine which activity music is playing
+  const getCurrentMusicType = () => {
+    if (!currentActivityMusic) return "Background";
+    
+    if (currentActivityMusic === basketballMusic) return "Basketball";
+    if (currentActivityMusic === chessMusicOrSimilar) return "Game Music";
+    if (currentActivityMusic === fountainMusic) return "Fountain";
+    if (currentActivityMusic === seesawMusic) return "Playground";
+    
+    return "Playing...";
+  };
 
   return (
     <div className="absolute top-5 right-5 z-50 flex flex-col gap-2">
@@ -28,17 +44,21 @@ const AudioControls: React.FC = () => {
         className="bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
         aria-label={isMusicMuted ? "Unmute Music" : "Mute Music"}
         title={isMusicMuted ? "Unmute Music" : "Mute Music"}
-        disabled={isMuted}
       >
         {isMusicMuted ? "🎵 ✕" : "🎵 ✓"}
       </button>
       
       {/* Show current music if playing */}
       {currentActivityMusic && !isMuted && !isMusicMuted && (
-        <div className="bg-black bg-opacity-50 text-white p-2 rounded text-xs animate-pulse">
-          🎵 Playing...
+        <div className="bg-black bg-opacity-50 text-white p-2 rounded text-xs animate-pulse whitespace-nowrap">
+          🎵 {getCurrentMusicType()}
         </div>
       )}
+      
+      {/* Show which control does what */}
+      <div className="bg-black bg-opacity-70 text-white p-2 rounded text-xs mt-1 whitespace-nowrap pointer-events-none">
+        Click objects to interact
+      </div>
     </div>
   );
 };

@@ -52,6 +52,19 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
     }
   };
   
+  // Determine the music type based on activity
+  const getActivityMusicType = () => {
+    switch (type) {
+      case "basketball": return "basketball";
+      case "mailbox":
+      case "hydrant":
+      case "tree": return "chessMusicOrSimilar";
+      case "fountain": return "fountain";
+      case "seesaw": return "seesaw";
+      default: return null;
+    }
+  };
+  
   // Interaction handlers
   const handlePointerOver = () => setHovered(true);
   const handlePointerOut = () => setHovered(false);
@@ -70,7 +83,10 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
         const angle = Math.PI / 4; // 45 degrees
         setBallPosition(new THREE.Vector3(0, 1, 1));
         setBallVelocity(new THREE.Vector3(0, 3, -3));
-        playActivityMusic("basketball");
+        
+        // Play the correct music for this activity
+        const musicType = getActivityMusicType();
+        if (musicType) playActivityMusic(musicType);
       }
       return;
     }
@@ -78,7 +94,8 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
     // Special case for fountain
     if (type === "fountain") {
       // Toggle fountain particles
-      playActivityMusic("fountain");
+      const musicType = getActivityMusicType();
+      if (musicType) playActivityMusic(musicType);
       return;
     }
     
@@ -110,10 +127,12 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
     
     if (interactionType !== "none") {
       startInteraction(interactionType, objectId, interactPos, interactRot);
-      playActivityMusic(interactionType);
+      const musicType = getActivityMusicType();
+      if (musicType) playActivityMusic(musicType);
     } else if (miniGameType) {
       startInteraction(miniGameType, objectId, interactPos, interactRot);
-      playActivityMusic("chessMusicOrSimilar");
+      const musicType = getActivityMusicType();
+      if (musicType) playActivityMusic(musicType);
     }
   };
   

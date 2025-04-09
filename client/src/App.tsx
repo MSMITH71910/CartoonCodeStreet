@@ -63,13 +63,25 @@ function App() {
       <AudioControls />
 
       {/* Instructions overlay */}
-      <div className="absolute top-5 left-5 z-50 bg-black bg-opacity-50 text-white p-3 rounded max-w-xs">
-        <h2 className="text-lg font-bold mb-2">Controls</h2>
+      <div className="absolute top-5 left-5 z-50 bg-black bg-opacity-70 text-white p-3 rounded max-w-xs">
+        <h2 className="text-lg font-bold mb-2">Controls & Interactions</h2>
         <p>W/↑ - Move forward</p>
         <p>S/↓ - Move backward</p>
         <p>A/← - Turn left</p>
         <p>D/→ - Turn right</p>
-        <p>E/Space - Interact</p>
+        <p>E/Space - Interact with objects</p>
+        <div className="mt-2 border-t pt-2 border-gray-600">
+          <p className="font-semibold">Interactions:</p>
+          <p>• Click houses to view projects</p>
+          <p>• Use benches to sit down</p>
+          <p>• Play basketball at the hoops</p>
+          <p>• Interact with mailbox for Hangman</p>
+          <p>• Visit hydrants for Tic-Tac-Toe</p>
+          <p>• Trees allow playing Checkers</p>
+        </div>
+        <div className="mt-2 border-t pt-2 border-gray-600">
+          <p>Different activities play unique music!</p>
+        </div>
       </div>
 
       {showCanvas && (
@@ -77,7 +89,7 @@ function App() {
           <Canvas
             shadows
             camera={{
-              position: [0, 5, 10],
+              position: [0, 5, -10], // Changed Z from 10 to -10 to face the character
               fov: 60,
               near: 0.1,
               far: 1000
