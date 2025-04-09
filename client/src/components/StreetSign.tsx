@@ -35,67 +35,104 @@ const StreetSign: React.FC<StreetSignProps> = ({ position }) => {
   
   return (
     <group ref={signRef} position={position}>
-      {/* Sign post */}
-      <mesh 
-        castShadow 
-        position={[0, 1, 0]}
-      >
-        <cylinderGeometry args={[0.1, 0.1, 2, 16]} />
+      {/* Sign posts - two sturdy poles */}
+      <mesh castShadow position={[-2, 2, 0]}>
+        <cylinderGeometry args={[0.2, 0.2, 4, 16]} />
         <meshStandardMaterial color="#8B4513" />
       </mesh>
       
-      {/* Sign board */}
+      <mesh castShadow position={[2, 2, 0]}>
+        <cylinderGeometry args={[0.2, 0.2, 4, 16]} />
+        <meshStandardMaterial color="#8B4513" />
+      </mesh>
+      
+      {/* Large billboard sign */}
       <group 
-        position={[0, 2, 0]} 
-        rotation={[0, Math.PI / 4, 0]} // Rotate the sign for better visibility
+        position={[0, 3.5, 0]} 
+        rotation={[0, 0, 0]} 
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
         onClick={handleSignClick}
       >
+        {/* Main sign background */}
         <mesh castShadow receiveShadow>
-          <boxGeometry args={[3, 1, 0.1]} />
-          <meshStandardMaterial color={hovered ? "#4CAF50" : "#2E7D32"} />
+          <boxGeometry args={[5, 2, 0.2]} />
+          <meshStandardMaterial color={hovered ? "#4285F4" : "#1E88E5"} />
         </mesh>
         
-        {/* White border for sign */}
-        <mesh position={[0, 0, 0.01]}>
-          <boxGeometry args={[3.2, 1.2, 0.01]} />
-          <meshStandardMaterial color="white" />
+        {/* Sign border */}
+        <mesh position={[0, 0, 0.11]}>
+          <boxGeometry args={[5.2, 2.2, 0.01]} />
+          <meshStandardMaterial color="#FFFFFF" />
         </mesh>
         
-        {/* Sign text */}
+        {/* Inner part with text */}
+        <mesh position={[0, 0, 0.12]}>
+          <boxGeometry args={[4.8, 1.8, 0.01]} />
+          <meshStandardMaterial color={hovered ? "#4285F4" : "#1E88E5"} />
+        </mesh>
+        
+        {/* Title text */}
         <Text
-          position={[0, 0, 0.06]}
+          position={[0, 0.5, 0.15]}
           color="white"
-          fontSize={0.2}
-          maxWidth={2.8}
+          fontSize={0.4}
+          maxWidth={4.5}
           textAlign="center"
           font="bold"
         >
           Michael R Smith Portfolio Street
         </Text>
+        
+        {/* Subtitle */}
+        <Text
+          position={[0, -0.2, 0.15]}
+          color="#FFEB3B"
+          fontSize={0.25}
+          maxWidth={4.5}
+          textAlign="center"
+        >
+          Interactive 3D Experience
+        </Text>
+        
+        {/* Instruction */}
+        <Text
+          position={[0, -0.6, 0.15]}
+          color="white"
+          fontSize={0.2}
+          maxWidth={4.5}
+          textAlign="center"
+        >
+          Click for more information
+        </Text>
       </group>
       
-      {/* Info popup when clicked */}
+      {/* Info panel when clicked */}
       {showInfo && (
-        <group position={[0, 3.5, 0]} rotation={[0, Math.PI / 4, 0]}>
+        <group position={[0, 3.5, 1]} rotation={[0, 0, 0]}>
           {/* Background with border */}
           <mesh>
-            <boxGeometry args={[4, 2.5, 0.1]} />
+            <boxGeometry args={[6, 4, 0.2]} />
             <meshStandardMaterial color="#333333" transparent opacity={0.95} />
           </mesh>
           
-          {/* White border */}
-          <mesh position={[0, 0, -0.01]}>
-            <boxGeometry args={[4.1, 2.6, 0.01]} />
+          {/* Border */}
+          <mesh position={[0, 0, 0.11]}>
+            <boxGeometry args={[6.2, 4.2, 0.01]} />
             <meshStandardMaterial color="#555555" />
           </mesh>
           
+          {/* Header */}
+          <mesh position={[0, 1.7, 0.15]}>
+            <boxGeometry args={[5.8, 0.6, 0.01]} />
+            <meshStandardMaterial color="#1A237E" />
+          </mesh>
+          
           <Text
-            position={[0, 0.9, 0.06]}
-            color="#FFEB3B" // Yellow title
-            fontSize={0.25}
-            maxWidth={3.8}
+            position={[0, 1.7, 0.16]}
+            color="#FFEB3B"
+            fontSize={0.4}
+            maxWidth={5.5}
             textAlign="center"
             font="bold"
           >
@@ -103,10 +140,10 @@ const StreetSign: React.FC<StreetSignProps> = ({ position }) => {
           </Text>
           
           <Text
-            position={[0, 0.1, 0.06]}
+            position={[0, 0.7, 0.16]}
             color="white"
-            fontSize={0.15}
-            maxWidth={3.6}
+            fontSize={0.25}
+            maxWidth={5.5}
             textAlign="left"
             lineHeight={1.5}
           >
@@ -119,24 +156,30 @@ const StreetSign: React.FC<StreetSignProps> = ({ position }) => {
           </Text>
           
           <Text
-            position={[0, -0.5, 0.06]}
+            position={[0, -0.3, 0.16]}
             color="#E0E0E0"
-            fontSize={0.15}
-            maxWidth={3.6}
+            fontSize={0.25}
+            maxWidth={5.5}
             textAlign="left"
             lineHeight={1.5}
           >
             This 3D portfolio features custom character
-            animations, interactive objects, and fully
+            animations, interactive objects, and a fully
             explorable environment with houses that
             represent different projects.
           </Text>
           
+          {/* Footer */}
+          <mesh position={[0, -1.7, 0.15]}>
+            <boxGeometry args={[5.8, 0.6, 0.01]} />
+            <meshStandardMaterial color="#1A237E" />
+          </mesh>
+          
           <Text
-            position={[0, -1.1, 0.06]}
+            position={[0, -1.7, 0.16]}
             color="#4FC3F7"
-            fontSize={0.15}
-            maxWidth={3.8}
+            fontSize={0.3}
+            maxWidth={5.5}
             textAlign="center"
             font="bold"
           >

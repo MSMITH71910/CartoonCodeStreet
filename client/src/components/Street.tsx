@@ -234,8 +234,8 @@ const Street = () => {
         />
       ))}
       
-      {/* Street sign with portfolio info - placed at the entrance of the street */}
-      <StreetSign position={[0, 0, 35]} />
+      {/* Large billboard street sign with portfolio info - placed near the character's starting position */}
+      <StreetSign position={[0, 0, 10]} />
     </group>
   );
 };
