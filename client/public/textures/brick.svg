@@ -1,0 +1,23 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="brick-pattern" patternUnits="userSpaceOnUse" width="100" height="50" patternTransform="scale(0.5)">
+      <!-- First row of bricks -->
+      <rect x="0" y="0" width="90" height="20" fill="#b35c44" />
+      <rect x="0" y="0" width="90" height="20" fill="none" stroke="#7d4032" stroke-width="1" />
+      
+      <rect x="95" y="0" width="90" height="20" fill="#b35c44" />
+      <rect x="95" y="0" width="90" height="20" fill="none" stroke="#7d4032" stroke-width="1" />
+      
+      <!-- Second row of bricks (offset) -->
+      <rect x="47.5" y="25" width="90" height="20" fill="#b35c44" />
+      <rect x="47.5" y="25" width="90" height="20" fill="none" stroke="#7d4032" stroke-width="1" />
+      
+      <rect x="142.5" y="25" width="90" height="20" fill="#b35c44" />
+      <rect x="142.5" y="25" width="90" height="20" fill="none" stroke="#7d4032" stroke-width="1" />
+      
+      <rect x="-47.5" y="25" width="90" height="20" fill="#b35c44" />
+      <rect x="-47.5" y="25" width="90" height="20" fill="none" stroke="#7d4032" stroke-width="1" />
+    </pattern>
+  </defs>
+  <rect width="200" height="200" fill="url(#brick-pattern)" />
+</svg>

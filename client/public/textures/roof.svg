@@ -1,0 +1,15 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="roof-pattern" patternUnits="userSpaceOnUse" width="60" height="30" patternTransform="scale(0.5)">
+      <!-- First row of shingles -->
+      <rect x="0" y="0" width="30" height="15" rx="2" fill="#4d3528" />
+      <rect x="30" y="0" width="30" height="15" rx="2" fill="#5a3e30" />
+      
+      <!-- Second row of shingles (offset) -->
+      <rect x="15" y="15" width="30" height="15" rx="2" fill="#4d3528" />
+      <rect x="45" y="15" width="30" height="15" rx="2" fill="#5a3e30" />
+      <rect x="-15" y="15" width="30" height="15" rx="2" fill="#5a3e30" />
+    </pattern>
+  </defs>
+  <rect width="200" height="200" fill="url(#roof-pattern)" />
+</svg>

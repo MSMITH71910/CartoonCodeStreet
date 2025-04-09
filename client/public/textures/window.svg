@@ -1,0 +1,14 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#81d4fa" />
+  
+  <!-- Window frame -->
+  <rect x="0" y="0" width="200" height="200" fill="none" stroke="#5d4037" stroke-width="20" />
+  
+  <!-- Window dividers -->
+  <line x1="100" y1="0" x2="100" y2="200" stroke="#5d4037" stroke-width="10" />
+  <line x1="0" y1="100" x2="200" y2="100" stroke="#5d4037" stroke-width="10" />
+  
+  <!-- Window reflections -->
+  <rect x="20" y="20" width="30" height="30" rx="5" fill="#e1f5fe" opacity="0.5" />
+  <rect x="120" y="120" width="40" height="40" rx="5" fill="#e1f5fe" opacity="0.5" />
+</svg>
