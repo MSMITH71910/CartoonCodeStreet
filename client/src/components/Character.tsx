@@ -161,25 +161,25 @@ const Character = () => {
       */}
       {interactionType === "sitting" || interactionType === "seesaw" ? (
         // Enhanced character sitting model specifically designed to work on sidewalk benches
-        <group>
+        <group rotation={[0, Math.PI, 0]}>
           {/* Torso - properly positioned to sit on bench */}
-          <mesh castShadow position={[0, 0.0, 0.0]}>
+          <mesh castShadow position={[0, 0.0, 0.15]}>
             <boxGeometry args={[0.3, 0.4, 0.2]} />
             <meshStandardMaterial color="#4285F4" />
           </mesh>
           
-          {/* Head - facing towards street */}
-          <mesh castShadow position={[0, 0.3, 0.0]}>
+          {/* Head - properly facing forward */}
+          <mesh castShadow position={[0, 0.3, 0.15]}>
             <sphereGeometry args={[0.15, 16, 16]} />
             <meshStandardMaterial color="#FFCC00" />
           </mesh>
           
-          {/* Eyes - positioned based on bench rotation to always face street */}
-          <mesh position={[0, 0.33, 0.15]}>
+          {/* Eyes - clearly facing forward (away from backrest) */}
+          <mesh position={[0.05, 0.33, 0.25]}>
             <sphereGeometry args={[0.03, 16, 16]} />
             <meshBasicMaterial color="black" />
           </mesh>
-          <mesh position={[-0, 0.33, 0.15]}>
+          <mesh position={[-0.05, 0.33, 0.25]}>
             <sphereGeometry args={[0.03, 16, 16]} />
             <meshBasicMaterial color="black" />
           </mesh>

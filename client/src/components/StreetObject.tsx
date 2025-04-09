@@ -108,8 +108,10 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
         );
       }
       
-      // Always face toward the street
-      interactRot = benchRotationY; // Match bench rotation exactly
+      // Character always faces toward the street by matching bench rotation
+      // For benches on the right, they face left (PI)
+      // For benches on the left, they face right (0)
+      interactRot = benchRotationY;
     } else if (type === "seesaw") {
       // Position character on one end of seesaw
       interactPos = new THREE.Vector3(
