@@ -87,15 +87,30 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
     let interactRot = rotation[1]; // Use Y rotation
     
     if (type === "bench") {
-      // Place character perfectly centered on the redesigned bench
-      interactPos = new THREE.Vector3(
-        position[0] - 0.05,        // Slightly left of center to avoid clipping with bench back
-        position[1] + 0.35,        // Perfect height to sit on the redesigned bench
-        position[2]                // Centered on Z axis
-      );
+      // Position character to sit exactly on the bench
+      // Different positioning based on bench placement and rotation
+      const benchRotationY = rotation[1]; // Get the bench's Y rotation
       
-      // Set rotation to face front (fixed direction for all benches)
-      interactRot = Math.PI;       // Always face forward
+      // Calculate position based on bench rotation
+      // For benches on right sidewalk (rotation = PI)
+      if (Math.abs(benchRotationY - Math.PI) < 0.1) {
+        interactPos = new THREE.Vector3(
+          position[0] - 0.15,      // Slightly left of bench center
+          position[1] + 0.32,      // Exact height to sit on bench
+          position[2] - 0.1        // Slightly forward to avoid back collision
+        );
+      }
+      // For benches on left sidewalk (rotation = 0)
+      else {
+        interactPos = new THREE.Vector3(
+          position[0] + 0.15,      // Slightly right of bench center
+          position[1] + 0.32,      // Exact height to sit on bench
+          position[2] - 0.1        // Slightly forward to avoid back collision
+        );
+      }
+      
+      // Always face toward the street
+      interactRot = benchRotationY; // Use the bench's rotation
     } else if (type === "seesaw") {
       // Position character on one end of seesaw
       interactPos = new THREE.Vector3(

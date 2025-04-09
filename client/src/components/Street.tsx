@@ -71,19 +71,21 @@ const Street = () => {
       });
     }
     
-    // Benches along the street
-    for (let i = -40; i <= 40; i += 20) {
+    // Benches positioned on the sidewalks
+    for (let i = -40; i <= 40; i += 15) {
+      // Left sidewalk benches - facing the street
       positions.push({
         type: "bench",
-        position: [-4, 0, i + 5],
-        rotation: [0, Math.PI / 2, 0],
+        position: [-7, 0, i + 5], // Moved from -4 to -7 (onto the sidewalk)
+        rotation: [0, 0, 0],      // Rotate to face the street
         scale: [1, 1, 1]
       });
       
+      // Right sidewalk benches - facing the street
       positions.push({
         type: "bench",
-        position: [4, 0, i - 5],
-        rotation: [0, -Math.PI / 2, 0],
+        position: [7, 0, i - 5],  // Moved from 4 to 7 (onto the sidewalk)
+        rotation: [0, Math.PI, 0], // Rotate to face the street
         scale: [1, 1, 1]
       });
     }
@@ -169,7 +171,7 @@ const Street = () => {
         />
       </mesh>
 
-      {/* Sidewalks */}
+      {/* Sidewalks - adjusted to match the new bench positions */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-7, 0.05, 0]} receiveShadow>
         <planeGeometry args={[4, 100]} />
         <meshStandardMaterial color="#888888" roughness={1} metalness={0} />
