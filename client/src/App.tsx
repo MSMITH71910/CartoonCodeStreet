@@ -141,12 +141,7 @@ function App() {
       {/* Mini-games UI */}
       <GameUI />
       
-      {/* Street sign overlay */}
-      <StreetSignOverlay 
-        visible={useStreetSign(state => state.isNearSign)}
-        showDetails={useStreetSign(state => state.showDetails)}
-        onClose={useStreetSign(state => state.toggleDetails)}
-      />
+      {/* We're using sprites directly on the sign now instead of the overlay */}
     </div>
   );
 }
