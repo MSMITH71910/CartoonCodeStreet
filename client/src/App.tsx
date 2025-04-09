@@ -7,7 +7,9 @@ import Experience from "./components/Experience";
 import ProjectDetails from "./components/ProjectDetails";
 import AudioControls from "./components/ui/AudioControls";
 import GameUI from "./components/games/GameUI";
+import StreetSignOverlay from "./components/ui/StreetSignOverlay";
 import { usePortfolio } from "./lib/stores/usePortfolio";
+import { useStreetSign } from "./lib/stores/useStreetSign";
 import { ControlName } from "./lib/constants";
 
 // Define control keys for the character movement
@@ -138,6 +140,13 @@ function App() {
       
       {/* Mini-games UI */}
       <GameUI />
+      
+      {/* Street sign overlay */}
+      <StreetSignOverlay 
+        visible={useStreetSign(state => state.isNearSign)}
+        showDetails={useStreetSign(state => state.showDetails)}
+        onClose={useStreetSign(state => state.toggleDetails)}
+      />
     </div>
   );
 }

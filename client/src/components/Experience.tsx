@@ -6,17 +6,17 @@ import Street from "./Street";
 import Character from "./Character";
 import { usePortfolio } from "../lib/stores/usePortfolio";
 import { useAudio } from "../lib/stores/useAudio";
-import StreetSignOverlay from "./ui/StreetSignOverlay";
+import { useStreetSign } from "../lib/stores/useStreetSign";
 
 const Experience = () => {
   const { camera } = useThree();
   const { characterRef, cameraTarget, isViewingProject } = usePortfolio();
   const { playHit } = useAudio();
   const [signHovered, setSignHovered] = useState(false);
-  const [showSignInfo, setShowSignInfo] = useState(false);
+  const { toggleDetails } = useStreetSign();
   
   const handleSignClick = () => {
-    setShowSignInfo(!showSignInfo);
+    toggleDetails();
     playHit();
   };
 
@@ -154,8 +154,8 @@ const Experience = () => {
     };
   }, []);
 
-  // State to control sign overlay visibility
-  const [isNearSign, setIsNearSign] = useState(false);
+  // Use the street sign store
+  const { setIsNearSign } = useStreetSign();
   
   // Check if character is near the sign
   useFrame(() => {
@@ -171,13 +171,6 @@ const Experience = () => {
 
   return (
     <>
-      {/* Street sign overlay - HTML based for better readability */}
-      <StreetSignOverlay 
-        visible={isNearSign} 
-        showDetails={showSignInfo}
-        onClose={handleSignClick}
-      />
-      
       {/* Main scene lighting - improved for better visibility from all angles */}
       <ambientLight intensity={0.7} /> {/* Brighter ambient light to see everything */}
       
