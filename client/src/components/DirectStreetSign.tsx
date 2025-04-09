@@ -1,32 +1,24 @@
-import { useState, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
-import { Text } from '@react-three/drei';
-import { useAudio } from '../lib/stores/useAudio';
+import { useState, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import { Text } from "@react-three/drei";
+import { useAudio } from "../lib/stores/useAudio";
 
-interface StreetSignProps {
-  position: [number, number, number];
-  rotation?: [number, number, number];
-}
-
-const StreetSign: React.FC<StreetSignProps> = ({ position, rotation = [0, 0, 0] }) => {
-  // Use the passed position and rotation directly
-  const adjustedPosition: [number, number, number] = [position[0], position[1], position[2]];
-  const { playHit } = useAudio();
-  const [showInfo, setShowInfo] = useState(false);
-  const [hovered, setHovered] = useState(false);
+const DirectStreetSign = () => {
   const signRef = useRef<THREE.Group>(null);
-  
+  const [hovered, setHovered] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+  const { playHit } = useAudio();
+
   // Subtle hover animation
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (!signRef.current) return;
     
     if (hovered) {
       // Gentle hovering animation
-      signRef.current.position.y = adjustedPosition[1] + Math.sin(state.clock.getElapsedTime() * 2) * 0.05;
+      signRef.current.position.y = Math.sin(state.clock.getElapsedTime() * 2) * 0.05;
     } else {
       // Reset to original position
-      signRef.current.position.y = adjustedPosition[1];
+      signRef.current.position.y = 0;
     }
   });
   
@@ -37,7 +29,7 @@ const StreetSign: React.FC<StreetSignProps> = ({ position, rotation = [0, 0, 0] 
   };
   
   return (
-    <group ref={signRef} position={adjustedPosition} rotation={rotation}>
+    <group ref={signRef} position={[0, 0, 25]} rotation={[0, Math.PI, 0]}>
       {/* Sign posts - two sturdy poles */}
       <mesh castShadow position={[-2, 2, 0]}>
         <cylinderGeometry args={[0.2, 0.2, 4, 16]} />
@@ -194,4 +186,4 @@ const StreetSign: React.FC<StreetSignProps> = ({ position, rotation = [0, 0, 0] 
   );
 };
 
-export default StreetSign;
+export default DirectStreetSign;

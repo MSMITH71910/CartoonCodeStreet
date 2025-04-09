@@ -236,7 +236,8 @@ const Street = () => {
       {/* Add portfolio street sign at the beginning of the street */}
       {/* Sign faces toward player's starting position */}
       <StreetSign
-        position={[0, 0, 10]}
+        position={[0, 0, 15]}
+        rotation={[0, Math.PI, 0]}
       />
     </group>
   );
