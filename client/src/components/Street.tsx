@@ -71,21 +71,21 @@ const Street = () => {
       });
     }
     
-    // Benches positioned on the sidewalks - facing TOWARD the street (inward) at 90-degree angles
+    // Benches positioned on the sidewalks - facing TOWARD the street at direct 90-degree angles
     for (let i = -40; i <= 40; i += 15) {
-      // Left sidewalk benches - facing RIGHT toward the street
+      // Left sidewalk benches - facing directly RIGHT (EAST) toward the street
       positions.push({
         type: "bench",
         position: [-7, 0, i + 5], // On the left sidewalk
-        rotation: [0, -Math.PI / 2, 0], // Face directly toward the street (right/east)
+        rotation: [0, 0, 0], // Face RIGHT/EAST directly toward the street
         scale: [1, 1, 1]
       });
       
-      // Right sidewalk benches - facing LEFT toward the street
+      // Right sidewalk benches - facing directly LEFT (WEST) toward the street
       positions.push({
         type: "bench",
         position: [7, 0, i - 5],  // On the right sidewalk
-        rotation: [0, Math.PI / 2, 0], // Face directly toward the street (left/west)
+        rotation: [0, Math.PI, 0], // Face LEFT/WEST directly toward the street
         scale: [1, 1, 1]
       });
     }
