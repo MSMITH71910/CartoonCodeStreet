@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAudio } from '../../lib/stores/useAudio';
 
 const AudioControls: React.FC = () => {
@@ -13,6 +13,14 @@ const AudioControls: React.FC = () => {
     fountainMusic,
     seesawMusic
   } = useAudio();
+  
+  // Force music to be muted on initial load
+  useEffect(() => {
+    // Make sure music is muted by default when app loads
+    if (!isMusicMuted) {
+      toggleMusicMute();
+    }
+  }, []);
   
   // Helper function to determine which activity music is playing
   const getCurrentMusicType = () => {

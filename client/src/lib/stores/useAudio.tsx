@@ -137,19 +137,50 @@ export const useAudio = create<AudioState>((set, get) => ({
   
   // Toggle just music (sound effects still play)
   toggleMusicMute: () => {
-    const { isMusicMuted, backgroundMusic, currentActivityMusic, isMuted } = get();
+    const { 
+      isMusicMuted, 
+      backgroundMusic, 
+      currentActivityMusic, 
+      basketballMusic,
+      chessMusicOrSimilar,
+      fountainMusic,
+      seesawMusic,
+      isMuted 
+    } = get();
+    
     const newMusicMutedState = !isMusicMuted;
     
     // Update state
     set({ isMusicMuted: newMusicMutedState });
     
-    // Always handle music toggle, regardless of isMuted state
+    // Force complete stopping of all music elements
     if (newMusicMutedState) {
-      // Music muting - pause all music
-      if (backgroundMusic) backgroundMusic.pause();
-      if (currentActivityMusic) currentActivityMusic.pause();
+      // Forcefully stop all music by setting volume to 0 and pausing
+      const allMusic = [
+        backgroundMusic, 
+        currentActivityMusic, 
+        basketballMusic, 
+        chessMusicOrSimilar, 
+        fountainMusic, 
+        seesawMusic
+      ];
+      
+      allMusic.forEach(audio => {
+        if (audio) {
+          audio.volume = 0;
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      });
     } else if (!isMuted) {
-      // Music unmuting (only if sound is not fully muted) - play appropriate music
+      // Only unmute and restore volume if sound is not fully muted
+      if (backgroundMusic) backgroundMusic.volume = 0.3;
+      if (basketballMusic) basketballMusic.volume = 0.4;
+      if (chessMusicOrSimilar) chessMusicOrSimilar.volume = 0.4;
+      if (fountainMusic) fountainMusic.volume = 0.4;
+      if (seesawMusic) seesawMusic.volume = 0.4;
+      
+      // Play the appropriate track
       if (currentActivityMusic) {
         currentActivityMusic.play().catch(error => {
           console.log("Activity music play prevented:", error);

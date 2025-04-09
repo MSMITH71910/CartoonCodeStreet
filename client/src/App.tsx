@@ -26,23 +26,30 @@ function App() {
 
   // Initialize audio elements
   useEffect(() => {
-    // Setup background music
+    // Setup background music - start MUTED by default
     const bgMusic = new Audio("/sounds/background.mp3");
     bgMusic.loop = true;
-    bgMusic.volume = 0.3;
+    bgMusic.volume = 0;
     setBackgroundMusic(bgMusic);
 
     // Setup sound effects in useAudio store
     const hitSound = new Audio("/sounds/hit.mp3");
     const successSound = new Audio("/sounds/success.mp3");
     
-    // Setup activity-specific music
+    // Setup activity-specific music - all muted by default
     const basketballMusic = new Audio("/sounds/basketball.mp3");
-    const chessMusicOrSimilar = new Audio("/sounds/board-game.mp3");
-    const fountainMusic = new Audio("/sounds/fountain.mp3");
-    const seesawMusic = new Audio("/sounds/playground.mp3");
+    basketballMusic.volume = 0;
     
-    // Initialize all audio in store
+    const chessMusicOrSimilar = new Audio("/sounds/board-game.mp3");
+    chessMusicOrSimilar.volume = 0;
+    
+    const fountainMusic = new Audio("/sounds/fountain.mp3");
+    fountainMusic.volume = 0;
+    
+    const seesawMusic = new Audio("/sounds/playground.mp3");
+    seesawMusic.volume = 0;
+    
+    // Initialize all audio in store - start with music muted
     useAudio.setState({
       hitSound,
       successSound,
@@ -50,8 +57,11 @@ function App() {
       chessMusicOrSimilar,
       fountainMusic,
       seesawMusic,
-      isMusicMuted: false,
+      isMusicMuted: true, // Start with music muted
     });
+    
+    // Make sure the audio store knows music is muted
+    useAudio.getState().toggleMusicMute();
 
     // Show the canvas once everything is loaded
     setShowCanvas(true);

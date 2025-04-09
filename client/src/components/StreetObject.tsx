@@ -78,16 +78,20 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
     
     // Special case for basketball
     if (type === "basketball") {
-      if (!ballPosition) {
-        // Start basketball mini-game
-        const angle = Math.PI / 4; // 45 degrees
-        setBallPosition(new THREE.Vector3(0, 1, 1));
-        setBallVelocity(new THREE.Vector3(0, 3, -3));
-        
-        // Play the correct music for this activity
-        const musicType = getActivityMusicType();
-        if (musicType) playActivityMusic(musicType);
-      }
+      // ALWAYS throw the ball when clicked, whether ballPosition exists or not
+      // This prevents the basketball from getting "stuck" and not working
+      
+      // Set basketball position and velocity - enhance arc for better shots
+      setBallPosition(new THREE.Vector3(0, 1, 1));
+      setBallVelocity(new THREE.Vector3(0, 6, -6)); // Higher velocity for better arc
+      
+      // Play sound effect but no music to avoid audio issues
+      playHit();
+      
+      // No music to avoid problems with turning it off
+      // const musicType = getActivityMusicType();
+      // if (musicType) playActivityMusic(musicType);
+      
       return;
     }
     
@@ -540,30 +544,26 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
           </group>
           
           {/* Throw ball button (click to play) */}
-          {!ballPosition && (
-            <mesh 
-              position={[0, 1, 1]} 
-              onClick={(e: any) => {
-                e.stopPropagation();
-                // Launch the basketball
-                setBallPosition(new THREE.Vector3(0, 1, 1));
-                setBallVelocity(new THREE.Vector3(0, 5, -5)); // Increase velocity for better arc
-                
-                // Play sound and activity music
-                playHit();
-                const musicType = getActivityMusicType();
-                if (musicType) playActivityMusic(musicType);
-              }}
-            >
-              <sphereGeometry args={[0.2, 16, 16]} />
-              <meshStandardMaterial 
-                color="#FF5722" 
-                emissive="#FF5722" 
-                emissiveIntensity={0.3} 
-                roughness={0.8} 
-              />
-            </mesh>
-          )}
+          <mesh 
+            position={[0, 1, 1]} 
+            onClick={(e: any) => {
+              e.stopPropagation();
+              // Launch the basketball - always allow the throw
+              setBallPosition(new THREE.Vector3(0, 1, 1));
+              setBallVelocity(new THREE.Vector3(0, 6, -6)); // Higher velocity for better arc
+              
+              // Play sound but NO music to avoid audio issues
+              playHit();
+            }}
+          >
+            <sphereGeometry args={[0.2, 16, 16]} />
+            <meshStandardMaterial 
+              color="#FF5722" 
+              emissive="#FF5722" 
+              emissiveIntensity={0.3} 
+              roughness={0.8} 
+            />
+          </mesh>
         </>
       )}
       
