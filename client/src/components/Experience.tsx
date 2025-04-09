@@ -6,6 +6,7 @@ import Street from "./Street";
 import Character from "./Character";
 import { usePortfolio } from "../lib/stores/usePortfolio";
 import { useAudio } from "../lib/stores/useAudio";
+import StreetSignOverlay from "./ui/StreetSignOverlay";
 
 const Experience = () => {
   const { camera } = useThree();
@@ -153,8 +154,30 @@ const Experience = () => {
     };
   }, []);
 
+  // State to control sign overlay visibility
+  const [isNearSign, setIsNearSign] = useState(false);
+  
+  // Check if character is near the sign
+  useFrame(() => {
+    if (characterRef && characterRef.current) {
+      const characterPosition = characterRef.current.position;
+      const signPosition = new THREE.Vector3(0, 0, 15);
+      const distance = characterPosition.distanceTo(signPosition);
+      
+      // Show overlay when within 10 units of the sign
+      setIsNearSign(distance < 10);
+    }
+  });
+
   return (
     <>
+      {/* Street sign overlay - HTML based for better readability */}
+      <StreetSignOverlay 
+        visible={isNearSign} 
+        showDetails={showSignInfo}
+        onClose={handleSignClick}
+      />
+      
       {/* Main scene lighting - improved for better visibility from all angles */}
       <ambientLight intensity={0.7} /> {/* Brighter ambient light to see everything */}
       
@@ -190,7 +213,7 @@ const Experience = () => {
       {/* Player character */}
       <Character />
       
-      {/* Direct street sign implementation - very simple */}
+      {/* Simple street sign implementation - no complex text rendering */}
       <group position={[0, 0, 15]} rotation={[0, Math.PI, 0]}>
         {/* Posts */}
         <mesh castShadow position={[-2, 2, 0]}>
@@ -216,411 +239,38 @@ const Experience = () => {
           <meshStandardMaterial color={signHovered ? "#4285F4" : "#1E88E5"} side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Sign text area - front side */}
+        {/* Simple white background for text - both sides */}
         <mesh position={[0, 3.5, 0.12]}>
           <boxGeometry args={[4.5, 1.5, 0.05]} />
           <meshStandardMaterial color="#FFFFFF" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Back side text area */}
         <mesh position={[0, 3.5, -0.12]}>
           <boxGeometry args={[4.5, 1.5, 0.05]} />
           <meshStandardMaterial color="#FFFFFF" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Front side text - Michael R. Smith Portfolio Street */}
-        {/* Front side text panel - Blue background */}
-        <mesh position={[0, 3.7, 0.15]}>
-          <planeGeometry args={[4, 0.6]} />
+        {/* Blue accent strip on top - both sides */}
+        <mesh position={[0, 4.1, 0.14]}>
+          <boxGeometry args={[4.6, 0.2, 0.01]} />
           <meshBasicMaterial color="#0D47A1" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Create text using HTML Canvas - MUCH LARGER */}
-        <mesh position={[0, 3.7, 0.16]}>
-          <planeGeometry args={[3.8, 0.4]} />
-          <meshBasicMaterial side={THREE.DoubleSide}>
-            <canvasTexture attach="map" args={[(() => {
-              // Create a canvas
-              const canvas = document.createElement('canvas');
-              canvas.width = 1024; // Double the resolution
-              canvas.height = 256; // Double the resolution
-              const ctx = canvas.getContext('2d');
-              
-              if (ctx) {
-                // Clear the canvas with a semi-transparent background for better readability
-                ctx.fillStyle = '#0D47A1';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Add border around text
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 4;
-                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-
-                // Main title - use larger font
-                ctx.fillStyle = 'yellow'; // Bright yellow for better visibility
-                ctx.font = 'bold 70px Arial'; // Much larger font
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                
-                // Draw top line - "PORTFOLIO"
-                ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height / 2 - 15);
-                
-                // Draw smaller subtitle below
-                ctx.font = 'bold 50px Arial';
-                ctx.fillStyle = 'white';
-                ctx.fillText('Michael R. Smith', canvas.width / 2, canvas.height / 2 + 50);
-              }
-              
-              return canvas;
-            })()]} />
-          </meshBasicMaterial>
-        </mesh>
-        
-        {/* Front side text - Bottom Section */}
-        <mesh position={[0, 3.3, 0.15]}>
-          <planeGeometry args={[4, 0.6]} />
-          <meshBasicMaterial color="#1565C0" side={THREE.DoubleSide} />
-        </mesh>
-        
-        {/* Create text for "Click for info" - LARGER */}
-        <mesh position={[0, 3.3, 0.16]}>
-          <planeGeometry args={[3.8, 0.4]} />
-          <meshBasicMaterial side={THREE.DoubleSide}>
-            <canvasTexture attach="map" args={[(() => {
-              // Create a canvas
-              const canvas = document.createElement('canvas');
-              canvas.width = 1024; // Higher resolution
-              canvas.height = 256; // Higher resolution
-              const ctx = canvas.getContext('2d');
-              
-              if (ctx) {
-                // Fill background
-                ctx.fillStyle = '#1565C0';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Add border for visibility
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 3;
-                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-                
-                // Add text - much larger
-                ctx.fillStyle = 'yellow'; // Bright yellow for visibility
-                ctx.font = 'bold 80px Arial'; // Much larger font
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height / 2);
-                
-                // Add arrow pointer icons
-                const arrowSize = 40;
-                const arrowX1 = canvas.width / 2 - 200;
-                const arrowX2 = canvas.width / 2 + 200;
-                const arrowY = canvas.height / 2;
-                
-                // Left arrow
-                ctx.beginPath();
-                ctx.moveTo(arrowX1 - arrowSize, arrowY);
-                ctx.lineTo(arrowX1, arrowY - arrowSize/2);
-                ctx.lineTo(arrowX1, arrowY + arrowSize/2);
-                ctx.closePath();
-                ctx.fillStyle = 'white';
-                ctx.fill();
-                
-                // Right arrow
-                ctx.beginPath();
-                ctx.moveTo(arrowX2 + arrowSize, arrowY);
-                ctx.lineTo(arrowX2, arrowY - arrowSize/2);
-                ctx.lineTo(arrowX2, arrowY + arrowSize/2);
-                ctx.closePath();
-                ctx.fillStyle = 'white';
-                ctx.fill();
-              }
-              
-              return canvas;
-            })()]} />
-          </meshBasicMaterial>
-        </mesh>
-        
-        {/* Back side text - Top Section */}
-        <mesh position={[0, 3.7, -0.15]} rotation={[0, Math.PI, 0]}>
-          <planeGeometry args={[4, 0.6]} />
+        <mesh position={[0, 4.1, -0.14]} rotation={[0, Math.PI, 0]}>
+          <boxGeometry args={[4.6, 0.2, 0.01]} />
           <meshBasicMaterial color="#0D47A1" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Create text for back side - MUCH LARGER */}
-        <mesh position={[0, 3.7, -0.16]} rotation={[0, Math.PI, 0]}>
-          <planeGeometry args={[3.8, 0.4]} />
-          <meshBasicMaterial side={THREE.DoubleSide}>
-            <canvasTexture attach="map" args={[(() => {
-              // Create a canvas
-              const canvas = document.createElement('canvas');
-              canvas.width = 1024; // Double the resolution
-              canvas.height = 256; // Double the resolution
-              const ctx = canvas.getContext('2d');
-              
-              if (ctx) {
-                // Clear the canvas with a semi-transparent background for better readability
-                ctx.fillStyle = '#0D47A1';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Add border around text
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 4;
-                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-
-                // Main title - use larger font
-                ctx.fillStyle = 'yellow'; // Bright yellow for better visibility
-                ctx.font = 'bold 70px Arial'; // Much larger font
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                
-                // Draw top line - "PORTFOLIO"
-                ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height / 2 - 15);
-                
-                // Draw smaller subtitle below
-                ctx.font = 'bold 50px Arial';
-                ctx.fillStyle = 'white';
-                ctx.fillText('Michael R. Smith', canvas.width / 2, canvas.height / 2 + 50);
-              }
-              
-              return canvas;
-            })()]} />
-          </meshBasicMaterial>
+        {/* Blue accent strip on bottom - both sides */}
+        <mesh position={[0, 2.9, 0.14]}>
+          <boxGeometry args={[4.6, 0.2, 0.01]} />
+          <meshBasicMaterial color="#0D47A1" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Back side text - Bottom Section */}
-        <mesh position={[0, 3.3, -0.15]} rotation={[0, Math.PI, 0]}>
-          <planeGeometry args={[4, 0.6]} />
-          <meshBasicMaterial color="#1565C0" side={THREE.DoubleSide} />
+        <mesh position={[0, 2.9, -0.14]} rotation={[0, Math.PI, 0]}>
+          <boxGeometry args={[4.6, 0.2, 0.01]} />
+          <meshBasicMaterial color="#0D47A1" side={THREE.DoubleSide} />
         </mesh>
-        
-        {/* Create text for "Click for info" on back side - LARGER */}
-        <mesh position={[0, 3.3, -0.16]} rotation={[0, Math.PI, 0]}>
-          <planeGeometry args={[3.8, 0.4]} />
-          <meshBasicMaterial side={THREE.DoubleSide}>
-            <canvasTexture attach="map" args={[(() => {
-              // Create a canvas
-              const canvas = document.createElement('canvas');
-              canvas.width = 1024; // Higher resolution
-              canvas.height = 256; // Higher resolution
-              const ctx = canvas.getContext('2d');
-              
-              if (ctx) {
-                // Fill background
-                ctx.fillStyle = '#1565C0';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Add border for visibility
-                ctx.strokeStyle = 'white';
-                ctx.lineWidth = 3;
-                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-                
-                // Add text - much larger
-                ctx.fillStyle = 'yellow'; // Bright yellow for visibility
-                ctx.font = 'bold 80px Arial'; // Much larger font
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height / 2);
-                
-                // Add arrow pointer icons
-                const arrowSize = 40;
-                const arrowX1 = canvas.width / 2 - 200;
-                const arrowX2 = canvas.width / 2 + 200;
-                const arrowY = canvas.height / 2;
-                
-                // Left arrow
-                ctx.beginPath();
-                ctx.moveTo(arrowX1 - arrowSize, arrowY);
-                ctx.lineTo(arrowX1, arrowY - arrowSize/2);
-                ctx.lineTo(arrowX1, arrowY + arrowSize/2);
-                ctx.closePath();
-                ctx.fillStyle = 'white';
-                ctx.fill();
-                
-                // Right arrow
-                ctx.beginPath();
-                ctx.moveTo(arrowX2 + arrowSize, arrowY);
-                ctx.lineTo(arrowX2, arrowY - arrowSize/2);
-                ctx.lineTo(arrowX2, arrowY + arrowSize/2);
-                ctx.closePath();
-                ctx.fillStyle = 'white';
-                ctx.fill();
-              }
-              
-              return canvas;
-            })()]} />
-          </meshBasicMaterial>
-        </mesh>
-        
-        {/* Info panel when clicked - visible from both sides */}
-        {showSignInfo && (
-          <>
-            {/* Front side panel */}
-            <group position={[0, 3.5, 1]}>
-              {/* Background panel */}
-              <mesh receiveShadow>
-                <boxGeometry args={[6, 4, 0.1]} />
-                <meshStandardMaterial color="#333333" transparent opacity={0.9} side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Info panel text using Canvas texture */}
-              <mesh position={[0, 0, 0.06]}>
-                <planeGeometry args={[5.8, 3.8]} />
-                <meshBasicMaterial side={THREE.DoubleSide}>
-                  <canvasTexture attach="map" args={[(() => {
-                    // Create a canvas
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 1024;
-                    canvas.height = 768;
-                    const ctx = canvas.getContext('2d');
-                    
-                    if (ctx) {
-                      // Fill background
-                      ctx.fillStyle = '#333';
-                      ctx.fillRect(0, 0, canvas.width, canvas.height);
-                      
-                      // Title
-                      ctx.fillStyle = '#FFEB3B';
-                      ctx.font = 'bold 48px Arial';
-                      ctx.textAlign = 'center';
-                      ctx.fillText('About This Portfolio', canvas.width / 2, 100);
-                      
-                      // Core Technologies
-                      ctx.fillStyle = '#2196F3';
-                      ctx.fillRect(50, 150, canvas.width - 100, 80);
-                      
-                      ctx.fillStyle = 'white';
-                      ctx.font = 'bold 36px Arial';
-                      ctx.fillText('Core Technologies', canvas.width / 2, 200);
-                      
-                      // Frameworks
-                      ctx.fillStyle = 'white';
-                      ctx.fillRect(50, 250, canvas.width - 100, 150);
-                      
-                      ctx.fillStyle = 'black';
-                      ctx.font = '28px Arial';
-                      ctx.fillText('React • TypeScript • Three.js', canvas.width / 2, 300);
-                      ctx.fillText('@react-three/fiber • @react-three/drei', canvas.width / 2, 350);
-                      ctx.fillText('TailwindCSS • Express • Node.js', canvas.width / 2, 400);
-                      
-                      // 3D Features
-                      ctx.fillStyle = '#E0E0E0';
-                      ctx.fillRect(50, 420, canvas.width - 100, 150);
-                      
-                      ctx.fillStyle = 'black';
-                      ctx.font = 'bold 32px Arial';
-                      ctx.fillText('3D Features', canvas.width / 2, 470);
-                      
-                      ctx.font = '28px Arial';
-                      ctx.fillText('Custom lighting • Physics • Animations', canvas.width / 2, 520);
-                      ctx.fillText('Interactive objects • Dynamic camera', canvas.width / 2, 560);
-                      
-                      // Interactive
-                      ctx.fillStyle = '#4CAF50';
-                      ctx.fillRect(50, 590, canvas.width - 100, 80);
-                      
-                      ctx.fillStyle = 'white';
-                      ctx.font = 'bold 32px Arial';
-                      ctx.fillText('Interactive Mini-Games & Portfolio Showcase', canvas.width / 2, 640);
-                      
-                      // Footer
-                      ctx.fillStyle = '#1A237E';
-                      ctx.fillRect(50, 690, canvas.width - 100, 60);
-                      
-                      ctx.fillStyle = '#81D4FA';
-                      ctx.font = '26px Arial';
-                      ctx.fillText('Click the sign again to close', canvas.width / 2, 725);
-                    }
-                    
-                    return canvas;
-                  })()]} />
-                </meshBasicMaterial>
-              </mesh>
-            </group>
-            
-            {/* Back side panel - mirrored */}
-            <group position={[0, 3.5, -1]} rotation={[0, Math.PI, 0]}>
-              {/* Background panel */}
-              <mesh receiveShadow>
-                <boxGeometry args={[6, 4, 0.1]} />
-                <meshStandardMaterial color="#333333" transparent opacity={0.9} side={THREE.DoubleSide} />
-              </mesh>
-              
-              {/* Info panel text using Canvas texture */}
-              <mesh position={[0, 0, 0.06]}>
-                <planeGeometry args={[5.8, 3.8]} />
-                <meshBasicMaterial side={THREE.DoubleSide}>
-                  <canvasTexture attach="map" args={[(() => {
-                    // Create a canvas
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 1024;
-                    canvas.height = 768;
-                    const ctx = canvas.getContext('2d');
-                    
-                    if (ctx) {
-                      // Fill background
-                      ctx.fillStyle = '#333';
-                      ctx.fillRect(0, 0, canvas.width, canvas.height);
-                      
-                      // Title
-                      ctx.fillStyle = '#FFEB3B';
-                      ctx.font = 'bold 48px Arial';
-                      ctx.textAlign = 'center';
-                      ctx.fillText('About This Portfolio', canvas.width / 2, 100);
-                      
-                      // Core Technologies
-                      ctx.fillStyle = '#2196F3';
-                      ctx.fillRect(50, 150, canvas.width - 100, 80);
-                      
-                      ctx.fillStyle = 'white';
-                      ctx.font = 'bold 36px Arial';
-                      ctx.fillText('Core Technologies', canvas.width / 2, 200);
-                      
-                      // Frameworks
-                      ctx.fillStyle = 'white';
-                      ctx.fillRect(50, 250, canvas.width - 100, 150);
-                      
-                      ctx.fillStyle = 'black';
-                      ctx.font = '28px Arial';
-                      ctx.fillText('React • TypeScript • Three.js', canvas.width / 2, 300);
-                      ctx.fillText('@react-three/fiber • @react-three/drei', canvas.width / 2, 350);
-                      ctx.fillText('TailwindCSS • Express • Node.js', canvas.width / 2, 400);
-                      
-                      // 3D Features
-                      ctx.fillStyle = '#E0E0E0';
-                      ctx.fillRect(50, 420, canvas.width - 100, 150);
-                      
-                      ctx.fillStyle = 'black';
-                      ctx.font = 'bold 32px Arial';
-                      ctx.fillText('3D Features', canvas.width / 2, 470);
-                      
-                      ctx.font = '28px Arial';
-                      ctx.fillText('Custom lighting • Physics • Animations', canvas.width / 2, 520);
-                      ctx.fillText('Interactive objects • Dynamic camera', canvas.width / 2, 560);
-                      
-                      // Interactive
-                      ctx.fillStyle = '#4CAF50';
-                      ctx.fillRect(50, 590, canvas.width - 100, 80);
-                      
-                      ctx.fillStyle = 'white';
-                      ctx.font = 'bold 32px Arial';
-                      ctx.fillText('Interactive Mini-Games & Portfolio Showcase', canvas.width / 2, 640);
-                      
-                      // Footer
-                      ctx.fillStyle = '#1A237E';
-                      ctx.fillRect(50, 690, canvas.width - 100, 60);
-                      
-                      ctx.fillStyle = '#81D4FA';
-                      ctx.font = '26px Arial';
-                      ctx.fillText('Click the sign again to close', canvas.width / 2, 725);
-                    }
-                    
-                    return canvas;
-                  })()]} />
-                </meshBasicMaterial>
-              </mesh>
-            </group>
-          </>
-        )}
       </group>
       
       {/* Camera controls - always enabled to allow viewing from different angles */}
