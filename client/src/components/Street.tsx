@@ -3,6 +3,7 @@ import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import House from "./House";
 import StreetObject from "./StreetObject";
+import StreetSign from "./StreetSign";
 import { projects } from "../lib/data/projects";
 
 const Street = () => {
@@ -234,11 +235,8 @@ const Street = () => {
       ))}
       {/* Add portfolio street sign at the beginning of the street */}
       {/* Sign faces toward player's starting position */}
-      <StreetObject
-        type="sign"
-        position={[0, 0, 20]}  
-        rotation={[0, Math.PI, 0]}  
-        scale={[1, 1, 1]}
+      <StreetSign
+        position={[0, 0, 10]}
       />
     </group>
   );

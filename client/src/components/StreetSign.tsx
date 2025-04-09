@@ -9,6 +9,9 @@ interface StreetSignProps {
 }
 
 const StreetSign: React.FC<StreetSignProps> = ({ position }) => {
+  // Make the sign face the player's starting position
+  const adjustedPosition: [number, number, number] = [position[0], position[1], position[2]];
+  const rotation: [number, number, number] = [0, Math.PI, 0]; // Rotate 180 degrees to face player
   const { playHit } = useAudio();
   const [showInfo, setShowInfo] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -20,10 +23,10 @@ const StreetSign: React.FC<StreetSignProps> = ({ position }) => {
     
     if (hovered) {
       // Gentle hovering animation
-      signRef.current.position.y = position[1] + Math.sin(state.clock.getElapsedTime() * 2) * 0.05;
+      signRef.current.position.y = adjustedPosition[1] + Math.sin(state.clock.getElapsedTime() * 2) * 0.05;
     } else {
       // Reset to original position
-      signRef.current.position.y = position[1];
+      signRef.current.position.y = adjustedPosition[1];
     }
   });
   
@@ -34,7 +37,7 @@ const StreetSign: React.FC<StreetSignProps> = ({ position }) => {
   };
   
   return (
-    <group ref={signRef} position={position}>
+    <group ref={signRef} position={adjustedPosition} rotation={rotation}>
       {/* Sign posts - two sturdy poles */}
       <mesh castShadow position={[-2, 2, 0]}>
         <cylinderGeometry args={[0.2, 0.2, 4, 16]} />
