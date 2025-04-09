@@ -161,13 +161,13 @@ const Experience = () => {
       <group position={[0, 0, 15]} rotation={[0, Math.PI, 0]}>
         {/* Posts */}
         <mesh castShadow position={[-2, 2, 0]}>
-          <cylinderGeometry args={[0.2, 0.2, 4, 16]} />
-          <meshStandardMaterial color="#8B4513" />
+          <cylinderGeometry args={[0.2, 0.2, 4, 32]} />
+          <meshStandardMaterial color="#8B4513" side={THREE.DoubleSide} />
         </mesh>
         
         <mesh castShadow position={[2, 2, 0]}>
-          <cylinderGeometry args={[0.2, 0.2, 4, 16]} />
-          <meshStandardMaterial color="#8B4513" />
+          <cylinderGeometry args={[0.2, 0.2, 4, 32]} />
+          <meshStandardMaterial color="#8B4513" side={THREE.DoubleSide} />
         </mesh>
         
         {/* Sign board - interactive */}
@@ -180,86 +180,166 @@ const Experience = () => {
           onClick={handleSignClick}
         >
           <boxGeometry args={[5, 1.8, 0.2]} />
-          <meshStandardMaterial color={signHovered ? "#4285F4" : "#1E88E5"} />
+          <meshStandardMaterial color={signHovered ? "#4285F4" : "#1E88E5"} side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Sign text area */}
+        {/* Sign text area - front side */}
         <mesh position={[0, 3.5, 0.12]}>
           <boxGeometry args={[4.5, 1.5, 0.05]} />
-          <meshStandardMaterial color="#FFFFFF" />
+          <meshStandardMaterial color="#FFFFFF" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Sign text - Top Section */}
+        {/* Back side text area */}
+        <mesh position={[0, 3.5, -0.12]}>
+          <boxGeometry args={[4.5, 1.5, 0.05]} />
+          <meshStandardMaterial color="#FFFFFF" side={THREE.DoubleSide} />
+        </mesh>
+        
+        {/* Front side text - Top Section */}
         <mesh position={[0, 3.7, 0.15]}>
           <planeGeometry args={[4, 0.6]} />
-          <meshBasicMaterial color="#0D47A1" />
+          <meshBasicMaterial color="#0D47A1" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Sign text - Bottom Section */}
+        {/* Front side text - Bottom Section */}
         <mesh position={[0, 3.3, 0.15]}>
           <planeGeometry args={[4, 0.6]} />
-          <meshBasicMaterial color="#1565C0" />
+          <meshBasicMaterial color="#1565C0" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Create white bars to represent text */}
+        {/* Back side text - Top Section */}
+        <mesh position={[0, 3.7, -0.15]} rotation={[0, Math.PI, 0]}>
+          <planeGeometry args={[4, 0.6]} />
+          <meshBasicMaterial color="#0D47A1" side={THREE.DoubleSide} />
+        </mesh>
+        
+        {/* Back side text - Bottom Section */}
+        <mesh position={[0, 3.3, -0.15]} rotation={[0, Math.PI, 0]}>
+          <planeGeometry args={[4, 0.6]} />
+          <meshBasicMaterial color="#1565C0" side={THREE.DoubleSide} />
+        </mesh>
+        
+        {/* Front white bars to represent text */}
         <mesh position={[0, 3.7, 0.16]}>
           <planeGeometry args={[3.5, 0.1]} />
-          <meshBasicMaterial color="#FFFFFF" />
+          <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
         </mesh>
         
         <mesh position={[0, 3.3, 0.16]}>
           <planeGeometry args={[3, 0.1]} />
-          <meshBasicMaterial color="#FFFFFF" />
+          <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Info panel when clicked */}
+        {/* Back white bars to represent text */}
+        <mesh position={[0, 3.7, -0.16]} rotation={[0, Math.PI, 0]}>
+          <planeGeometry args={[3.5, 0.1]} />
+          <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
+        </mesh>
+        
+        <mesh position={[0, 3.3, -0.16]} rotation={[0, Math.PI, 0]}>
+          <planeGeometry args={[3, 0.1]} />
+          <meshBasicMaterial color="#FFFFFF" side={THREE.DoubleSide} />
+        </mesh>
+        
+        {/* Info panel when clicked - visible from both sides */}
         {showSignInfo && (
-          <group position={[0, 3.5, 1]}>
-            {/* Background panel */}
-            <mesh receiveShadow>
-              <boxGeometry args={[6, 4, 0.1]} />
-              <meshStandardMaterial color="#333333" transparent opacity={0.9} />
-            </mesh>
+          <>
+            {/* Front side panel */}
+            <group position={[0, 3.5, 1]}>
+              {/* Background panel */}
+              <mesh receiveShadow>
+                <boxGeometry args={[6, 4, 0.1]} />
+                <meshStandardMaterial color="#333333" transparent opacity={0.9} side={THREE.DoubleSide} />
+              </mesh>
+              
+              {/* Header bar */}
+              <mesh position={[0, 1.7, 0.06]}>
+                <boxGeometry args={[5.8, 0.6, 0.02]} />
+                <meshStandardMaterial color="#1A237E" side={THREE.DoubleSide} />
+              </mesh>
+              
+              {/* Border */}
+              <mesh position={[0, 0, 0.06]}>
+                <boxGeometry args={[5.9, 3.9, 0.01]} />
+                <meshStandardMaterial color="#555555" side={THREE.DoubleSide} />
+              </mesh>
+              
+              {/* Text indicators represented by colored bars */}
+              <mesh position={[0, 1.7, 0.07]}>
+                <boxGeometry args={[3, 0.3, 0.01]} />
+                <meshStandardMaterial color="#FFEB3B" side={THREE.DoubleSide} />
+              </mesh>
+              
+              <mesh position={[0, 0.8, 0.07]}>
+                <boxGeometry args={[5, 0.8, 0.01]} />
+                <meshStandardMaterial color="#FFFFFF" side={THREE.DoubleSide} />
+              </mesh>
+              
+              <mesh position={[0, -0.3, 0.07]}>
+                <boxGeometry args={[5, 0.8, 0.01]} />
+                <meshStandardMaterial color="#E0E0E0" side={THREE.DoubleSide} />
+              </mesh>
+              
+              {/* Footer */}
+              <mesh position={[0, -1.7, 0.06]}>
+                <boxGeometry args={[5.8, 0.6, 0.02]} />
+                <meshStandardMaterial color="#1A237E" side={THREE.DoubleSide} />
+              </mesh>
+              
+              <mesh position={[0, -1.7, 0.07]}>
+                <boxGeometry args={[4, 0.3, 0.01]} />
+                <meshStandardMaterial color="#4FC3F7" side={THREE.DoubleSide} />
+              </mesh>
+            </group>
             
-            {/* Header bar */}
-            <mesh position={[0, 1.7, 0.06]}>
-              <boxGeometry args={[5.8, 0.6, 0.02]} />
-              <meshStandardMaterial color="#1A237E" />
-            </mesh>
-            
-            {/* Border */}
-            <mesh position={[0, 0, 0.06]}>
-              <boxGeometry args={[5.9, 3.9, 0.01]} />
-              <meshStandardMaterial color="#555555" />
-            </mesh>
-            
-            {/* Text indicators represented by colored bars */}
-            <mesh position={[0, 1.7, 0.07]}>
-              <boxGeometry args={[3, 0.3, 0.01]} />
-              <meshStandardMaterial color="#FFEB3B" />
-            </mesh>
-            
-            <mesh position={[0, 0.8, 0.07]}>
-              <boxGeometry args={[5, 0.8, 0.01]} />
-              <meshStandardMaterial color="#FFFFFF" />
-            </mesh>
-            
-            <mesh position={[0, -0.3, 0.07]}>
-              <boxGeometry args={[5, 0.8, 0.01]} />
-              <meshStandardMaterial color="#E0E0E0" />
-            </mesh>
-            
-            {/* Footer */}
-            <mesh position={[0, -1.7, 0.06]}>
-              <boxGeometry args={[5.8, 0.6, 0.02]} />
-              <meshStandardMaterial color="#1A237E" />
-            </mesh>
-            
-            <mesh position={[0, -1.7, 0.07]}>
-              <boxGeometry args={[4, 0.3, 0.01]} />
-              <meshStandardMaterial color="#4FC3F7" />
-            </mesh>
-          </group>
+            {/* Back side panel */}
+            <group position={[0, 3.5, -1]} rotation={[0, Math.PI, 0]}>
+              {/* Background panel */}
+              <mesh receiveShadow>
+                <boxGeometry args={[6, 4, 0.1]} />
+                <meshStandardMaterial color="#333333" transparent opacity={0.9} side={THREE.DoubleSide} />
+              </mesh>
+              
+              {/* Header bar */}
+              <mesh position={[0, 1.7, 0.06]}>
+                <boxGeometry args={[5.8, 0.6, 0.02]} />
+                <meshStandardMaterial color="#1A237E" side={THREE.DoubleSide} />
+              </mesh>
+              
+              {/* Border */}
+              <mesh position={[0, 0, 0.06]}>
+                <boxGeometry args={[5.9, 3.9, 0.01]} />
+                <meshStandardMaterial color="#555555" side={THREE.DoubleSide} />
+              </mesh>
+              
+              {/* Text indicators represented by colored bars */}
+              <mesh position={[0, 1.7, 0.07]}>
+                <boxGeometry args={[3, 0.3, 0.01]} />
+                <meshStandardMaterial color="#FFEB3B" side={THREE.DoubleSide} />
+              </mesh>
+              
+              <mesh position={[0, 0.8, 0.07]}>
+                <boxGeometry args={[5, 0.8, 0.01]} />
+                <meshStandardMaterial color="#FFFFFF" side={THREE.DoubleSide} />
+              </mesh>
+              
+              <mesh position={[0, -0.3, 0.07]}>
+                <boxGeometry args={[5, 0.8, 0.01]} />
+                <meshStandardMaterial color="#E0E0E0" side={THREE.DoubleSide} />
+              </mesh>
+              
+              {/* Footer */}
+              <mesh position={[0, -1.7, 0.06]}>
+                <boxGeometry args={[5.8, 0.6, 0.02]} />
+                <meshStandardMaterial color="#1A237E" side={THREE.DoubleSide} />
+              </mesh>
+              
+              <mesh position={[0, -1.7, 0.07]}>
+                <boxGeometry args={[4, 0.3, 0.01]} />
+                <meshStandardMaterial color="#4FC3F7" side={THREE.DoubleSide} />
+              </mesh>
+            </group>
+          </>
         )}
       </group>
       
