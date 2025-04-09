@@ -6,6 +6,7 @@ import "@fontsource/inter";
 import Experience from "./components/Experience";
 import ProjectDetails from "./components/ProjectDetails";
 import AudioControls from "./components/ui/AudioControls";
+import GameUI from "./components/games/GameUI";
 import { usePortfolio } from "./lib/stores/usePortfolio";
 import { ControlName } from "./lib/constants";
 
@@ -84,7 +85,7 @@ function App() {
           <p className="font-semibold">Interactions:</p>
           <p>• Click houses to view projects</p>
           <p>• Use benches to sit down</p>
-          <p>• Play basketball at the hoops</p>
+          <p>• Interact with seesaw for fun</p>
           <p>• Interact with mailbox for Hangman</p>
           <p>• Visit hydrants for Tic-Tac-Toe</p>
           <p>• Trees allow playing Checkers</p>
@@ -123,6 +124,9 @@ function App() {
       {activeProject && (
         <ProjectDetails project={activeProject} onClose={closeProject} />
       )}
+      
+      {/* Mini-games UI */}
+      <GameUI />
     </div>
   );
 }

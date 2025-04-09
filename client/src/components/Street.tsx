@@ -21,7 +21,7 @@ const Street = () => {
   }, [asphaltTexture, grassTexture]);
 
   // Define types for street objects
-  type StreetObjectType = "lamppost" | "tree" | "bench" | "hydrant" | "mailbox" | "basketball" | "seesaw" | "fountain";
+  type StreetObjectType = "lamppost" | "tree" | "bench" | "hydrant" | "mailbox" | "seesaw" | "fountain";
   
   interface StreetObjectData {
     type: StreetObjectType;
@@ -115,20 +115,7 @@ const Street = () => {
       });
     }
     
-    // Add basketball courts
-    positions.push({
-      type: "basketball",
-      position: [-14, 0, -15],
-      rotation: [0, Math.PI / 4, 0],
-      scale: [1.2, 1.2, 1.2]
-    });
-    
-    positions.push({
-      type: "basketball",
-      position: [14, 0, 28],
-      rotation: [0, -Math.PI / 4, 0],
-      scale: [1.2, 1.2, 1.2]
-    });
+    // Basketball courts removed as requested
     
     // Add seesaws (playground)
     positions.push({
@@ -145,17 +132,17 @@ const Street = () => {
       scale: [1, 1, 1]
     });
     
-    // Add fountain
+    // Add fountains on the sides of the street instead of in the center
     positions.push({
       type: "fountain",
-      position: [0, 0, -25],
+      position: [-14, 0, -25],
       rotation: [0, 0, 0],
       scale: [1.5, 1.5, 1.5]
     });
     
     positions.push({
       type: "fountain",
-      position: [0, 0, 25],
+      position: [14, 0, 25],
       rotation: [0, 0, 0],
       scale: [1.5, 1.5, 1.5]
     });

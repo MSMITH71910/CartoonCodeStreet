@@ -151,90 +151,171 @@ const Character = () => {
 
   return (
     <group ref={characterRef} position={[0, 0.15, 5]}>
-      {/* Character body */}
-      <mesh castShadow position={[0, 0.8, 0]}>
-        <capsuleGeometry args={[0.3, 1, 4, 8]} />
-        <meshStandardMaterial color="#4285F4" />
-      </mesh>
-      
-      {/* Character head */}
-      <mesh castShadow position={[0, 1.65, 0]}>
-        <sphereGeometry args={[0.25, 16, 16]} />
-        <meshStandardMaterial color="#FFCC00" />
-      </mesh>
-      
-      {/* Eyes */}
-      <mesh position={[0.1, 1.7, 0.2]}>
-        <sphereGeometry args={[0.05, 16, 16]} />
-        <meshBasicMaterial color="black" />
-      </mesh>
-      <mesh position={[-0.1, 1.7, 0.2]}>
-        <sphereGeometry args={[0.05, 16, 16]} />
-        <meshBasicMaterial color="black" />
-      </mesh>
-      
-      {/* Left rollerblade */}
-      <group position={[-0.2, 0, 0]}>
-        <mesh 
-          castShadow 
-          position={[0, 0.05, 0]} 
-          rotation={[0, 0, isMoving ? Math.sin(animationTime) * 0.2 : 0]}
-        >
-          <boxGeometry args={[0.2, 0.1, 0.5]} />
-          <meshStandardMaterial color="#E53935" />
-        </mesh>
-        
-        {/* Wheels */}
-        <mesh position={[0, 0, 0.15]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.05, 0.05, 0.05, 16]} />
-          <meshStandardMaterial color="black" />
-        </mesh>
-        <mesh position={[0, 0, -0.15]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.05, 0.05, 0.05, 16]} />
-          <meshStandardMaterial color="black" />
-        </mesh>
-      </group>
-      
-      {/* Right rollerblade */}
-      <group position={[0.2, 0, 0]}>
-        <mesh 
-          castShadow 
-          position={[0, 0.05, 0]} 
-          rotation={[0, 0, isMoving ? -Math.sin(animationTime) * 0.2 : 0]}
-        >
-          <boxGeometry args={[0.2, 0.1, 0.5]} />
-          <meshStandardMaterial color="#E53935" />
-        </mesh>
-        
-        {/* Wheels */}
-        <mesh position={[0, 0, 0.15]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.05, 0.05, 0.05, 16]} />
-          <meshStandardMaterial color="black" />
-        </mesh>
-        <mesh position={[0, 0, -0.15]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.05, 0.05, 0.05, 16]} />
-          <meshStandardMaterial color="black" />
-        </mesh>
-      </group>
-      
-      {/* Arms - animate based on movement */}
-      <mesh 
-        castShadow 
-        position={[0.5, 1.0, 0]} 
-        rotation={[0, 0, isMoving ? Math.sin(animationTime) * 0.5 : 0]}
-      >
-        <capsuleGeometry args={[0.1, 0.6, 4, 8]} />
-        <meshStandardMaterial color="#4285F4" />
-      </mesh>
-      
-      <mesh 
-        castShadow 
-        position={[-0.5, 1.0, 0]} 
-        rotation={[0, 0, isMoving ? -Math.sin(animationTime) * 0.5 : 0]}
-      >
-        <capsuleGeometry args={[0.1, 0.6, 4, 8]} />
-        <meshStandardMaterial color="#4285F4" />
-      </mesh>
+      {/* 
+        Render different character styles based on interaction:
+        - Regular standing character when not interacting
+        - Seated character when sitting on a bench
+        - Special pose for seesaw interaction
+        - Specific poses for other interactions
+      */}
+      {interactionType === "sitting" || interactionType === "seesaw" ? (
+        // Seated character - facing forward when sitting on bench
+        <group rotation={[0, Math.PI / 2, 0]} position={[0, -0.5, 0]}>
+          {/* Seated body (shorter) */}
+          <mesh castShadow position={[0, 0.6, 0]}>
+            <capsuleGeometry args={[0.3, 0.7, 4, 8]} />
+            <meshStandardMaterial color="#4285F4" />
+          </mesh>
+          
+          {/* Character head - positioned to be visible */}
+          <mesh castShadow position={[0, 1.3, 0]}>
+            <sphereGeometry args={[0.25, 16, 16]} />
+            <meshStandardMaterial color="#FFCC00" />
+          </mesh>
+          
+          {/* Eyes - facing forward when sitting */}
+          <mesh position={[0.1, 1.35, 0.2]}>
+            <sphereGeometry args={[0.05, 16, 16]} />
+            <meshBasicMaterial color="black" />
+          </mesh>
+          <mesh position={[-0.1, 1.35, 0.2]}>
+            <sphereGeometry args={[0.05, 16, 16]} />
+            <meshBasicMaterial color="black" />
+          </mesh>
+          
+          {/* Bent legs for sitting */}
+          <mesh castShadow position={[-0.2, 0.3, 0.25]} rotation={[Math.PI / 4, 0, 0]}>
+            <capsuleGeometry args={[0.1, 0.4, 4, 8]} />
+            <meshStandardMaterial color="#4285F4" />
+          </mesh>
+          
+          <mesh castShadow position={[0.2, 0.3, 0.25]} rotation={[Math.PI / 4, 0, 0]}>
+            <capsuleGeometry args={[0.1, 0.4, 4, 8]} />
+            <meshStandardMaterial color="#4285F4" />
+          </mesh>
+          
+          {/* Legs dangling down */}
+          <mesh castShadow position={[-0.2, 0.1, 0.5]} rotation={[Math.PI / 2, 0, 0]}>
+            <capsuleGeometry args={[0.1, 0.4, 4, 8]} />
+            <meshStandardMaterial color="#4285F4" />
+          </mesh>
+          
+          <mesh castShadow position={[0.2, 0.1, 0.5]} rotation={[Math.PI / 2, 0, 0]}>
+            <capsuleGeometry args={[0.1, 0.4, 4, 8]} />
+            <meshStandardMaterial color="#4285F4" />
+          </mesh>
+          
+          {/* Rollerblades at the end of legs */}
+          <mesh castShadow position={[-0.2, 0.05, 0.9]}>
+            <boxGeometry args={[0.2, 0.1, 0.5]} />
+            <meshStandardMaterial color="#E53935" />
+          </mesh>
+          
+          <mesh castShadow position={[0.2, 0.05, 0.9]}>
+            <boxGeometry args={[0.2, 0.1, 0.5]} />
+            <meshStandardMaterial color="#E53935" />
+          </mesh>
+          
+          {/* Arms resting on bench */}
+          <mesh castShadow position={[0.5, 0.7, 0]} rotation={[0, 0, -Math.PI / 6]}>
+            <capsuleGeometry args={[0.1, 0.6, 4, 8]} />
+            <meshStandardMaterial color="#4285F4" />
+          </mesh>
+          
+          <mesh castShadow position={[-0.5, 0.7, 0]} rotation={[0, 0, Math.PI / 6]}>
+            <capsuleGeometry args={[0.1, 0.6, 4, 8]} />
+            <meshStandardMaterial color="#4285F4" />
+          </mesh>
+        </group>
+      ) : (
+        // Regular standing character
+        <group>
+          {/* Character body */}
+          <mesh castShadow position={[0, 0.8, 0]}>
+            <capsuleGeometry args={[0.3, 1, 4, 8]} />
+            <meshStandardMaterial color="#4285F4" />
+          </mesh>
+          
+          {/* Character head */}
+          <mesh castShadow position={[0, 1.65, 0]}>
+            <sphereGeometry args={[0.25, 16, 16]} />
+            <meshStandardMaterial color="#FFCC00" />
+          </mesh>
+          
+          {/* Eyes */}
+          <mesh position={[0.1, 1.7, 0.2]}>
+            <sphereGeometry args={[0.05, 16, 16]} />
+            <meshBasicMaterial color="black" />
+          </mesh>
+          <mesh position={[-0.1, 1.7, 0.2]}>
+            <sphereGeometry args={[0.05, 16, 16]} />
+            <meshBasicMaterial color="black" />
+          </mesh>
+          
+          {/* Left rollerblade */}
+          <group position={[-0.2, 0, 0]}>
+            <mesh 
+              castShadow 
+              position={[0, 0.05, 0]} 
+              rotation={[0, 0, isMoving ? Math.sin(animationTime) * 0.2 : 0]}
+            >
+              <boxGeometry args={[0.2, 0.1, 0.5]} />
+              <meshStandardMaterial color="#E53935" />
+            </mesh>
+            
+            {/* Wheels */}
+            <mesh position={[0, 0, 0.15]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.05, 0.05, 0.05, 16]} />
+              <meshStandardMaterial color="black" />
+            </mesh>
+            <mesh position={[0, 0, -0.15]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.05, 0.05, 0.05, 16]} />
+              <meshStandardMaterial color="black" />
+            </mesh>
+          </group>
+          
+          {/* Right rollerblade */}
+          <group position={[0.2, 0, 0]}>
+            <mesh 
+              castShadow 
+              position={[0, 0.05, 0]} 
+              rotation={[0, 0, isMoving ? -Math.sin(animationTime) * 0.2 : 0]}
+            >
+              <boxGeometry args={[0.2, 0.1, 0.5]} />
+              <meshStandardMaterial color="#E53935" />
+            </mesh>
+            
+            {/* Wheels */}
+            <mesh position={[0, 0, 0.15]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.05, 0.05, 0.05, 16]} />
+              <meshStandardMaterial color="black" />
+            </mesh>
+            <mesh position={[0, 0, -0.15]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.05, 0.05, 0.05, 16]} />
+              <meshStandardMaterial color="black" />
+            </mesh>
+          </group>
+          
+          {/* Arms - animate based on movement */}
+          <mesh 
+            castShadow 
+            position={[0.5, 1.0, 0]} 
+            rotation={[0, 0, isMoving ? Math.sin(animationTime) * 0.5 : 0]}
+          >
+            <capsuleGeometry args={[0.1, 0.6, 4, 8]} />
+            <meshStandardMaterial color="#4285F4" />
+          </mesh>
+          
+          <mesh 
+            castShadow 
+            position={[-0.5, 1.0, 0]} 
+            rotation={[0, 0, isMoving ? -Math.sin(animationTime) * 0.5 : 0]}
+          >
+            <capsuleGeometry args={[0.1, 0.6, 4, 8]} />
+            <meshStandardMaterial color="#4285F4" />
+          </mesh>
+        </group>
+      )}
     </group>
   );
 };
