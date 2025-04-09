@@ -132,12 +132,18 @@ export const useAudio = create<AudioState>((set, get) => ({
       
       allAudio.forEach(audio => {
         if (audio) {
-          audio.pause();
-          audio.currentTime = 0;
-          // Setting volume to 0 as additional precaution
-          audio.volume = 0;
+          try {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.volume = 0;
+          } catch (e) {
+            console.error("Error while trying to mute audio:", e);
+          }
         }
       });
+
+      // Set current activity music to null when muting everything
+      set({ currentActivityMusic: null });
     } else {
       // Unmuting - play appropriate music if music is not separately muted
       if (!get().isMusicMuted) {
@@ -185,7 +191,7 @@ export const useAudio = create<AudioState>((set, get) => ({
     
     // Force complete stopping of all music elements
     if (newMusicMutedState) {
-      // Forcefully stop all music by setting volume to 0 and pausing
+      // Forcefully stop all music
       const allMusic = [
         backgroundMusic, 
         currentActivityMusic, 
@@ -198,32 +204,17 @@ export const useAudio = create<AudioState>((set, get) => ({
       allMusic.forEach(audio => {
         if (audio) {
           try {
-            // Double-prevention technique - should be more reliable
-            audio.volume = 0;
+            // Simple approach - pause and reset
             audio.pause();
             audio.currentTime = 0;
-            
-            // Additional measures if the audio continues playing somehow
-            const clone = audio.cloneNode() as HTMLAudioElement;
-            audio.remove();
-            
-            // Store the cloned but paused version
-            if (audio === backgroundMusic) set({ backgroundMusic: clone as HTMLAudioElement });
-            else if (audio === basketballMusic) set({ basketballMusic: clone as HTMLAudioElement });
-            else if (audio === chessMusicOrSimilar) set({ chessMusicOrSimilar: clone as HTMLAudioElement });
-            else if (audio === fountainMusic) set({ fountainMusic: clone as HTMLAudioElement });
-            else if (audio === seesawMusic) set({ seesawMusic: clone as HTMLAudioElement });
-            
-            // Reset current activity music to null to prevent issues
-            if (audio === currentActivityMusic) set({ currentActivityMusic: null });
+            audio.volume = 0;
           } catch (e) {
             console.error("Error while trying to mute audio:", e);
           }
         }
       });
       
-      // Set current to null to be extra safe
-      set({ currentActivityMusic: null });
+      console.log("All music muted");
     } else if (!isMuted) {
       // Only unmute and restore volume if sound is not fully muted
       if (backgroundMusic) backgroundMusic.volume = 0.3;

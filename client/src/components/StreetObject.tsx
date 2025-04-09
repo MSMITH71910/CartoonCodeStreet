@@ -89,11 +89,12 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
     if (type === "bench") {
       // Position character to sit properly on bench
       interactPos = new THREE.Vector3(
-        position[0] - 0.1,  // Less offset from bench to avoid sitting through it
-        position[1] + 0.5,  // Slightly higher to sit on top of bench
-        position[2]         // Same Z as bench
+        position[0] + Math.sin(rotation[1]) * 0.15,  // Position right on the bench with rotation offset
+        position[1] + 0.45,                          // Height to sit directly on bench seat
+        position[2] - Math.cos(rotation[1]) * 0.15   // Z with rotation offset to center on bench
       );
-      interactRot = rotation[1]; // Align with bench direction without extra rotation
+      // Set rotation to face outward from bench
+      interactRot = rotation[1] + Math.PI; // Face outward from bench
     } else if (type === "seesaw") {
       // Position character on one end of seesaw
       interactPos = new THREE.Vector3(
