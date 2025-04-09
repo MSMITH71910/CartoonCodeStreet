@@ -60,7 +60,7 @@ const Character = () => {
     
     // If in an interaction that requires positioning, update character position
     if (interactionPosition && interactionRotation !== null) {
-      if (interactionType === "sitting" || interactionType === "seesaw") {
+      if (interactionType === "seesaw") {
         // Snap to interaction position
         characterRef.current.position.copy(interactionPosition);
         characterRef.current.rotation.y = interactionRotation;
@@ -155,14 +155,13 @@ const Character = () => {
       {/* 
         Render different character styles based on interaction:
         - Regular standing character when not interacting
-        - Seated character when sitting on a bench
         - Special pose for seesaw interaction
         - Specific poses for other interactions
       */}
-      {interactionType === "sitting" || interactionType === "seesaw" ? (
+      {interactionType === "seesaw" ? (
         // Simple seated character facing directly forward
         <group>
-          {/* Torso - positioned correctly ON the bench */}
+          {/* Torso - positioned correctly for seesaw */}
           <mesh castShadow position={[0, 0.05, 0.05]}>
             <boxGeometry args={[0.3, 0.3, 0.2]} />
             <meshStandardMaterial color="#4285F4" />
@@ -184,7 +183,7 @@ const Character = () => {
             <meshBasicMaterial color="black" />
           </mesh>
           
-          {/* Upper legs hanging down from bench seat */}
+          {/* Upper legs hanging down from seesaw */}
           <mesh castShadow position={[-0.08, -0.25, 0.15]} rotation={[Math.PI / 2, 0, 0]}>
             <capsuleGeometry args={[0.05, 0.15, 4, 8]} />
             <meshStandardMaterial color="#4285F4" />
@@ -217,7 +216,7 @@ const Character = () => {
             <meshStandardMaterial color="#E53935" />
           </mesh>
           
-          {/* Arms resting on lap or bench */}
+          {/* Arms resting on lap for seesaw */}
           <mesh castShadow position={[0.2, -0.05, 0.1]} rotation={[0.3, 0, -0.2]}>
             <capsuleGeometry args={[0.05, 0.15, 4, 8]} />
             <meshStandardMaterial color="#4285F4" />

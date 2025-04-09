@@ -4,7 +4,6 @@ import { RefObject } from "react";
 
 export type InteractionType = 
   | "none" 
-  | "sitting" 
   | "seesaw" 
   | "ticTacToe" 
   | "hangman" 
@@ -67,12 +66,10 @@ export const useInteraction = create<InteractionState>((set, get) => ({
     }
     
     // Setup special interaction states
-    let isSitting = false;
+    let isSitting = false; // "sitting" type removed
     let isOnSeesaw = false;
     
-    if (type === "sitting") {
-      isSitting = true;
-    } else if (type === "seesaw") {
+    if (type === "seesaw") {
       isOnSeesaw = true;
     }
     

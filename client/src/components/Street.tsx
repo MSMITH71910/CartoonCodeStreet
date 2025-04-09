@@ -21,7 +21,7 @@ const Street = () => {
   }, [asphaltTexture, grassTexture]);
 
   // Define types for street objects
-  type StreetObjectType = "lamppost" | "tree" | "bench" | "hydrant" | "mailbox" | "seesaw" | "fountain";
+  type StreetObjectType = "lamppost" | "tree" | "hydrant" | "mailbox" | "seesaw" | "fountain";
   
   interface StreetObjectData {
     type: StreetObjectType;
@@ -71,24 +71,7 @@ const Street = () => {
       });
     }
     
-    // Benches positioned on the sidewalks - facing TOWARD the street at direct 90-degree angles
-    for (let i = -40; i <= 40; i += 15) {
-      // Left sidewalk benches - facing directly RIGHT (EAST) toward the street
-      positions.push({
-        type: "bench",
-        position: [-7, 0, i + 5], // On the left sidewalk
-        rotation: [0, 0, 0], // Face RIGHT/EAST directly toward the street
-        scale: [1, 1, 1]
-      });
-      
-      // Right sidewalk benches - facing directly LEFT (WEST) toward the street
-      positions.push({
-        type: "bench",
-        position: [7, 0, i - 5],  // On the right sidewalk
-        rotation: [0, Math.PI, 0], // Face LEFT/WEST directly toward the street
-        scale: [1, 1, 1]
-      });
-    }
+    // Benches have been removed as requested
     
     // Fire hydrants
     for (let i = -35; i <= 35; i += 25) {

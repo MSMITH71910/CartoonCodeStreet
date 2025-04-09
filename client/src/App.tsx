@@ -81,10 +81,10 @@ function App() {
         <p>A/← - Turn left</p>
         <p>D/→ - Turn right</p>
         <p>E/Space - Interact with objects</p>
+        <p className="text-yellow-300">Click and hold left mouse button to look around</p>
         <div className="mt-2 border-t pt-2 border-gray-600">
           <p className="font-semibold">Interactions:</p>
           <p>• Click houses to view projects</p>
-          <p>• Use benches to sit down</p>
           <p>• Interact with seesaw for fun</p>
           <p>• Interact with mailbox for Hangman</p>
           <p>• Visit hydrants for Tic-Tac-Toe</p>

@@ -7,7 +7,7 @@ import { useKeyboardControls } from "@react-three/drei";
 import { ControlName } from "../lib/constants";
 
 interface StreetObjectProps {
-  type: "lamppost" | "tree" | "bench" | "hydrant" | "mailbox" | "seesaw" | "fountain";
+  type: "lamppost" | "tree" | "hydrant" | "mailbox" | "seesaw" | "fountain";
   position: [number, number, number];
   rotation: [number, number, number];
   scale: [number, number, number];
@@ -33,7 +33,6 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
   // Determine interaction type based on object type
   const getInteractionType = () => {
     switch (type) {
-      case "bench": return "sitting";
       case "seesaw": return "seesaw";
       case "lamppost": return "lamp";
       case "fountain": return "none"; // Custom handling
@@ -86,33 +85,7 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
     let interactPos = new THREE.Vector3(position[0], position[1], position[2]);
     let interactRot = rotation[1]; // Use Y rotation
     
-    if (type === "bench") {
-      // Position character to sit exactly on the bench based on bench orientation
-      const benchRotationY = rotation[1]; // Get the bench's Y rotation
-      
-      // Calculate position based on bench rotation
-      // For benches on RIGHT sidewalk (rotation = PI) - facing LEFT/WEST toward street
-      if (Math.abs(benchRotationY - Math.PI) < 0.1) {
-        interactPos = new THREE.Vector3(
-          position[0] + 0.05,      // Slightly toward front of bench seat
-          position[1] + 0.25,      // Height exactly on top of bench
-          position[2]              // Centered on Z
-        );
-      }
-      // For benches on LEFT sidewalk (rotation = 0) - facing RIGHT/EAST toward street
-      else {
-        interactPos = new THREE.Vector3(
-          position[0] - 0.05,      // Slightly toward front of bench seat
-          position[1] + 0.25,      // Height exactly on top of bench
-          position[2]              // Centered on Z
-        );
-      }
-      
-      // Character always faces toward the street by matching bench rotation
-      // For benches on the right, they face left (PI)
-      // For benches on the left, they face right (0)
-      interactRot = benchRotationY;
-    } else if (type === "seesaw") {
+    if (type === "seesaw") {
       // Position character on one end of seesaw
       interactPos = new THREE.Vector3(
         position[0],          // Same X
@@ -207,19 +180,7 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
         }
         break;
         
-      case "bench":
-        // Bench glows when hovered
-        if (objectRef.current.children.length > 0) {
-          const benchSeat = objectRef.current.children[0] as THREE.Mesh;
-          const material = benchSeat.material as THREE.MeshStandardMaterial;
-          
-          if (hovered) {
-            material.color.setHex(0xffeb3b); // Yellow glow
-          } else {
-            material.color.setHex(0x8d6e63); // Normal wood color
-          }
-        }
-        break;
+      // Bench case removed
         
       // Basketball case completely removed
         
@@ -359,45 +320,7 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
         </>
       )}
       
-      {type === "bench" && (
-        <>
-          {/* A very clear simple bench design where the backrest is obvious */}
-          
-          {/* Main bench seat */}
-          <mesh castShadow position={[0, 0.25, 0]}>
-            <boxGeometry args={[0.6, 0.1, 0.4]} />
-            <meshStandardMaterial color="#8D6E63" roughness={0.9} />
-          </mesh>
-          
-          {/* Bench back - clear vertical board for backrest facing away from street */}
-          <mesh castShadow position={[-0.25, 0.55, 0]}>
-            <boxGeometry args={[0.1, 0.5, 0.4]} />
-            <meshStandardMaterial color="#A1887F" roughness={0.9} />
-          </mesh>
-          
-          {/* Armrests */}
-          <mesh castShadow position={[0, 0.35, 0.2]}>
-            <boxGeometry args={[0.5, 0.1, 0.05]} />
-            <meshStandardMaterial color="#8D6E63" roughness={0.9} />
-          </mesh>
-          
-          <mesh castShadow position={[0, 0.35, -0.2]}>
-            <boxGeometry args={[0.5, 0.1, 0.05]} />
-            <meshStandardMaterial color="#8D6E63" roughness={0.9} />
-          </mesh>
-          
-          {/* Support legs - thick and clear */}
-          <mesh castShadow position={[0.25, 0.125, 0]}>
-            <boxGeometry args={[0.1, 0.25, 0.3]} />
-            <meshStandardMaterial color="#5D4037" roughness={0.9} />
-          </mesh>
-          
-          <mesh castShadow position={[-0.25, 0.125, 0]}>
-            <boxGeometry args={[0.1, 0.25, 0.3]} />
-            <meshStandardMaterial color="#5D4037" roughness={0.9} />
-          </mesh>
-        </>
-      )}
+      {/* Bench component removed */}
       
       {type === "hydrant" && (
         <>
