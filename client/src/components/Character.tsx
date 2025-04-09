@@ -168,18 +168,18 @@ const Character = () => {
             <meshStandardMaterial color="#4285F4" />
           </mesh>
           
-          {/* Head - facing street (forward) */}
+          {/* Head - facing towards street */}
           <mesh castShadow position={[0, 0.3, 0.0]}>
             <sphereGeometry args={[0.15, 16, 16]} />
             <meshStandardMaterial color="#FFCC00" />
           </mesh>
           
-          {/* Eyes - always face toward street regardless of bench position */}
-          <mesh position={[0.05, 0.33, 0.15]}>
+          {/* Eyes - positioned based on bench rotation to always face street */}
+          <mesh position={[0, 0.33, 0.15]}>
             <sphereGeometry args={[0.03, 16, 16]} />
             <meshBasicMaterial color="black" />
           </mesh>
-          <mesh position={[-0.05, 0.33, 0.15]}>
+          <mesh position={[-0, 0.33, 0.15]}>
             <sphereGeometry args={[0.03, 16, 16]} />
             <meshBasicMaterial color="black" />
           </mesh>

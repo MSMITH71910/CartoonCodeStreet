@@ -91,20 +91,20 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
       const benchRotationY = rotation[1]; // Get the bench's Y rotation
       
       // Calculate position based on bench rotation
-      // For benches on right sidewalk (rotation = PI) - facing west/left
-      if (Math.abs(benchRotationY - Math.PI) < 0.1) {
+      // For benches on right sidewalk (rotation = -PI/2) - facing left toward street
+      if (Math.abs(benchRotationY + Math.PI/2) < 0.1) {
         interactPos = new THREE.Vector3(
-          position[0],             // Centered on bench
+          position[0] - 0.2,       // Slightly offset from center toward street
           position[1] + 0.32,      // Height to sit on bench
-          position[2] + 0.2        // Slightly offset for back support
+          position[2]              // Centered on Z
         );
       }
-      // For benches on left sidewalk (rotation = 0) - facing east/right
+      // For benches on left sidewalk (rotation = PI/2) - facing right toward street
       else {
         interactPos = new THREE.Vector3(
-          position[0],             // Centered on bench
+          position[0] + 0.2,       // Slightly offset from center toward street
           position[1] + 0.32,      // Height to sit on bench
-          position[2] - 0.2        // Slightly offset for back support
+          position[2]              // Centered on Z
         );
       }
       
@@ -359,44 +359,47 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
       
       {type === "bench" && (
         <>
-          {/* Bench designed to face the street with proper orientation */}
-          {/* Main bench seat - perfectly positioned for sitting */}
+          {/* Bench correctly oriented to face toward the street 
+               For sidewalk bench, the backrest should face away from street
+               This puts the bench facing INWARD toward the street */}
+          
+          {/* Main bench seat */}
           <mesh castShadow position={[0, 0.3, 0]}>
-            <boxGeometry args={[0.8, 0.1, 1.6]} />
+            <boxGeometry args={[1.6, 0.1, 0.8]} />
             <meshStandardMaterial color="#8D6E63" roughness={0.9} />
           </mesh>
           
-          {/* Bench back support - positioned for leaning against when sitting */}
-          <mesh castShadow position={[0.35, 0.8, 0]}>
-            <boxGeometry args={[0.1, 0.9, 1.6]} />
+          {/* Bench back - away from the street */}
+          <mesh castShadow position={[-0.7, 0.8, 0]}>
+            <boxGeometry args={[0.1, 0.9, 0.8]} />
             <meshStandardMaterial color="#8D6E63" roughness={0.9} />
           </mesh>
           
-          {/* Armrests on both sides */}
-          <mesh castShadow position={[0, 0.5, 0.7]}>
-            <boxGeometry args={[0.8, 0.3, 0.1]} />
+          {/* Armrests on sides */}
+          <mesh castShadow position={[0, 0.5, 0.35]}>
+            <boxGeometry args={[1.6, 0.3, 0.1]} />
             <meshStandardMaterial color="#5D4037" roughness={0.9} />
           </mesh>
           
-          <mesh castShadow position={[0, 0.5, -0.7]}>
-            <boxGeometry args={[0.8, 0.3, 0.1]} />
+          <mesh castShadow position={[0, 0.5, -0.35]}>
+            <boxGeometry args={[1.6, 0.3, 0.1]} />
             <meshStandardMaterial color="#5D4037" roughness={0.9} />
           </mesh>
           
-          {/* Strong bench legs */}
-          <mesh castShadow position={[0, 0.15, -0.6]}>
-            <boxGeometry args={[0.7, 0.3, 0.1]} />
+          {/* Bench legs */}
+          <mesh castShadow position={[0.6, 0.15, 0]}>
+            <boxGeometry args={[0.1, 0.3, 0.7]} />
             <meshStandardMaterial color="#5D4037" roughness={0.9} />
           </mesh>
           
-          <mesh castShadow position={[0, 0.15, 0.6]}>
-            <boxGeometry args={[0.7, 0.3, 0.1]} />
+          <mesh castShadow position={[-0.6, 0.15, 0]}>
+            <boxGeometry args={[0.1, 0.3, 0.7]} />
             <meshStandardMaterial color="#5D4037" roughness={0.9} />
           </mesh>
           
-          {/* Support beam across backrest */}
-          <mesh castShadow position={[0.3, 0.55, 0]}>
-            <boxGeometry args={[0.1, 0.4, 1.6]} />
+          {/* Support beam */}
+          <mesh castShadow position={[-0.55, 0.55, 0]}>
+            <boxGeometry args={[0.3, 0.4, 0.8]} />
             <meshStandardMaterial color="#6D4C41" roughness={0.9} />
           </mesh>
         </>
