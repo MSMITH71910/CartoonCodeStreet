@@ -47,22 +47,30 @@ const StreetSign: React.FC<StreetSignProps> = ({ position }) => {
       {/* Sign board */}
       <group 
         position={[0, 2, 0]} 
+        rotation={[0, Math.PI / 4, 0]} // Rotate the sign for better visibility
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
         onClick={handleSignClick}
       >
         <mesh castShadow receiveShadow>
-          <boxGeometry args={[2.5, 0.8, 0.1]} />
+          <boxGeometry args={[3, 1, 0.1]} />
           <meshStandardMaterial color={hovered ? "#4CAF50" : "#2E7D32"} />
+        </mesh>
+        
+        {/* White border for sign */}
+        <mesh position={[0, 0, 0.01]}>
+          <boxGeometry args={[3.2, 1.2, 0.01]} />
+          <meshStandardMaterial color="white" />
         </mesh>
         
         {/* Sign text */}
         <Text
           position={[0, 0, 0.06]}
           color="white"
-          fontSize={0.12}
-          maxWidth={2.3}
+          fontSize={0.2}
+          maxWidth={2.8}
           textAlign="center"
+          font="bold"
         >
           Michael R Smith Portfolio Street
         </Text>
@@ -70,27 +78,35 @@ const StreetSign: React.FC<StreetSignProps> = ({ position }) => {
       
       {/* Info popup when clicked */}
       {showInfo && (
-        <group position={[0, 3.2, 0]}>
+        <group position={[0, 3.5, 0]} rotation={[0, Math.PI / 4, 0]}>
+          {/* Background with border */}
           <mesh>
             <boxGeometry args={[4, 2.5, 0.1]} />
-            <meshStandardMaterial color="#333333" transparent opacity={0.9} />
+            <meshStandardMaterial color="#333333" transparent opacity={0.95} />
+          </mesh>
+          
+          {/* White border */}
+          <mesh position={[0, 0, -0.01]}>
+            <boxGeometry args={[4.1, 2.6, 0.01]} />
+            <meshStandardMaterial color="#555555" />
           </mesh>
           
           <Text
             position={[0, 0.9, 0.06]}
-            color="white"
-            fontSize={0.15}
+            color="#FFEB3B" // Yellow title
+            fontSize={0.25}
             maxWidth={3.8}
             textAlign="center"
+            font="bold"
           >
             About This Portfolio
           </Text>
           
           <Text
-            position={[0, 0, 0.06]}
+            position={[0, 0.1, 0.06]}
             color="white"
-            fontSize={0.1}
-            maxWidth={3.8}
+            fontSize={0.15}
+            maxWidth={3.6}
             textAlign="left"
             lineHeight={1.5}
           >
@@ -100,21 +116,31 @@ const StreetSign: React.FC<StreetSignProps> = ({ position }) => {
             • TailwindCSS for UI styling
             • Custom animation system
             • Interactive mini-games
-            
+          </Text>
+          
+          <Text
+            position={[0, -0.5, 0.06]}
+            color="#E0E0E0"
+            fontSize={0.15}
+            maxWidth={3.6}
+            textAlign="left"
+            lineHeight={1.5}
+          >
             This 3D portfolio features custom character
-            animations, interactive objects, and a fully
+            animations, interactive objects, and fully
             explorable environment with houses that
             represent different projects.
           </Text>
           
           <Text
-            position={[0, -1, 0.06]}
+            position={[0, -1.1, 0.06]}
             color="#4FC3F7"
-            fontSize={0.08}
+            fontSize={0.15}
             maxWidth={3.8}
             textAlign="center"
+            font="bold"
           >
-            Click the sign again to close this info
+            Click the sign again to close
           </Text>
         </group>
       )}

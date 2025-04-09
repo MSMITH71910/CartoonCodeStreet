@@ -235,7 +235,7 @@ const Street = () => {
       ))}
       
       {/* Street sign with portfolio info - placed at the entrance of the street */}
-      <StreetSign position={[0, 0, 45]} />
+      <StreetSign position={[0, 0, 35]} />
     </group>
   );
 };
