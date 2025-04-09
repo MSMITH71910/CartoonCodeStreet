@@ -235,28 +235,40 @@ const Experience = () => {
           <meshBasicMaterial color="#0D47A1" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Create text using HTML Canvas */}
+        {/* Create text using HTML Canvas - MUCH LARGER */}
         <mesh position={[0, 3.7, 0.16]}>
-          <planeGeometry args={[3.5, 0.4]} />
+          <planeGeometry args={[3.8, 0.4]} />
           <meshBasicMaterial side={THREE.DoubleSide}>
             <canvasTexture attach="map" args={[(() => {
               // Create a canvas
               const canvas = document.createElement('canvas');
-              canvas.width = 512;
-              canvas.height = 128;
+              canvas.width = 1024; // Double the resolution
+              canvas.height = 256; // Double the resolution
               const ctx = canvas.getContext('2d');
               
               if (ctx) {
-                // Clear the canvas
-                ctx.fillStyle = 'transparent';
+                // Clear the canvas with a semi-transparent background for better readability
+                ctx.fillStyle = '#0D47A1';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                // Add text
-                ctx.fillStyle = 'white';
-                ctx.font = 'bold 40px Arial';
+                // Add border around text
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+                // Main title - use larger font
+                ctx.fillStyle = 'yellow'; // Bright yellow for better visibility
+                ctx.font = 'bold 70px Arial'; // Much larger font
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('Michael R. Smith Portfolio Street', canvas.width / 2, canvas.height / 2);
+                
+                // Draw top line - "PORTFOLIO"
+                ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height / 2 - 15);
+                
+                // Draw smaller subtitle below
+                ctx.font = 'bold 50px Arial';
+                ctx.fillStyle = 'white';
+                ctx.fillText('Michael R. Smith', canvas.width / 2, canvas.height / 2 + 50);
               }
               
               return canvas;
@@ -270,28 +282,57 @@ const Experience = () => {
           <meshBasicMaterial color="#1565C0" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Create text for "Click for info" */}
+        {/* Create text for "Click for info" - LARGER */}
         <mesh position={[0, 3.3, 0.16]}>
-          <planeGeometry args={[3.5, 0.4]} />
+          <planeGeometry args={[3.8, 0.4]} />
           <meshBasicMaterial side={THREE.DoubleSide}>
             <canvasTexture attach="map" args={[(() => {
               // Create a canvas
               const canvas = document.createElement('canvas');
-              canvas.width = 512;
-              canvas.height = 128;
+              canvas.width = 1024; // Higher resolution
+              canvas.height = 256; // Higher resolution
               const ctx = canvas.getContext('2d');
               
               if (ctx) {
-                // Clear the canvas
-                ctx.fillStyle = 'transparent';
+                // Fill background
+                ctx.fillStyle = '#1565C0';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                // Add text
-                ctx.fillStyle = 'white';
-                ctx.font = '36px Arial';
+                // Add border for visibility
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+                
+                // Add text - much larger
+                ctx.fillStyle = 'yellow'; // Bright yellow for visibility
+                ctx.font = 'bold 80px Arial'; // Much larger font
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('Click for info', canvas.width / 2, canvas.height / 2);
+                ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height / 2);
+                
+                // Add arrow pointer icons
+                const arrowSize = 40;
+                const arrowX1 = canvas.width / 2 - 200;
+                const arrowX2 = canvas.width / 2 + 200;
+                const arrowY = canvas.height / 2;
+                
+                // Left arrow
+                ctx.beginPath();
+                ctx.moveTo(arrowX1 - arrowSize, arrowY);
+                ctx.lineTo(arrowX1, arrowY - arrowSize/2);
+                ctx.lineTo(arrowX1, arrowY + arrowSize/2);
+                ctx.closePath();
+                ctx.fillStyle = 'white';
+                ctx.fill();
+                
+                // Right arrow
+                ctx.beginPath();
+                ctx.moveTo(arrowX2 + arrowSize, arrowY);
+                ctx.lineTo(arrowX2, arrowY - arrowSize/2);
+                ctx.lineTo(arrowX2, arrowY + arrowSize/2);
+                ctx.closePath();
+                ctx.fillStyle = 'white';
+                ctx.fill();
               }
               
               return canvas;
@@ -305,28 +346,40 @@ const Experience = () => {
           <meshBasicMaterial color="#0D47A1" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Create text for back side */}
+        {/* Create text for back side - MUCH LARGER */}
         <mesh position={[0, 3.7, -0.16]} rotation={[0, Math.PI, 0]}>
-          <planeGeometry args={[3.5, 0.4]} />
+          <planeGeometry args={[3.8, 0.4]} />
           <meshBasicMaterial side={THREE.DoubleSide}>
             <canvasTexture attach="map" args={[(() => {
               // Create a canvas
               const canvas = document.createElement('canvas');
-              canvas.width = 512;
-              canvas.height = 128;
+              canvas.width = 1024; // Double the resolution
+              canvas.height = 256; // Double the resolution
               const ctx = canvas.getContext('2d');
               
               if (ctx) {
-                // Clear the canvas
-                ctx.fillStyle = 'transparent';
+                // Clear the canvas with a semi-transparent background for better readability
+                ctx.fillStyle = '#0D47A1';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                // Add text
-                ctx.fillStyle = 'white';
-                ctx.font = 'bold 40px Arial';
+                // Add border around text
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+                // Main title - use larger font
+                ctx.fillStyle = 'yellow'; // Bright yellow for better visibility
+                ctx.font = 'bold 70px Arial'; // Much larger font
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('Michael R. Smith Portfolio Street', canvas.width / 2, canvas.height / 2);
+                
+                // Draw top line - "PORTFOLIO"
+                ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height / 2 - 15);
+                
+                // Draw smaller subtitle below
+                ctx.font = 'bold 50px Arial';
+                ctx.fillStyle = 'white';
+                ctx.fillText('Michael R. Smith', canvas.width / 2, canvas.height / 2 + 50);
               }
               
               return canvas;
@@ -340,28 +393,57 @@ const Experience = () => {
           <meshBasicMaterial color="#1565C0" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Create text for "Click for info" on back side */}
+        {/* Create text for "Click for info" on back side - LARGER */}
         <mesh position={[0, 3.3, -0.16]} rotation={[0, Math.PI, 0]}>
-          <planeGeometry args={[3.5, 0.4]} />
+          <planeGeometry args={[3.8, 0.4]} />
           <meshBasicMaterial side={THREE.DoubleSide}>
             <canvasTexture attach="map" args={[(() => {
               // Create a canvas
               const canvas = document.createElement('canvas');
-              canvas.width = 512;
-              canvas.height = 128;
+              canvas.width = 1024; // Higher resolution
+              canvas.height = 256; // Higher resolution
               const ctx = canvas.getContext('2d');
               
               if (ctx) {
-                // Clear the canvas
-                ctx.fillStyle = 'transparent';
+                // Fill background
+                ctx.fillStyle = '#1565C0';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                // Add text
-                ctx.fillStyle = 'white';
-                ctx.font = '36px Arial';
+                // Add border for visibility
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+                
+                // Add text - much larger
+                ctx.fillStyle = 'yellow'; // Bright yellow for visibility
+                ctx.font = 'bold 80px Arial'; // Much larger font
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('Click for info', canvas.width / 2, canvas.height / 2);
+                ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height / 2);
+                
+                // Add arrow pointer icons
+                const arrowSize = 40;
+                const arrowX1 = canvas.width / 2 - 200;
+                const arrowX2 = canvas.width / 2 + 200;
+                const arrowY = canvas.height / 2;
+                
+                // Left arrow
+                ctx.beginPath();
+                ctx.moveTo(arrowX1 - arrowSize, arrowY);
+                ctx.lineTo(arrowX1, arrowY - arrowSize/2);
+                ctx.lineTo(arrowX1, arrowY + arrowSize/2);
+                ctx.closePath();
+                ctx.fillStyle = 'white';
+                ctx.fill();
+                
+                // Right arrow
+                ctx.beginPath();
+                ctx.moveTo(arrowX2 + arrowSize, arrowY);
+                ctx.lineTo(arrowX2, arrowY - arrowSize/2);
+                ctx.lineTo(arrowX2, arrowY + arrowSize/2);
+                ctx.closePath();
+                ctx.fillStyle = 'white';
+                ctx.fill();
               }
               
               return canvas;
