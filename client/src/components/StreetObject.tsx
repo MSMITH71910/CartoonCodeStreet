@@ -1,13 +1,13 @@
 import { useRef, useState, useMemo, useEffect } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAudio } from "../lib/stores/useAudio";
 import { useInteraction } from "../lib/stores/useInteraction";
-import { useKeyboardControls } from "@react-three/drei";
+import { useKeyboardControls, Text } from "@react-three/drei";
 import { ControlName } from "../lib/constants";
 
 interface StreetObjectProps {
-  type: "lamppost" | "tree" | "hydrant" | "mailbox" | "seesaw" | "fountain";
+  type: "lamppost" | "tree" | "hydrant" | "mailbox" | "seesaw" | "fountain" | "sign";
   position: [number, number, number];
   rotation: [number, number, number];
   scale: [number, number, number];
@@ -466,6 +466,181 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
               distance={3} 
               color="#29B6F6" 
             />
+          )}
+        </>
+      )}
+      
+      {type === "sign" && (
+        <>
+          {/* Sign posts - two sturdy poles */}
+          <mesh castShadow position={[-2, 2, 0]}>
+            <cylinderGeometry args={[0.2, 0.2, 4, 16]} />
+            <meshStandardMaterial color="#8B4513" />
+          </mesh>
+          
+          <mesh castShadow position={[2, 2, 0]}>
+            <cylinderGeometry args={[0.2, 0.2, 4, 16]} />
+            <meshStandardMaterial color="#8B4513" />
+          </mesh>
+          
+          {/* Large billboard sign */}
+          <group position={[0, 3.5, 0]}>
+            {/* Main sign background */}
+            <mesh castShadow receiveShadow>
+              <boxGeometry args={[5, 2, 0.2]} />
+              <meshStandardMaterial color={hovered ? "#4285F4" : "#1E88E5"} />
+            </mesh>
+            
+            {/* Sign border */}
+            <mesh position={[0, 0, 0.11]}>
+              <boxGeometry args={[5.2, 2.2, 0.01]} />
+              <meshStandardMaterial color="#FFFFFF" />
+            </mesh>
+            
+            {/* Inner part with text effect */}
+            <mesh position={[0, 0, 0.12]}>
+              <boxGeometry args={[4.8, 1.8, 0.01]} />
+              <meshStandardMaterial color={hovered ? "#4285F4" : "#1E88E5"} />
+            </mesh>
+            
+            {/* Sign title */}
+            <Text
+              position={[0, 0.5, 0.2]}
+              fontSize={0.3}
+              color="white"
+              anchorX="center"
+              anchorY="middle"
+            >
+              PORTFOLIO STREET
+            </Text>
+            
+            {/* Sign subtitle */}
+            <Text
+              position={[0, 0, 0.2]}
+              fontSize={0.15}
+              color="white"
+              anchorX="center"
+              anchorY="middle"
+            >
+              Michael R Smith
+            </Text>
+            
+            {/* Technologies used */}
+            <Text
+              position={[0, -0.4, 0.2]}
+              fontSize={0.12}
+              color="white"
+              anchorX="center"
+              anchorY="middle"
+            >
+              Built with React, Three.js & TypeScript
+            </Text>
+          </group>
+          
+          {/* Info panel when clicked */}
+          {clicked && (
+            <group position={[0, 3.5, 1]}>
+              {/* Background with border */}
+              <mesh>
+                <boxGeometry args={[6, 4, 0.2]} />
+                <meshStandardMaterial color="#333333" transparent opacity={0.95} />
+              </mesh>
+              
+              {/* Border */}
+              <mesh position={[0, 0, 0.11]}>
+                <boxGeometry args={[6.2, 4.2, 0.01]} />
+                <meshStandardMaterial color="#555555" />
+              </mesh>
+              
+              {/* Header */}
+              <mesh position={[0, 1.7, 0.15]}>
+                <boxGeometry args={[5.8, 0.6, 0.01]} />
+                <meshStandardMaterial color="#1A237E" />
+              </mesh>
+              
+              {/* Footer */}
+              <mesh position={[0, -1.7, 0.15]}>
+                <boxGeometry args={[5.8, 0.6, 0.01]} />
+                <meshStandardMaterial color="#1A237E" />
+              </mesh>
+              
+              {/* Header Text */}
+              <Text
+                position={[0, 1.7, 0.2]}
+                fontSize={0.25}
+                color="white"
+                anchorX="center"
+                anchorY="middle"
+              >
+                WELCOME TO MY PORTFOLIO
+              </Text>
+              
+              {/* Main content */}
+              <Text
+                position={[0, 0.8, 0.2]}
+                fontSize={0.15}
+                color="white"
+                anchorX="center"
+                anchorY="middle"
+                maxWidth={5}
+              >
+                Controls:
+              </Text>
+              
+              <Text
+                position={[0, 0.3, 0.2]}
+                fontSize={0.12}
+                color="white"
+                anchorX="center"
+                anchorY="middle"
+                maxWidth={5}
+              >
+                WASD / Arrow Keys: Move character
+              </Text>
+              
+              <Text
+                position={[0, 0, 0.2]}
+                fontSize={0.12}
+                color="white"
+                anchorX="center"
+                anchorY="middle"
+                maxWidth={5}
+              >
+                E: Interact with objects
+              </Text>
+              
+              <Text
+                position={[0, -0.3, 0.2]}
+                fontSize={0.12}
+                color="white"
+                anchorX="center"
+                anchorY="middle"
+                maxWidth={5}
+              >
+                Mouse: Click + hold to look around
+              </Text>
+              
+              <Text
+                position={[0, -0.6, 0.2]}
+                fontSize={0.12}
+                color="white"
+                anchorX="center"
+                anchorY="middle"
+                maxWidth={5}
+              >
+                Z: Dance | Q: Wave Left | R: Wave Right
+              </Text>
+              
+              <Text
+                position={[0, -1.7, 0.2]}
+                fontSize={0.12}
+                color="white"
+                anchorX="center"
+                anchorY="middle"
+              >
+                Click houses to view projects | Try the mini-games!
+              </Text>
+            </group>
           )}
         </>
       )}
