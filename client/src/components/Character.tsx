@@ -28,6 +28,11 @@ const Character = () => {
   const [isMoving, setIsMoving] = useState(false);
   const [animationTime, setAnimationTime] = useState(0);
   
+  // Special interaction animations
+  const [isDancing, setIsDancing] = useState(false);
+  const [isWaving, setIsWaving] = useState(false);
+  const [waveArm, setWaveArm] = useState<'left' | 'right'>('right');
+  
   // Get keyboard controls
   const forward = useKeyboardControls((state) => state[ControlName.forward]);
   const backward = useKeyboardControls((state) => state[ControlName.backward]);
@@ -149,6 +154,72 @@ const Character = () => {
   useEffect(() => {
     console.log(`Controls: forward=${forward}, backward=${backward}, left=${leftward}, right=${rightward}, interact=${interact}`);
   }, [forward, backward, leftward, rightward, interact]);
+  
+  // Update animation time for dancing/waving animations
+  useFrame((state, delta) => {
+    if (isDancing || isWaving) {
+      setAnimationTime(prev => prev + delta * 8); // Faster animation for dancing/waving
+    }
+  });
+  
+  // Set timeouts to stop animations after a delay
+  useEffect(() => {
+    let danceTimer: NodeJS.Timeout;
+    let waveTimer: NodeJS.Timeout;
+    
+    if (isDancing) {
+      danceTimer = setTimeout(() => setIsDancing(false), 3000);
+    }
+    
+    if (isWaving) {
+      waveTimer = setTimeout(() => setIsWaving(false), 3000);
+    }
+    
+    // Clean up timeouts if component unmounts or animation state changes
+    return () => {
+      clearTimeout(danceTimer);
+      clearTimeout(waveTimer);
+    };
+  }, [isDancing, isWaving]);
+  
+  // Handle movement stopping animations
+  useEffect(() => {
+    if (isMoving && (isDancing || isWaving)) {
+      // Stop animations when character starts moving
+      setIsDancing(false);
+      setIsWaving(false);
+    }
+  }, [isMoving, isDancing, isWaving]);
+  
+  // Click handlers for character parts
+  const handleLegClick = () => {
+    if (!isMoving && !isDancing && !isWaving && interactionType === "none") {
+      console.log("Dancing animation triggered!");
+      setIsDancing(true);
+      setAnimationTime(0); // Reset animation timer
+      playSuccess(); // Play a sound effect
+    }
+  };
+  
+  const handleLeftArmClick = () => {
+    if (!isMoving && !isDancing && !isWaving && interactionType === "none") {
+      console.log("Left arm wave animation triggered!");
+      setIsWaving(true);
+      setWaveArm('left');
+      setAnimationTime(0); // Reset animation timer
+      playHit(); // Play a sound effect
+    }
+  };
+  
+  const handleRightArmClick = () => {
+    if (!isMoving && !isDancing && !isWaving && interactionType === "none") {
+      console.log("Right arm wave animation triggered!");
+      setIsWaving(true);
+      setWaveArm('right');
+      setAnimationTime(0); // Reset animation timer
+      playHit(); // Play a sound effect
+    }
+  };
 
   return (
     <group ref={characterRef} position={[0, 0.15, 5]}>
@@ -252,12 +323,19 @@ const Character = () => {
             <meshBasicMaterial color="black" />
           </mesh>
           
-          {/* Left rollerblade */}
-          <group position={[-0.2, 0, 0]}>
+          {/* Left rollerblade with dancing animation */}
+          <group 
+            position={[-0.2, isDancing ? Math.sin(animationTime) * 0.3 : 0, 0]}
+            onClick={handleLegClick}
+          >
             <mesh 
               castShadow 
               position={[0, 0.05, 0]} 
-              rotation={[0, 0, isMoving ? Math.sin(animationTime) * 0.2 : 0]}
+              rotation={[
+                isDancing ? Math.sin(animationTime * 2) * 0.3 : 0,
+                0, 
+                isMoving ? Math.sin(animationTime) * 0.2 : 0
+              ]}
             >
               <boxGeometry args={[0.2, 0.1, 0.5]} />
               <meshStandardMaterial color="#E53935" />
@@ -274,12 +352,19 @@ const Character = () => {
             </mesh>
           </group>
           
-          {/* Right rollerblade */}
-          <group position={[0.2, 0, 0]}>
+          {/* Right rollerblade with dancing animation */}
+          <group 
+            position={[0.2, isDancing ? -Math.sin(animationTime) * 0.3 : 0, 0]}
+            onClick={handleLegClick}
+          >
             <mesh 
               castShadow 
               position={[0, 0.05, 0]} 
-              rotation={[0, 0, isMoving ? -Math.sin(animationTime) * 0.2 : 0]}
+              rotation={[
+                isDancing ? -Math.sin(animationTime * 2) * 0.3 : 0,
+                0, 
+                isMoving ? -Math.sin(animationTime) * 0.2 : 0
+              ]}
             >
               <boxGeometry args={[0.2, 0.1, 0.5]} />
               <meshStandardMaterial color="#E53935" />
@@ -296,20 +381,31 @@ const Character = () => {
             </mesh>
           </group>
           
-          {/* Arms - animate based on movement */}
+          {/* Right arm with waving animation */}
           <mesh 
             castShadow 
             position={[0.5, 1.0, 0]} 
-            rotation={[0, 0, isMoving ? Math.sin(animationTime) * 0.5 : 0]}
+            rotation={[
+              isWaving && waveArm === 'right' ? Math.sin(animationTime) * 0.8 : 0,
+              0, 
+              isMoving ? Math.sin(animationTime) * 0.5 : 0
+            ]}
+            onClick={handleRightArmClick}
           >
             <capsuleGeometry args={[0.1, 0.6, 4, 8]} />
             <meshStandardMaterial color="#4285F4" />
           </mesh>
           
+          {/* Left arm with waving animation */}
           <mesh 
             castShadow 
             position={[-0.5, 1.0, 0]} 
-            rotation={[0, 0, isMoving ? -Math.sin(animationTime) * 0.5 : 0]}
+            rotation={[
+              isWaving && waveArm === 'left' ? Math.sin(animationTime) * 0.8 : 0,
+              0, 
+              isMoving ? -Math.sin(animationTime) * 0.5 : 0
+            ]}
+            onClick={handleLeftArmClick}
           >
             <capsuleGeometry args={[0.1, 0.6, 4, 8]} />
             <meshStandardMaterial color="#4285F4" />
