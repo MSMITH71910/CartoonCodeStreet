@@ -148,6 +148,32 @@ const Experience = () => {
       {/* Player character */}
       <Character />
       
+      {/* Direct street sign implementation - very simple */}
+      <group position={[0, 0, 15]} rotation={[0, Math.PI, 0]}>
+        {/* Posts */}
+        <mesh castShadow position={[-2, 2, 0]}>
+          <cylinderGeometry args={[0.2, 0.2, 4, 16]} />
+          <meshStandardMaterial color="#8B4513" />
+        </mesh>
+        
+        <mesh castShadow position={[2, 2, 0]}>
+          <cylinderGeometry args={[0.2, 0.2, 4, 16]} />
+          <meshStandardMaterial color="#8B4513" />
+        </mesh>
+        
+        {/* Sign board */}
+        <mesh castShadow position={[0, 3.5, 0]} receiveShadow>
+          <boxGeometry args={[5, 1.8, 0.2]} />
+          <meshStandardMaterial color="#1E88E5" />
+        </mesh>
+        
+        {/* Sign text area */}
+        <mesh position={[0, 3.5, 0.12]}>
+          <boxGeometry args={[4.5, 1.5, 0.05]} />
+          <meshStandardMaterial color="#FFFFFF" />
+        </mesh>
+      </group>
+      
       {/* Camera controls - always enabled to allow viewing from different angles */}
       <OrbitControls 
         target={cameraTarget} 

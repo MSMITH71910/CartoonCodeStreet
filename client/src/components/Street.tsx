@@ -233,12 +233,7 @@ const Street = () => {
           scale={obj.scale}
         />
       ))}
-      {/* Add portfolio street sign at the beginning of the street */}
-      {/* Sign faces toward player's starting position */}
-      <StreetSign
-        position={[0, 0, 15]}
-        rotation={[0, Math.PI, 0]}
-      />
+      {/* Street sign is now directly in Experience component */}
     </group>
   );
 };
