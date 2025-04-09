@@ -5,13 +5,24 @@ import * as THREE from "three";
 import { ControlName } from "../lib/constants";
 import { usePortfolio } from "../lib/stores/usePortfolio";
 import { useAudio } from "../lib/stores/useAudio";
+import { useInteraction } from "../lib/stores/useInteraction";
 
 const Character = () => {
   const characterRef = useRef<THREE.Group>(null);
   const { setCharacterRef, isViewingProject } = usePortfolio();
   const [velocity, setVelocity] = useState(new THREE.Vector3());
   const [rotation, setRotation] = useState(0);
-  const { playHit } = useAudio();
+  const { playHit, playSuccess } = useAudio();
+  
+  // Interaction state
+  const { 
+    interactionType, 
+    interactionPosition, 
+    interactionRotation,
+    isSitting,
+    isOnSeesaw,
+    endInteraction
+  } = useInteraction();
   
   // Animation states
   const [isMoving, setIsMoving] = useState(false);
@@ -30,11 +41,36 @@ const Character = () => {
     console.log("Character ref registered to portfolio store");
   }, [setCharacterRef]);
 
+  // Handle interactions
+  useEffect(() => {
+    if (interact && interactionType === "none") {
+      // If player is pressing interact, try to end current interaction
+      console.log("Trying to end interaction on button press");
+    } else if (interact && interactionType !== "none") {
+      // If already interacting and pressing interact, end interaction
+      console.log("Ending interaction on button press");
+      endInteraction();
+      playHit();
+    }
+  }, [interact, interactionType, endInteraction, playHit]);
+
   // Character movement and animation
   useFrame((state, delta) => {
     if (!characterRef.current || isViewingProject) return;
     
-    // Character movement logic
+    // If in an interaction that requires positioning, update character position
+    if (interactionPosition && interactionRotation !== null) {
+      if (interactionType === "sitting" || interactionType === "seesaw") {
+        // Snap to interaction position
+        characterRef.current.position.copy(interactionPosition);
+        characterRef.current.rotation.y = interactionRotation;
+        
+        // Don't allow movement while in these interactions
+        return;
+      }
+    }
+    
+    // Regular character movement logic
     const speed = 5; // Base speed
     const turnSpeed = 2.5; // Rotation speed
     
@@ -45,9 +81,19 @@ const Character = () => {
     if (forward) {
       movingForward = 1;
       setIsMoving(true);
+      
+      // Moving breaks out of certain interactions
+      if (interactionType !== "none") {
+        endInteraction();
+      }
     } else if (backward) {
       movingForward = -0.5; // Move backward at half speed
       setIsMoving(true);
+      
+      // Moving breaks out of certain interactions
+      if (interactionType !== "none") {
+        endInteraction();
+      }
     } else {
       movingForward = 0;
       setIsMoving(false);
@@ -91,6 +137,11 @@ const Character = () => {
     
     characterRef.current.position.x = Math.max(bounds.minX, Math.min(bounds.maxX, characterRef.current.position.x));
     characterRef.current.position.z = Math.max(bounds.minZ, Math.min(bounds.maxZ, characterRef.current.position.z));
+    
+    // Log character position occasionally for debugging
+    if (Math.random() < 0.05) {
+      console.log(`Character position: (${characterRef.current.position.x.toFixed(2)}, ${characterRef.current.position.y.toFixed(2)}, ${characterRef.current.position.z.toFixed(2)})`);
+    }
   });
 
   // Debug logging for controls

@@ -5,6 +5,7 @@ import { useAudio } from "./lib/stores/useAudio";
 import "@fontsource/inter";
 import Experience from "./components/Experience";
 import ProjectDetails from "./components/ProjectDetails";
+import AudioControls from "./components/ui/AudioControls";
 import { usePortfolio } from "./lib/stores/usePortfolio";
 import { ControlName } from "./lib/constants";
 
@@ -35,9 +36,21 @@ function App() {
     const hitSound = new Audio("/sounds/hit.mp3");
     const successSound = new Audio("/sounds/success.mp3");
     
+    // Setup activity-specific music
+    const basketballMusic = new Audio("/sounds/basketball.mp3");
+    const chessMusicOrSimilar = new Audio("/sounds/board-game.mp3");
+    const fountainMusic = new Audio("/sounds/fountain.mp3");
+    const seesawMusic = new Audio("/sounds/playground.mp3");
+    
+    // Initialize all audio in store
     useAudio.setState({
       hitSound,
       successSound,
+      basketballMusic,
+      chessMusicOrSimilar,
+      fountainMusic,
+      seesawMusic,
+      isMusicMuted: false,
     });
 
     // Show the canvas once everything is loaded
@@ -46,14 +59,8 @@ function App() {
 
   return (
     <div className="w-screen h-screen relative overflow-hidden">
-      {/* Sound control button */}
-      <button 
-        onClick={toggleMute} 
-        className="absolute top-5 right-5 z-50 bg-black bg-opacity-50 text-white p-2 rounded-full"
-        aria-label={isMuted ? "Unmute" : "Mute"}
-      >
-        {isMuted ? "🔇" : "🔊"}
-      </button>
+      {/* Audio controls component */}
+      <AudioControls />
 
       {/* Instructions overlay */}
       <div className="absolute top-5 left-5 z-50 bg-black bg-opacity-50 text-white p-3 rounded max-w-xs">

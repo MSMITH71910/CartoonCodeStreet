@@ -1,7 +1,10 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAudio } from "../lib/stores/useAudio";
+import { useInteraction } from "../lib/stores/useInteraction";
+import { useKeyboardControls } from "@react-three/drei";
+import { ControlName } from "../lib/constants";
 
 interface StreetObjectProps {
   type: "lamppost" | "tree" | "bench" | "hydrant" | "mailbox" | "basketball" | "seesaw" | "fountain";
@@ -19,12 +22,99 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
   // Create a unique animation offset for this object
   const animationOffset = useMemo(() => Math.random() * Math.PI * 2, []);
   
+  // Get interaction state and controls
+  const { startInteraction, endInteraction, interactingWithId } = useInteraction();
+  const { playActivityMusic, stopActivityMusic } = useAudio();
+  const interact = useKeyboardControls((state) => state[ControlName.interact]);
+
+  // Generate a unique ID for this object
+  const objectId = useMemo(() => `${type}-${position.join("-")}`, [type, position]);
+  
+  // Determine interaction type based on object type
+  const getInteractionType = () => {
+    switch (type) {
+      case "bench": return "sitting";
+      case "seesaw": return "seesaw";
+      case "basketball": return "none"; // Custom handling
+      case "lamppost": return "lamp";
+      case "fountain": return "none"; // Custom handling
+      default: return "none";
+    }
+  };
+  
+  // Handle mini-games based on object type
+  const getMiniGameType = () => {
+    switch (type) {
+      case "mailbox": return "hangman";
+      case "hydrant": return "ticTacToe";
+      case "tree": return "checkers";
+      default: return null;
+    }
+  };
+  
   // Interaction handlers
   const handlePointerOver = () => setHovered(true);
   const handlePointerOut = () => setHovered(false);
-  const handleClick = () => {
+  
+  const handleClick = (e: any) => {
+    if (e.stopPropagation) e.stopPropagation();
+    
+    // Toggle clicked state for visual feedback
     setClicked(!clicked);
     playHit();
+    
+    // Special case for basketball
+    if (type === "basketball") {
+      if (!ballPosition) {
+        // Start basketball mini-game
+        const angle = Math.PI / 4; // 45 degrees
+        setBallPosition(new THREE.Vector3(0, 1, 1));
+        setBallVelocity(new THREE.Vector3(0, 3, -3));
+        playActivityMusic("basketball");
+      }
+      return;
+    }
+    
+    // Special case for fountain
+    if (type === "fountain") {
+      // Toggle fountain particles
+      playActivityMusic("fountain");
+      return;
+    }
+    
+    // Determine interaction position (offset for different objects)
+    let interactPos = new THREE.Vector3(position[0], position[1], position[2]);
+    let interactRot = rotation[1]; // Use Y rotation
+    
+    if (type === "bench") {
+      // Position character to sit on bench
+      interactPos = new THREE.Vector3(
+        position[0] - 0.3,  // Offset from bench back
+        position[1] + 0.4,  // Height of seat
+        position[2]         // Same Z as bench
+      );
+      interactRot = rotation[1] + Math.PI/2; // Rotate to face out from bench
+    } else if (type === "seesaw") {
+      // Position character on one end of seesaw
+      interactPos = new THREE.Vector3(
+        position[0],          // Same X
+        position[1] + 0.7,    // Height of seesaw
+        position[2] + 1.2     // End of seesaw
+      );
+      interactRot = rotation[1]; // Face along seesaw
+    }
+    
+    // Start appropriate interaction based on object type
+    const interactionType = getInteractionType();
+    const miniGameType = getMiniGameType();
+    
+    if (interactionType !== "none") {
+      startInteraction(interactionType, objectId, interactPos, interactRot);
+      playActivityMusic(interactionType);
+    } else if (miniGameType) {
+      startInteraction(miniGameType, objectId, interactPos, interactRot);
+      playActivityMusic("chessMusicOrSimilar");
+    }
   };
   
   // Ball state for basketball hoop
@@ -57,11 +147,29 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
         break;
         
       case "lamppost":
-        // Light flicker effect when hovered
-        if (hovered && objectRef.current.children.length > 1) {
+        // Light effects for lamps
+        if (objectRef.current.children.length > 1) {
           const light = objectRef.current.children[1] as THREE.Mesh;
           const material = light.material as THREE.MeshStandardMaterial;
-          material.emissiveIntensity = 0.5 + Math.sin(time * 10) * 0.2;
+          const pointLight = objectRef.current.children[3] as THREE.PointLight;
+          
+          if (interactingWithId === objectId) {
+            // Lamp is active from interaction
+            material.emissiveIntensity = 1.0;
+            pointLight.intensity = 1.5;
+          } else if (hovered) {
+            // Lamp is hovered
+            material.emissiveIntensity = 0.5 + Math.sin(time * 10) * 0.2;
+            pointLight.intensity = 0.8;
+          } else if (clicked) {
+            // Lamp was clicked but not actively interacting
+            material.emissiveIntensity = 0.8;
+            pointLight.intensity = 1.0;
+          } else {
+            // Default state
+            material.emissiveIntensity = 0.3;
+            pointLight.intensity = 0.5;
+          }
         }
         break;
         
@@ -401,8 +509,8 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
           {!ballPosition && (
             <mesh 
               position={[0, 1, 1]} 
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={(e: any) => {
+                if (e.stopPropagation) e.stopPropagation();
                 const angle = Math.PI / 4; // 45 degrees
                 setBallPosition(new THREE.Vector3(0, 1, 1));
                 setBallVelocity(new THREE.Vector3(0, 3, -3));

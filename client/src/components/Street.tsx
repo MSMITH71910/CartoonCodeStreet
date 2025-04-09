@@ -20,10 +20,20 @@ const Street = () => {
     grassTexture.repeat.set(10, 50);
   }, [asphaltTexture, grassTexture]);
 
+  // Define types for street objects
+  type StreetObjectType = "lamppost" | "tree" | "bench" | "hydrant" | "mailbox" | "basketball" | "seesaw" | "fountain";
+  
+  interface StreetObjectData {
+    type: StreetObjectType;
+    position: [number, number, number];
+    rotation: [number, number, number];
+    scale: [number, number, number];
+  }
+  
   // Pre-calculate street object positions
-  const streetObjectPositions = useMemo(() => {
+  const streetObjectPositions = useMemo<StreetObjectData[]>(() => {
     // Generate deterministic positions for street objects
-    const positions = [];
+    const positions: StreetObjectData[] = [];
     
     // Lamp posts along the street
     for (let i = -45; i <= 45; i += 10) {
@@ -226,11 +236,15 @@ const Street = () => {
         const xOffset = side * (10 + Math.sin(index * 0.5) * 2);
         const rotationY = side === -1 ? Math.PI / 2 : -Math.PI / 2;
         
+        // Explicitly type the position and rotation as [number, number, number]
+        const position: [number, number, number] = [xOffset, 0, zPosition];
+        const rotation: [number, number, number] = [0, rotationY, 0];
+        
         return (
           <House
             key={project.id}
-            position={[xOffset, 0, zPosition]}
-            rotation={[0, rotationY, 0]}
+            position={position}
+            rotation={rotation}
             project={project}
           />
         );
