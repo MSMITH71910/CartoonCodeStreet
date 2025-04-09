@@ -22,13 +22,12 @@ const Character = () => {
   const backward = useKeyboardControls((state) => state[ControlName.backward]);
   const leftward = useKeyboardControls((state) => state[ControlName.leftward]);
   const rightward = useKeyboardControls((state) => state[ControlName.rightward]);
+  const interact = useKeyboardControls((state) => state[ControlName.interact]);
 
   // Register character reference to the store
   useEffect(() => {
-    if (characterRef.current) {
-      setCharacterRef(characterRef);
-      console.log("Character ref registered");
-    }
+    setCharacterRef(characterRef);
+    console.log("Character ref registered to portfolio store");
   }, [setCharacterRef]);
 
   // Character movement and animation
@@ -96,8 +95,8 @@ const Character = () => {
 
   // Debug logging for controls
   useEffect(() => {
-    console.log(`Controls: forward=${forward}, backward=${backward}, left=${leftward}, right=${rightward}`);
-  }, [forward, backward, leftward, rightward]);
+    console.log(`Controls: forward=${forward}, backward=${backward}, left=${leftward}, right=${rightward}, interact=${interact}`);
+  }, [forward, backward, leftward, rightward, interact]);
 
   return (
     <group ref={characterRef} position={[0, 0.15, 5]}>

@@ -12,7 +12,7 @@ const Experience = () => {
 
   // Set up camera following logic
   useFrame(() => {
-    if (characterRef.current && !isViewingProject) {
+    if (characterRef && characterRef.current && !isViewingProject) {
       // Get character position
       const characterPosition = characterRef.current.position;
       
@@ -39,6 +39,11 @@ const Experience = () => {
       // Update the camera target in the portfolio store
       cameraTarget.copy(lookTarget);
       camera.lookAt(lookTarget);
+      
+      // Log character position occasionally for debugging
+      if (Math.random() < 0.01) { // Log about 1% of the time to avoid flooding console
+        console.log(`Character position: (${characterPosition.x.toFixed(2)}, ${characterPosition.y.toFixed(2)}, ${characterPosition.z.toFixed(2)})`);
+      }
     }
   });
 

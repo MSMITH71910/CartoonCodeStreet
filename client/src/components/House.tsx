@@ -68,15 +68,21 @@ const House = ({ position, rotation, project }: HouseProps) => {
       const wasNearby = isNearby;
       const newIsNearby = distance < 5; // Within 5 units of the house
       
+      if (newIsNearby !== wasNearby) {
+        console.log(`House ${project.title} proximity changed: ${newIsNearby ? 'NEARBY' : 'FAR'}, distance: ${distance.toFixed(2)}`);
+      }
+      
       setIsNearby(newIsNearby);
       
       // Play sound when player enters proximity
       if (newIsNearby && !wasNearby) {
         playHit();
+        console.log(`Player entered proximity of ${project.title} house`);
       }
       
       // Check for interaction
       if (newIsNearby && interact && !isViewingProject) {
+        console.log(`Interaction with house ${project.title}`);
         setDoorOpen(true);
         playSuccess();
         setActiveProject(project);
