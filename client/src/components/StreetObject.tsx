@@ -94,16 +94,16 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
       // For benches on RIGHT sidewalk (rotation = PI) - facing LEFT/WEST toward street
       if (Math.abs(benchRotationY - Math.PI) < 0.1) {
         interactPos = new THREE.Vector3(
-          position[0] - 0.1,       // Offset to place character ON the bench seat
-          position[1] + 0.34,      // Height to sit on bench
+          position[0] + 0.05,      // Slightly toward front of bench seat
+          position[1] + 0.25,      // Height exactly on top of bench
           position[2]              // Centered on Z
         );
       }
       // For benches on LEFT sidewalk (rotation = 0) - facing RIGHT/EAST toward street
       else {
         interactPos = new THREE.Vector3(
-          position[0] + 0.1,       // Offset to place character ON the bench seat
-          position[1] + 0.34,      // Height to sit on bench
+          position[0] - 0.05,      // Slightly toward front of bench seat
+          position[1] + 0.25,      // Height exactly on top of bench
           position[2]              // Centered on Z
         );
       }
@@ -361,50 +361,40 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
       
       {type === "bench" && (
         <>
-          {/* Simple park bench design - shorter and clearly facing forward */}
+          {/* A very clear simple bench design where the backrest is obvious */}
           
           {/* Main bench seat */}
-          <mesh castShadow position={[0, 0.3, 0]}>
-            <boxGeometry args={[0.8, 0.08, 0.5]} />
+          <mesh castShadow position={[0, 0.25, 0]}>
+            <boxGeometry args={[0.6, 0.1, 0.4]} />
             <meshStandardMaterial color="#8D6E63" roughness={0.9} />
           </mesh>
           
-          {/* Bench back - positioned toward negative X (away from street) */}
-          <mesh castShadow position={[-0.35, 0.7, 0]}>
-            <boxGeometry args={[0.1, 0.7, 0.5]} />
+          {/* Bench back - clear vertical board for backrest facing away from street */}
+          <mesh castShadow position={[-0.25, 0.55, 0]}>
+            <boxGeometry args={[0.1, 0.5, 0.4]} />
+            <meshStandardMaterial color="#A1887F" roughness={0.9} />
+          </mesh>
+          
+          {/* Armrests */}
+          <mesh castShadow position={[0, 0.35, 0.2]}>
+            <boxGeometry args={[0.5, 0.1, 0.05]} />
             <meshStandardMaterial color="#8D6E63" roughness={0.9} />
           </mesh>
           
-          {/* Support legs */}
-          <mesh castShadow position={[0.3, 0.15, 0.2]}>
-            <boxGeometry args={[0.08, 0.3, 0.08]} />
+          <mesh castShadow position={[0, 0.35, -0.2]}>
+            <boxGeometry args={[0.5, 0.1, 0.05]} />
+            <meshStandardMaterial color="#8D6E63" roughness={0.9} />
+          </mesh>
+          
+          {/* Support legs - thick and clear */}
+          <mesh castShadow position={[0.25, 0.125, 0]}>
+            <boxGeometry args={[0.1, 0.25, 0.3]} />
             <meshStandardMaterial color="#5D4037" roughness={0.9} />
           </mesh>
           
-          <mesh castShadow position={[0.3, 0.15, -0.2]}>
-            <boxGeometry args={[0.08, 0.3, 0.08]} />
+          <mesh castShadow position={[-0.25, 0.125, 0]}>
+            <boxGeometry args={[0.1, 0.25, 0.3]} />
             <meshStandardMaterial color="#5D4037" roughness={0.9} />
-          </mesh>
-          
-          <mesh castShadow position={[-0.3, 0.15, 0.2]}>
-            <boxGeometry args={[0.08, 0.3, 0.08]} />
-            <meshStandardMaterial color="#5D4037" roughness={0.9} />
-          </mesh>
-          
-          <mesh castShadow position={[-0.3, 0.15, -0.2]}>
-            <boxGeometry args={[0.08, 0.3, 0.08]} />
-            <meshStandardMaterial color="#5D4037" roughness={0.9} />
-          </mesh>
-          
-          {/* Bench decorative elements - to help indicate direction */}
-          <mesh castShadow position={[0.38, 0.29, 0]}>
-            <boxGeometry args={[0.04, 0.06, 0.4]} />
-            <meshStandardMaterial color="#A1887F" roughness={0.9} />
-          </mesh>
-          
-          <mesh castShadow position={[-0.4, 0.5, 0]}>
-            <boxGeometry args={[0.05, 0.5, 0.45]} />
-            <meshStandardMaterial color="#A1887F" roughness={0.9} />
           </mesh>
         </>
       )}
