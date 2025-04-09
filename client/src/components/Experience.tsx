@@ -79,8 +79,15 @@ const Experience = () => {
       {/* Player character */}
       <Character />
       
-      {/* Debug camera controls - disabled during normal gameplay */}
-      {isViewingProject && <OrbitControls target={cameraTarget} enableZoom={false} />}
+      {/* Camera controls - always enabled to allow viewing from different angles */}
+      <OrbitControls 
+        target={cameraTarget} 
+        enableZoom={true} 
+        enablePan={false}
+        minDistance={5}
+        maxDistance={20}
+        maxPolarAngle={Math.PI / 2 - 0.1} // Prevent going below ground
+      />
     </>
   );
 };
