@@ -3,6 +3,7 @@ import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import House from "./House";
 import StreetObject from "./StreetObject";
+import StreetSign from "./StreetSign";
 import { projects } from "../lib/data/projects";
 
 const Street = () => {
@@ -232,6 +233,9 @@ const Street = () => {
           scale={obj.scale}
         />
       ))}
+      
+      {/* Street sign with portfolio info - placed at the entrance of the street */}
+      <StreetSign position={[0, 0, 45]} />
     </group>
   );
 };
