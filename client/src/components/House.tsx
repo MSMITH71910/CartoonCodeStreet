@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useMemo } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame, useThree, ThreeEvent } from "@react-three/fiber";
 import { useKeyboardControls } from "@react-three/drei";
 import * as THREE from "three";
 import { ControlName } from "../lib/constants";
@@ -135,7 +135,12 @@ const House = ({ position, rotation, project }: HouseProps) => {
   }, [project.title, position]);
 
   // Handler for direct mouse clicks on house
-  const handleClick = () => {
+  const handleClick = (e: ThreeEvent<MouseEvent>) => {
+    // Stop propagation to prevent OrbitControls from capturing the event
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation();
+    }
+    
     console.log(`Mouse click on house: ${project.title}`);
     setDoorOpen(true);
     playSuccess();

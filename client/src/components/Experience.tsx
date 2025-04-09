@@ -55,31 +55,63 @@ const Experience = () => {
     }
   });
   
-  // Add mouse event listeners to track when mouse look is active
+  // Add mouse event listeners to track when mouse look is active and handle clicks
   useEffect(() => {
     // Flag to track if mouse button is held down for rotation
     window.isMouseRotating = false;
     
+    // Track initial mouse position and time to distinguish between clicks and drags
+    let mouseDownTime = 0;
+    let initialMouseX = 0;
+    let initialMouseY = 0;
+    const clickThreshold = 200; // ms to consider as a click vs. drag
+    const moveThreshold = 5; // pixels to consider as a drag vs. click
+    
     // Event handlers for mouse
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button === 0) { // Left mouse button
-        window.isMouseRotating = true;
+        // Record time and position for click vs. drag detection
+        mouseDownTime = Date.now();
+        initialMouseX = e.clientX;
+        initialMouseY = e.clientY;
+        
+        // Don't set isMouseRotating immediately - we'll do that after determining if it's a drag
+        // This allows clicks to pass through to clickable objects
+      }
+    };
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      // Only track movement if mouse is down
+      if (e.buttons & 1) { // Left button is pressed
+        const deltaX = Math.abs(e.clientX - initialMouseX);
+        const deltaY = Math.abs(e.clientY - initialMouseY);
+        
+        // If mouse has moved significantly, consider it a drag/rotation
+        if (deltaX > moveThreshold || deltaY > moveThreshold) {
+          window.isMouseRotating = true;
+        }
       }
     };
     
     const handleMouseUp = (e: MouseEvent) => {
       if (e.button === 0) { // Left mouse button
+        const isClick = (Date.now() - mouseDownTime < clickThreshold);
+        
+        // If it was a quick click without much movement, don't treat it as rotation
+        // This allows the click to propagate to the houses
         window.isMouseRotating = false;
       }
     };
     
     // Add event listeners
     window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
     
     // Cleanup function
     return () => {
       window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }, []);
@@ -133,6 +165,19 @@ const Experience = () => {
         minDistance={5}
         maxDistance={20}
         maxPolarAngle={Math.PI / 2 - 0.1} // Prevent going below ground
+        
+        // Important: Add event handlers to allow clicks to work on houses
+        // This makes OrbitControls more cooperative with other click handlers
+        onStart={(e) => {
+          // Cast event to appropriate type since OrbitControls' type definitions are complex
+          const event = e as unknown as MouseEvent;
+          
+          // Only start rotation if we've determined it's a drag (not a click)
+          if (event && !window.isMouseRotating && 'button' in event && event.button === 0) {
+            // Prevent orbit controls from handling this event if it's a click
+            event.stopPropagation?.();
+          }
+        }}
       />
     </>
   );
