@@ -250,6 +250,8 @@ const Checkers = () => {
         winner: null
       }
     });
+    
+    // No sound effect - removed to avoid clicking sound
   };
   
   const renderCell = (row: number, col: number) => {

@@ -39,11 +39,9 @@ function App() {
     backgroundMusicElement.loop = true;
     backgroundMusicElement.volume = 0.3;
     
-    const hitSoundElement = new Audio("/sounds/hit.mp3");
-    hitSoundElement.volume = 0.5;
-    
-    const successSoundElement = new Audio("/sounds/success.mp3");
-    successSoundElement.volume = 0.5;
+    // No longer using sound effects to prevent clicking sounds
+    // const hitSoundElement = new Audio("/sounds/hit.mp3");
+    // const successSoundElement = new Audio("/sounds/success.mp3");
     
     const boardGameMusicElement = new Audio("/sounds/board-game.mp3");
     boardGameMusicElement.loop = true;
@@ -62,8 +60,8 @@ function App() {
     useAudio.setState({
       // Reset all audio tracks
       backgroundMusic: backgroundMusicElement,
-      hitSound: hitSoundElement,
-      successSound: successSoundElement,
+      hitSound: null, // Remove sound effects entirely
+      successSound: null, // Remove sound effects entirely
       // If any of the mini-game music files don't load properly, we'll use the background music as fallback
       chessMusicOrSimilar: boardGameMusicElement || backgroundMusicElement,
       fountainMusic: fountainMusicElement || backgroundMusicElement,

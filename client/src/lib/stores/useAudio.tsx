@@ -93,9 +93,16 @@ export const useAudio = create<AudioState>((set, get) => ({
     }
   },
   
-  setHitSound: (sound) => set({ hitSound: sound }),
+  // Completely disabled sound effects to prevent clicks
+  setHitSound: (_sound) => {
+    // Don't actually set the sound
+    return;
+  },
   
-  setSuccessSound: (sound) => set({ successSound: sound }),
+  setSuccessSound: (_sound) => {
+    // Don't actually set the sound
+    return;
+  },
   
   setActivityMusic: (activityType, music) => {
     // Setup music properties
