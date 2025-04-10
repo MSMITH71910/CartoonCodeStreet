@@ -10,7 +10,6 @@ import GameUI from "./components/games/GameUI";
 import AboutInfoDialog from "./components/ui/AboutInfoDialog";
 import { usePortfolio } from "./lib/stores/usePortfolio";
 import { useStreetSign } from "./lib/stores/useStreetSign";
-import ProceduralMusicLayer from "./components/ProceduralMusicLayer";
 import { ControlName } from "./lib/constants";
 
 // Define control keys for the character movement
@@ -117,7 +116,8 @@ function App() {
         </div>
         <div className="mt-2 border-t pt-2 border-gray-600">
           <p className="font-semibold text-cyan-300">Audio Features:</p>
-          <p>• Different activities play unique music</p>
+          <p>• Background music plays during exploration</p>
+          <p>• Music pauses during mini-games for focus</p>
           <p>• Toggle audio with the controls in top-right</p>
         </div>
       </div>
@@ -161,8 +161,7 @@ function App() {
         onClose={useStreetSign(state => state.closeAboutInfo)}
       />
       
-      {/* Procedural music layer - generates unique sounds for each activity */}
-      <ProceduralMusicLayer />
+      {/* Simplified audio system - just background music that pauses during mini-games */}
     </div>
   );
 }
