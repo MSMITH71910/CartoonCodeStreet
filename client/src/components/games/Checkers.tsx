@@ -13,7 +13,7 @@ const Checkers = () => {
   
   if (!gameState.checkers) return null;
   
-  const { board, currentPlayer, selectedPiece } = gameState.checkers;
+  const { board, currentPlayer, selectedPiece, winner } = gameState.checkers;
   
   const handleCellClick = (row: number, col: number) => {
     // If a piece is already selected
@@ -200,8 +200,14 @@ const Checkers = () => {
       }
     }
     
-    // If no valid moves were found, player 1 wins
-    alert("Computer has no valid moves! You win!");
+    // If no valid moves were found, player 1 wins - update the game state
+    updateGameState({
+      checkers: {
+        ...gameState.checkers,
+        currentPlayer: 1,
+        winner: "player" // Add winner state
+      }
+    });
   };
   
   const resetGame = () => {
@@ -262,12 +268,16 @@ const Checkers = () => {
       <h2 className="text-2xl font-bold mb-2">Checkers</h2>
       
       <div className="mb-4">
-        <p className="text-lg">
-          {currentPlayer === 1 ? 
-            <span>Your turn (Red)</span> : 
-            <span>Computer's turn (Black)</span>
-          }
-        </p>
+        {winner ? (
+          <p className="text-lg font-bold text-green-600">You won! Computer has no valid moves.</p>
+        ) : (
+          <p className="text-lg">
+            {currentPlayer === 1 ? 
+              <span>Your turn (Red)</span> : 
+              <span>Computer's turn (Black)</span>
+            }
+          </p>
+        )}
       </div>
       
       <div className="grid grid-cols-8 gap-0 border border-gray-800">
