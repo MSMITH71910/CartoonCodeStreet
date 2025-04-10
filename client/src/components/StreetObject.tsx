@@ -95,6 +95,10 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
       
       // Start a proper interaction with the fountain to track it correctly
       startInteraction("fountain", objectId, fountainPos, rotation[1]);
+      
+      // EXPLICITLY PLAY fountain music directly (same pattern as other interactions)
+      console.log("MUSIC DEBUG: Directly playing fountain music for fountain interaction");
+      playActivityMusic("fountain"); 
       return;
     }
     
