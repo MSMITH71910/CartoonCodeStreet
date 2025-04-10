@@ -181,34 +181,46 @@ const Character = () => {
     console.log(`Controls: forward=${forward}, backward=${backward}, left=${leftward}, right=${rightward}, interact=${interact}`);
   }, [forward, backward, leftward, rightward, interact]);
   
-  // Handle animation key presses
+  // Handle animation key presses - IMPROVED VERSION
   useEffect(() => {
-    // Handle dancing with Z key
-    if (danceKey && !isMoving && !isDancing && !isWaving && interactionType === "none") {
-      console.log("Dance animation triggered by keyboard!");
-      setIsDancing(true);
-      setAnimationTime(0);
-      playSuccess();
+    // Handle dancing with Z key - MORE AGGRESSIVE DETECTION
+    if (danceKey) {
+      console.log("Dance key pressed (Z)!");
+      if (!isMoving && interactionType === "none") {
+        console.log("Dance animation triggered by keyboard!");
+        setIsDancing(true);
+        setIsWaving(false); // Force stop any other animations
+        setAnimationTime(0);
+        // Don't play sounds to avoid clicking
+      }
     }
     
-    // Handle left arm wave with Q key
-    if (waveLeftKey && !isMoving && !isDancing && !isWaving && interactionType === "none") {
-      console.log("Left arm wave animation triggered by keyboard!");
-      setIsWaving(true);
-      setWaveArm('left');
-      setAnimationTime(0);
-      playHit();
+    // Handle left arm wave with Q key - MORE AGGRESSIVE DETECTION
+    if (waveLeftKey) {
+      console.log("Left wave key pressed (Q)!");
+      if (!isMoving && interactionType === "none") {
+        console.log("Left arm wave animation triggered by keyboard!");
+        setIsDancing(false); // Force stop any other animations
+        setIsWaving(true);
+        setWaveArm('left');
+        setAnimationTime(0);
+        // Don't play sounds to avoid clicking
+      }
     }
     
-    // Handle right arm wave with R key
-    if (waveRightKey && !isMoving && !isDancing && !isWaving && interactionType === "none") {
-      console.log("Right arm wave animation triggered by keyboard!");
-      setIsWaving(true);
-      setWaveArm('right');
-      setAnimationTime(0);
-      playHit();
+    // Handle right arm wave with R key - MORE AGGRESSIVE DETECTION
+    if (waveRightKey) {
+      console.log("Right wave key pressed (R)!");
+      if (!isMoving && interactionType === "none") {
+        console.log("Right arm wave animation triggered by keyboard!");
+        setIsDancing(false); // Force stop any other animations
+        setIsWaving(true);
+        setWaveArm('right');
+        setAnimationTime(0);
+        // Don't play sounds to avoid clicking
+      }
     }
-  }, [danceKey, waveLeftKey, waveRightKey, isMoving, isDancing, isWaving, interactionType, playSuccess, playHit]);
+  }, [danceKey, waveLeftKey, waveRightKey, isMoving, interactionType]);
   
   // Update animation time for dancing/waving animations
   useFrame((state, delta) => {

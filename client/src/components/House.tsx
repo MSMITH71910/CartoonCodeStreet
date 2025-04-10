@@ -173,9 +173,9 @@ const House = ({ position, rotation, project }: HouseProps) => {
         <meshStandardMaterial color={houseColor} roughness={0.8} />
       </mesh>
       
-      {/* Roof */}
-      <mesh position={[0, 3.5, 0]} castShadow receiveShadow>
-        <coneGeometry args={[3, 1.5, 4]} />
+      {/* Roof - fixed position and orientation */}
+      <mesh position={[0, 3.5, 0]} rotation={[0, Math.PI/4, 0]} castShadow receiveShadow>
+        <coneGeometry args={[2.5, 2, 4]} />
         <meshStandardMaterial color="#5D4037" roughness={0.9} />
       </mesh>
       
