@@ -293,14 +293,18 @@ export const useAudio = create<AudioState>((set, get) => ({
       seesawMusic
     } = get();
     
+    console.log(`AUDIO DEBUG: Attempting to play ${activityType} music (muted=${isMuted}, musicMuted=${isMusicMuted})`);
+    
     // If already playing activity music, stop it first
     if (currentActivityMusic) {
+      console.log("AUDIO DEBUG: Stopping currently playing activity music");
       currentActivityMusic.pause();
       currentActivityMusic.currentTime = 0;
     }
     
     // Pause background music
     if (backgroundMusic) {
+      console.log("AUDIO DEBUG: Pausing background music");
       backgroundMusic.pause();
     }
     
@@ -309,18 +313,24 @@ export const useAudio = create<AudioState>((set, get) => ({
     switch (activityType) {
       case "basketball":
         activityMusic = basketballMusic;
+        console.log("AUDIO DEBUG: Selected basketball music");
         break;
       case "ticTacToe":
       case "checkers":
       case "hangman":
         activityMusic = chessMusicOrSimilar;
+        console.log("AUDIO DEBUG: Selected chess/board game music");
         break;
       case "fountain":
         activityMusic = fountainMusic;
+        console.log("AUDIO DEBUG: Selected fountain music");
         break;
       case "seesaw":
         activityMusic = seesawMusic;
+        console.log("AUDIO DEBUG: Selected seesaw music");
         break;
+      default:
+        console.log(`AUDIO DEBUG: No music found for activity type "${activityType}"`);
     }
     
     // Set as current activity music
@@ -328,10 +338,20 @@ export const useAudio = create<AudioState>((set, get) => ({
     
     // Play the activity music if not muted
     if (activityMusic && !isMuted && !isMusicMuted) {
+      console.log("AUDIO DEBUG: Playing activity music");
       activityMusic.currentTime = 0;
+      activityMusic.volume = 0.4;
       activityMusic.play().catch(error => {
-        console.log(`Activity music play prevented for ${activityType}:`, error);
+        console.log(`AUDIO DEBUG: Activity music play prevented for ${activityType}:`, error);
       });
+    } else {
+      if (!activityMusic) {
+        console.log(`AUDIO DEBUG: Activity music for ${activityType} is not loaded`);
+      } else if (isMuted) {
+        console.log("AUDIO DEBUG: All sound is muted, not playing activity music");
+      } else if (isMusicMuted) {
+        console.log("AUDIO DEBUG: Music is muted, not playing activity music");
+      }
     }
     
     console.log(`Playing ${activityType} music`);
