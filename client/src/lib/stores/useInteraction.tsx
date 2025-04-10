@@ -160,24 +160,38 @@ export const useInteraction = create<InteractionState>((set, get) => ({
       case "checkers":
         console.log(`AUDIO CONTROL: Switching to game music for ${type} mini-game`);
         
-        // Use our global helper function for mini-game music
-        // This is a much simpler approach than the previous complex code
-        if (window.playMiniGameMusic) {
-          console.log(`AUDIO CONTROL: Using global helper for ${type} mini-game music`);
-          window.playMiniGameMusic();
-        } else {
-          console.error("AUDIO ERROR: Global playMiniGameMusic function not available");
+        // Use the audio store directly
+        const audioStore = useAudio.getState();
+        if (!audioStore.isMuted && !audioStore.isMusicMuted && audioStore.chessMusicOrSimilar) {
+          console.log(`AUDIO CONTROL: Playing chess music for ${type} mini-game`);
           
-          // Fallback to more basic approach (should not be needed)
-          const audioStore = useAudio.getState();
-          if (!audioStore.isMuted && !audioStore.isMusicMuted && audioStore.chessMusicOrSimilar) {
-            console.log("AUDIO CONTROL: Using fallback method for mini-game music");
-            if (audioStore.backgroundMusic) audioStore.backgroundMusic.pause();
-            if (audioStore.currentActivityMusic) audioStore.currentActivityMusic.pause();
-            
-            audioStore.chessMusicOrSimilar.currentTime = 0;
-            audioStore.chessMusicOrSimilar.play();
+          // Stop any currently playing music
+          if (audioStore.currentActivityMusic) {
+            audioStore.currentActivityMusic.pause();
           }
+          
+          if (audioStore.backgroundMusic) {
+            audioStore.backgroundMusic.pause();
+          }
+          
+          // Play chess music
+          audioStore.chessMusicOrSimilar.currentTime = 0;
+          audioStore.chessMusicOrSimilar.volume = 0.4;
+          
+          // Update the state
+          useAudio.setState({
+            currentActivityMusic: audioStore.chessMusicOrSimilar,
+            currentTrack: "chess"
+          });
+          
+          // Play the music
+          try {
+            audioStore.chessMusicOrSimilar.play();
+          } catch (e) {
+            console.error("AUDIO ERROR: Failed to play chess music:", e);
+          }
+        } else {
+          console.log("AUDIO CONTROL: Not playing mini-game music (muted or not available)");
         }
         break;
         

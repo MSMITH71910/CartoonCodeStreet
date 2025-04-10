@@ -14,31 +14,16 @@ const GameUI = () => {
     console.log("MUSIC: Closing game UI and restoring background music");
     toggleGameUI(); // Close UI first
     
-    // Return to background music using global helper function
-    if (window.playBackgroundMusic) {
-      console.log("DIRECT AUDIO: Using global helper to restore background music");
-      window.playBackgroundMusic();
-    } else {
-      console.log("DIRECT AUDIO: Global helper not available, using store method");
-      stopActivityMusic(); // Fallback to original method
-    }
+    // Return to background music 
+    stopActivityMusic();
     
     // End interaction after audio is handled
     endInteraction();
   };
   
-  // Add effect to ensure mini-game music plays when UI opens
+  // Add effect to handle escape key only, music is handled by interaction store
   useEffect(() => {
-    // Use our global helper function to play mini-game music
-    if (showGameUI && interactionType) {
-      console.log("MUSIC: GameUI detected show event, using global helper to play music");
-      // Use the global helper function we defined
-      if (window.playMiniGameMusic) {
-        window.playMiniGameMusic();
-      } else {
-        console.error("MUSIC ERROR: Global playMiniGameMusic function not available");
-      }
-    }
+    // We're not playing music here anymore - that's handled by the interaction store
     
     // Add escape key handler
     const handleKeyDown = (e: KeyboardEvent) => {
