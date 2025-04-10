@@ -53,20 +53,22 @@ const Street = () => {
       });
     }
     
-    // Trees on both sides of the street
+    // Trees on the grass areas only
     for (let i = -48; i <= 48; i += 8) {
       if (i % 16 === 0) continue; // Skip some positions for variety
       
+      // Left side trees - deeper on the grass (x = -14 to -18)
       positions.push({
         type: "tree",
-        position: [-8 + Math.sin(i * 0.5) * 2, 0, i],
+        position: [-16 + Math.sin(i * 0.5) * 2, 0, i],
         rotation: [0, Math.sin(i) * 0.5, 0],
         scale: [0.8 + Math.sin(i * 0.3) * 0.2, 0.8 + Math.cos(i * 0.4) * 0.2, 0.8 + Math.sin(i * 0.5) * 0.2]
       });
       
+      // Right side trees - deeper on the grass (x = 14 to 18)
       positions.push({
         type: "tree",
-        position: [8 + Math.cos(i * 0.5) * 2, 0, i],
+        position: [16 + Math.cos(i * 0.5) * 2, 0, i],
         rotation: [0, Math.cos(i) * 0.5, 0],
         scale: [0.8 + Math.cos(i * 0.3) * 0.2, 0.8 + Math.sin(i * 0.4) * 0.2, 0.8 + Math.cos(i * 0.5) * 0.2]
       });
@@ -91,15 +93,25 @@ const Street = () => {
       });
     }
     
-    // Add random objects (mailboxes)
-    for (let i = -30; i <= 30; i += 15) {
+    // Add mailboxes only in front of houses
+    projects.forEach((project, index) => {
+      // Alternate houses on left and right side of the street
+      const side = index % 2 === 0 ? -1 : 1;
+      // Space houses evenly along the street
+      const zPosition = -40 + index * 15;
+      
+      // Position mailbox in front of each house on the sidewalk
       positions.push({
         type: "mailbox",
-        position: [-5.5, 0, i + 3],
-        rotation: [0, Math.PI / 4, 0],
+        position: [
+          side === -1 ? -5.5 : 5.5,  // Left or right side of street
+          0, 
+          zPosition + (side === -1 ? 2 : -2) // Slightly offset from house z-position
+        ],
+        rotation: [0, side === -1 ? Math.PI / 4 : -Math.PI / 4, 0],
         scale: [1, 1, 1]
       });
-    }
+    });
     
     // Basketball courts removed as requested
     
