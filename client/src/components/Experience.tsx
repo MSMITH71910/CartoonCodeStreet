@@ -206,135 +206,137 @@ const Experience = () => {
       {/* Player character */}
       <SimpleWorkingCharacter />
       
-      {/* Simplified street sign with much easier-to-read text */}
-      <group position={[0, 0, 15]} rotation={[0, Math.PI, 0]}>
-        {/* Posts */}
-        <mesh castShadow position={[-2, 2, 0]}>
-          <cylinderGeometry args={[0.2, 0.2, 4, 32]} />
-          <meshStandardMaterial color="#8B4513" side={THREE.DoubleSide} />
-        </mesh>
-        
-        <mesh castShadow position={[2, 2, 0]}>
-          <cylinderGeometry args={[0.2, 0.2, 4, 32]} />
-          <meshStandardMaterial color="#8B4513" side={THREE.DoubleSide} />
-        </mesh>
-        
-        {/* ENTIRELY NEW SIGN APPROACH - front side */}
-        <group position={[0, 3, 0]}>
-          {/* Sign board */}
-          <mesh 
-            castShadow 
-            position={[0, 0, 0]} 
-            receiveShadow
-            onPointerOver={() => setSignHovered(true)}
-            onPointerOut={() => setSignHovered(false)}
-            onClick={handleSignClick}
-          >
-            <boxGeometry args={[5, 3, 0.2]} />
-            <meshStandardMaterial color={signHovered ? "#4285F4" : "#1E88E5"} side={THREE.DoubleSide} />
+      {/* FIXED STREET SIGN - completely detached from character position */}
+      <scene>
+        <group position={[0, 0, 15]} rotation={[0, Math.PI, 0]}>
+          {/* Posts */}
+          <mesh castShadow position={[-2, 2, 0]}>
+            <cylinderGeometry args={[0.2, 0.2, 4, 32]} />
+            <meshStandardMaterial color="#8B4513" side={THREE.DoubleSide} />
           </mesh>
-
-          {/* Front side - ALL text in one sprite with smaller text to fit */}
-          <sprite position={[0, 0, 0.2]} scale={[4.8, 2.8, 1]}>
-            <spriteMaterial alphaTest={0.5}>
-              <canvasTexture attach="map" args={[(() => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 1024;
-                canvas.height = 1024;
-                const ctx = canvas.getContext('2d');
-                
-                if (ctx) {
-                  // Fill the background
-                  ctx.fillStyle = "#0D47A1";
-                  ctx.fillRect(0, 0, canvas.width, canvas.height);
-                  
-                  // Border
-                  ctx.strokeStyle = 'white';
-                  ctx.lineWidth = 12;
-                  ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-                  
-                  // Header - smaller text
-                  ctx.font = 'bold 80px Arial';
-                  ctx.fillStyle = 'yellow';
-                  ctx.textAlign = 'center';
-                  ctx.textBaseline = 'middle';
-                  ctx.fillText('MICHAEL R. SMITH', canvas.width / 2, canvas.height * 0.25);
-                  
-                  // Subheader - smaller text
-                  ctx.font = 'bold 75px Arial';
-                  ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height * 0.5);
-                  
-                  // Bottom text - highlight
-                  ctx.fillStyle = '#1A237E';
-                  ctx.fillRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
-                  
-                  // Border for highlight
-                  ctx.strokeStyle = 'white';
-                  ctx.lineWidth = 6;
-                  ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
-                  
-                  // Bottom text - smaller text
-                  ctx.font = 'bold 68px Arial';
-                  ctx.fillStyle = 'yellow';
-                  ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height * 0.78);
-                }
-                
-                return canvas;
-              })()]} />
-            </spriteMaterial>
-          </sprite>
           
-          {/* Back side - EXACT same content but with smaller text to match front */}
-          <sprite position={[0, 0, -0.2]} rotation={[0, Math.PI, 0]} scale={[4.8, 2.8, 1]}>
-            <spriteMaterial alphaTest={0.5}>
-              <canvasTexture attach="map" args={[(() => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 1024;
-                canvas.height = 1024;
-                const ctx = canvas.getContext('2d');
-                
-                if (ctx) {
-                  // Fill the background
-                  ctx.fillStyle = "#0D47A1";
-                  ctx.fillRect(0, 0, canvas.width, canvas.height);
+          <mesh castShadow position={[2, 2, 0]}>
+            <cylinderGeometry args={[0.2, 0.2, 4, 32]} />
+            <meshStandardMaterial color="#8B4513" side={THREE.DoubleSide} />
+          </mesh>
+          
+          {/* COMPLETELY FIXED SIGN APPROACH */}
+          <group position={[0, 3, 0]}>
+            {/* Sign board */}
+            <mesh 
+              castShadow 
+              position={[0, 0, 0]} 
+              receiveShadow
+              onPointerOver={() => setSignHovered(true)}
+              onPointerOut={() => setSignHovered(false)}
+              onClick={handleSignClick}
+            >
+              <boxGeometry args={[5, 3, 0.2]} />
+              <meshStandardMaterial color={signHovered ? "#4285F4" : "#1E88E5"} side={THREE.DoubleSide} />
+            </mesh>
+
+            {/* Front side - ALL text in one sprite with smaller text to fit */}
+            <sprite position={[0, 0, 0.2]} scale={[4.8, 2.8, 1]}>
+              <spriteMaterial alphaTest={0.5}>
+                <canvasTexture attach="map" args={[(() => {
+                  const canvas = document.createElement('canvas');
+                  canvas.width = 1024;
+                  canvas.height = 1024;
+                  const ctx = canvas.getContext('2d');
                   
-                  // Border
-                  ctx.strokeStyle = 'white';
-                  ctx.lineWidth = 12;
-                  ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+                  if (ctx) {
+                    // Fill the background
+                    ctx.fillStyle = "#0D47A1";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Border
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 12;
+                    ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+                    
+                    // Header - smaller text
+                    ctx.font = 'bold 80px Arial';
+                    ctx.fillStyle = 'yellow';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('MICHAEL R. SMITH', canvas.width / 2, canvas.height * 0.25);
+                    
+                    // Subheader - smaller text
+                    ctx.font = 'bold 75px Arial';
+                    ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height * 0.5);
+                    
+                    // Bottom text - highlight
+                    ctx.fillStyle = '#1A237E';
+                    ctx.fillRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
+                    
+                    // Border for highlight
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 6;
+                    ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
+                    
+                    // Bottom text - smaller text
+                    ctx.font = 'bold 68px Arial';
+                    ctx.fillStyle = 'yellow';
+                    ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height * 0.78);
+                  }
                   
-                  // Header - smaller text
-                  ctx.font = 'bold 80px Arial';
-                  ctx.fillStyle = 'yellow';
-                  ctx.textAlign = 'center';
-                  ctx.textBaseline = 'middle';
-                  ctx.fillText('MICHAEL R. SMITH', canvas.width / 2, canvas.height * 0.25);
+                  return canvas;
+                })()]} />
+              </spriteMaterial>
+            </sprite>
+            
+            {/* Back side - EXACT same content but with smaller text to match front */}
+            <sprite position={[0, 0, -0.2]} rotation={[0, Math.PI, 0]} scale={[4.8, 2.8, 1]}>
+              <spriteMaterial alphaTest={0.5}>
+                <canvasTexture attach="map" args={[(() => {
+                  const canvas = document.createElement('canvas');
+                  canvas.width = 1024;
+                  canvas.height = 1024;
+                  const ctx = canvas.getContext('2d');
                   
-                  // Subheader - smaller text
-                  ctx.font = 'bold 75px Arial';
-                  ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height * 0.5);
+                  if (ctx) {
+                    // Fill the background
+                    ctx.fillStyle = "#0D47A1";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Border
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 12;
+                    ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+                    
+                    // Header - smaller text
+                    ctx.font = 'bold 80px Arial';
+                    ctx.fillStyle = 'yellow';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('MICHAEL R. SMITH', canvas.width / 2, canvas.height * 0.25);
+                    
+                    // Subheader - smaller text
+                    ctx.font = 'bold 75px Arial';
+                    ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height * 0.5);
+                    
+                    // Bottom text - highlight
+                    ctx.fillStyle = '#1A237E';
+                    ctx.fillRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
+                    
+                    // Border for highlight
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 6;
+                    ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
+                    
+                    // Bottom text - smaller text
+                    ctx.font = 'bold 68px Arial';
+                    ctx.fillStyle = 'yellow';
+                    ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height * 0.78);
+                  }
                   
-                  // Bottom text - highlight
-                  ctx.fillStyle = '#1A237E';
-                  ctx.fillRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
-                  
-                  // Border for highlight
-                  ctx.strokeStyle = 'white';
-                  ctx.lineWidth = 6;
-                  ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
-                  
-                  // Bottom text - smaller text
-                  ctx.font = 'bold 68px Arial';
-                  ctx.fillStyle = 'yellow';
-                  ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height * 0.78);
-                }
-                
-                return canvas;
-              })()]} />
-            </spriteMaterial>
-          </sprite>
+                  return canvas;
+                })()]} />
+              </spriteMaterial>
+            </sprite>
+          </group>
         </group>
-      </group>
+      </scene>
       
       {/* Camera controls - always enabled to allow viewing from different angles */}
       <OrbitControls 

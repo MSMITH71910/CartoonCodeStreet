@@ -25,21 +25,48 @@ const SimpleWorkingCharacter = () => {
     }
   }, [setCharacterRef]);
   
-  // Direct keyboard event handlers for dancing and waving
+  // COMPLETELY REWRITTEN keyboard event handlers for dancing and waving
   useEffect(() => {
-    // Event handlers
+    // We'll add a global object to store animation key states
+    if (!window.animationKeys) {
+      window.animationKeys = {
+        Z: false, // For dancing
+        Q: false, // For left-arm waving
+        R: false  // For right-arm waving
+      };
+    }
+    
+    // Debug message to know when this is mounted
+    console.log("Animation keyboard handlers setup - NEW VERSION");
+    
+    // Event handlers with better debugging
     const handleKeyDown = (event: KeyboardEvent) => {
+      console.log(`Key pressed: ${event.code}`);
+      
+      // First update our tracking object
+      if (event.code === 'KeyZ') {
+        window.animationKeys.Z = true;
+        console.log("Z KEY DOWN DETECTED (dance)");
+      } else if (event.code === 'KeyQ') {
+        window.animationKeys.Q = true;
+        console.log("Q KEY DOWN DETECTED (wave left)");
+      } else if (event.code === 'KeyR') {
+        window.animationKeys.R = true;
+        console.log("R KEY DOWN DETECTED (wave right)");
+      }
+      
+      // Now process animations directly, bypassing React state system initially
       if (event.code === 'KeyZ' && !moving && !isDancing && !isWaving) {
-        console.log("DANCE KEY PRESSED");
+        console.log("DANCE ANIMATION STARTED");
         setIsDancing(true);
         setIsWaving(false);
       } else if (event.code === 'KeyQ' && !moving && !isDancing && !isWaving) {
-        console.log("WAVE LEFT KEY PRESSED");
+        console.log("WAVE LEFT ANIMATION STARTED");
         setIsWaving(true);
         setWaveArm('left');
         setIsDancing(false);
       } else if (event.code === 'KeyR' && !moving && !isDancing && !isWaving) {
-        console.log("WAVE RIGHT KEY PRESSED");
+        console.log("WAVE RIGHT ANIMATION STARTED");
         setIsWaving(true);
         setWaveArm('right');
         setIsDancing(false);
@@ -47,28 +74,78 @@ const SimpleWorkingCharacter = () => {
     };
     
     const handleKeyUp = (event: KeyboardEvent) => {
+      console.log(`Key released: ${event.code}`);
+      
+      // Update our tracking object first
+      if (event.code === 'KeyZ') {
+        window.animationKeys.Z = false;
+        console.log("Z KEY UP DETECTED (dance)");
+      } else if (event.code === 'KeyQ') {
+        window.animationKeys.Q = false;
+        console.log("Q KEY UP DETECTED (wave left)");
+      } else if (event.code === 'KeyR') {
+        window.animationKeys.R = false;
+        console.log("R KEY UP DETECTED (wave right)");
+      }
+      
+      // Now process the animation stops
       if (event.code === 'KeyZ' && isDancing) {
-        console.log("DANCE KEY RELEASED");
+        console.log("DANCE ANIMATION STOPPED");
         setIsDancing(false);
       } else if (event.code === 'KeyQ' && isWaving && waveArm === 'left') {
-        console.log("WAVE LEFT KEY RELEASED");
+        console.log("WAVE LEFT ANIMATION STOPPED");
         setIsWaving(false);
       } else if (event.code === 'KeyR' && isWaving && waveArm === 'right') {
-        console.log("WAVE RIGHT KEY RELEASED");
+        console.log("WAVE RIGHT ANIMATION STOPPED");
         setIsWaving(false);
       }
     };
     
-    // Add event listeners
+    // Add event listeners with better console logging
+    console.log("Adding animation key event listeners");
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     
     // Remove event listeners on cleanup
     return () => {
+      console.log("Removing animation key event listeners");
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
   }, [moving, isDancing, isWaving, waveArm]);
+  
+  // Backup animation check in the animation frame
+  useEffect(() => {
+    // Periodically check if keys are held down but animations didn't start
+    const checkInterval = setInterval(() => {
+      if (window.animationKeys) {
+        // If Z is pressed but not dancing, and not moving or waving
+        if (window.animationKeys.Z && !isDancing && !moving && !isWaving) {
+          console.log("Backup dance animation triggered");
+          setIsDancing(true);
+          setIsWaving(false);
+        }
+        
+        // If Q is pressed but not waving left, and not moving or dancing
+        if (window.animationKeys.Q && !isWaving && !moving && !isDancing) {
+          console.log("Backup wave left animation triggered");
+          setIsWaving(true);
+          setWaveArm('left');
+          setIsDancing(false);
+        }
+        
+        // If R is pressed but not waving right, and not moving or dancing
+        if (window.animationKeys.R && !isWaving && !moving && !isDancing) {
+          console.log("Backup wave right animation triggered");
+          setIsWaving(true);
+          setWaveArm('right');
+          setIsDancing(false);
+        }
+      }
+    }, 100); // Check every 100ms
+    
+    return () => clearInterval(checkInterval);
+  }, [moving, isDancing, isWaving]);
   
   // Use keyboard controls from drei
   const forward = useKeyboardControls(state => state[ControlName.forward]);
