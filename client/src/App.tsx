@@ -10,6 +10,7 @@ import GameUI from "./components/games/GameUI";
 import AboutInfoDialog from "./components/ui/AboutInfoDialog";
 import { usePortfolio } from "./lib/stores/usePortfolio";
 import { useStreetSign } from "./lib/stores/useStreetSign";
+import AudioManager from "./components/AudioManager";
 import { ControlName } from "./lib/constants";
 
 // Define control keys for the character movement
