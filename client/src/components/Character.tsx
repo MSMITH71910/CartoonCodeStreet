@@ -108,34 +108,34 @@ const Character = () => {
       setIsMoving(false);
     }
     
-    // FIXED ROTATION HANDLING
-    // Use a more direct and forceful approach to rotation
+    // COMPLETELY OVERHAULED ROTATION HANDLING
+    // Use direct immediate rotation to ensure it works reliably
+    let rotationChanged = false;
+    let newRotation = rotation;
+    
     if (leftward) {
-      // Left key pressed: rotate counter-clockwise (subtract from rotation)
-      const newRotation = rotation - turnSpeed * delta;
-      setRotation(newRotation);
-      
-      // Force direct rotation update on the mesh
-      if (characterRef.current) {
-        characterRef.current.rotation.y = newRotation;
-      }
-      
-      // Verbose logging for debugging
-      console.log(`LEFT key: New rotation = ${newRotation.toFixed(2)}`);
-    } 
+      // Left key pressed - rotate counter-clockwise
+      newRotation = rotation - turnSpeed * delta;
+      rotationChanged = true;
+      console.log(`LEFT key pressed, rotating to ${newRotation.toFixed(2)}`);
+    }
     
     if (rightward) {
-      // Right key pressed: rotate clockwise (add to rotation)
-      const newRotation = rotation + turnSpeed * delta;
+      // Right key pressed - rotate clockwise
+      newRotation = rotation + turnSpeed * delta;
+      rotationChanged = true;
+      console.log(`RIGHT key pressed, rotating to ${newRotation.toFixed(2)}`);
+    }
+    
+    // Apply rotation changes if needed
+    if (rotationChanged) {
       setRotation(newRotation);
       
-      // Force direct rotation update on the mesh
+      // CRITICAL: Force an immediate update to the mesh rotation
       if (characterRef.current) {
         characterRef.current.rotation.y = newRotation;
+        console.log(`Applied rotation: ${newRotation.toFixed(2)}`);
       }
-      
-      // Verbose logging for debugging
-      console.log(`RIGHT key: New rotation = ${newRotation.toFixed(2)}`);
     }
     
     // Calculate forward direction based on character rotation
@@ -181,46 +181,91 @@ const Character = () => {
     console.log(`Controls: forward=${forward}, backward=${backward}, left=${leftward}, right=${rightward}, interact=${interact}`);
   }, [forward, backward, leftward, rightward, interact]);
   
-  // Handle animation key presses - IMPROVED VERSION
+  // COMPLETELY REWRITTEN ANIMATION SYSTEM
+  // Separate direct key handlers for animations
+  
+  // Dancing Z key handler
   useEffect(() => {
-    // Handle dancing with Z key - MORE AGGRESSIVE DETECTION
-    if (danceKey) {
-      console.log("Dance key pressed (Z)!");
-      if (!isMoving && interactionType === "none") {
-        console.log("Dance animation triggered by keyboard!");
-        setIsDancing(true);
-        setIsWaving(false); // Force stop any other animations
-        setAnimationTime(0);
-        // Don't play sounds to avoid clicking
-      }
+    if (!danceKey) return; // Exit if key not pressed
+    
+    // Only log on initial press, not continuously
+    console.log("Z KEY PRESSED: Dance animation triggered!");
+    
+    // Only allow animation when not moving and not in interaction
+    if (isMoving || interactionType !== "none") {
+      console.log("Cannot dance while moving or during interaction");
+      return;
     }
     
-    // Handle left arm wave with Q key - MORE AGGRESSIVE DETECTION
-    if (waveLeftKey) {
-      console.log("Left wave key pressed (Q)!");
-      if (!isMoving && interactionType === "none") {
-        console.log("Left arm wave animation triggered by keyboard!");
-        setIsDancing(false); // Force stop any other animations
-        setIsWaving(true);
-        setWaveArm('left');
-        setAnimationTime(0);
-        // Don't play sounds to avoid clicking
-      }
+    // Forcefully set animation state
+    setIsDancing(true);
+    setIsWaving(false); // Cancel other animations
+    setAnimationTime(0);  // Reset animation timer
+    
+    // Set a timeout to stop the dance after 3 seconds
+    const timer = setTimeout(() => {
+      setIsDancing(false);
+      console.log("Dance animation completed");
+    }, 3000);
+    
+    return () => clearTimeout(timer); // Cleanup when unmounting
+  }, [danceKey]); // Only depend on danceKey to catch every press
+  
+  // Left wave Q key handler
+  useEffect(() => {
+    if (!waveLeftKey) return; // Exit if key not pressed
+    
+    // Only log on initial press, not continuously
+    console.log("Q KEY PRESSED: Left wave animation triggered!");
+    
+    // Only allow animation when not moving and not in interaction
+    if (isMoving || interactionType !== "none") {
+      console.log("Cannot wave while moving or during interaction");
+      return;
     }
     
-    // Handle right arm wave with R key - MORE AGGRESSIVE DETECTION
-    if (waveRightKey) {
-      console.log("Right wave key pressed (R)!");
-      if (!isMoving && interactionType === "none") {
-        console.log("Right arm wave animation triggered by keyboard!");
-        setIsDancing(false); // Force stop any other animations
-        setIsWaving(true);
-        setWaveArm('right');
-        setAnimationTime(0);
-        // Don't play sounds to avoid clicking
-      }
+    // Forcefully set animation state
+    setIsDancing(false); // Cancel other animations
+    setIsWaving(true);
+    setWaveArm('left');
+    setAnimationTime(0); // Reset animation timer
+    
+    // Set a timeout to stop the wave after 3 seconds
+    const timer = setTimeout(() => {
+      setIsWaving(false);
+      console.log("Left wave animation completed");
+    }, 3000);
+    
+    return () => clearTimeout(timer); // Cleanup when unmounting
+  }, [waveLeftKey]); // Only depend on waveLeftKey to catch every press
+  
+  // Right wave R key handler
+  useEffect(() => {
+    if (!waveRightKey) return; // Exit if key not pressed
+    
+    // Only log on initial press, not continuously
+    console.log("R KEY PRESSED: Right wave animation triggered!");
+    
+    // Only allow animation when not moving and not in interaction
+    if (isMoving || interactionType !== "none") {
+      console.log("Cannot wave while moving or during interaction");
+      return;
     }
-  }, [danceKey, waveLeftKey, waveRightKey, isMoving, interactionType]);
+    
+    // Forcefully set animation state
+    setIsDancing(false); // Cancel other animations
+    setIsWaving(true);
+    setWaveArm('right');
+    setAnimationTime(0); // Reset animation timer
+    
+    // Set a timeout to stop the wave after 3 seconds
+    const timer = setTimeout(() => {
+      setIsWaving(false);
+      console.log("Right wave animation completed");
+    }, 3000);
+    
+    return () => clearTimeout(timer); // Cleanup when unmounting
+  }, [waveRightKey]); // Only depend on waveRightKey to catch every press
   
   // Update animation time for dancing/waving animations
   useFrame((state, delta) => {
@@ -229,25 +274,8 @@ const Character = () => {
     }
   });
   
-  // Set timeouts to stop animations after a delay
-  useEffect(() => {
-    let danceTimer: NodeJS.Timeout;
-    let waveTimer: NodeJS.Timeout;
-    
-    if (isDancing) {
-      danceTimer = setTimeout(() => setIsDancing(false), 3000);
-    }
-    
-    if (isWaving) {
-      waveTimer = setTimeout(() => setIsWaving(false), 3000);
-    }
-    
-    // Clean up timeouts if component unmounts or animation state changes
-    return () => {
-      clearTimeout(danceTimer);
-      clearTimeout(waveTimer);
-    };
-  }, [isDancing, isWaving]);
+  // Animation timeouts are now handled directly in the key press handlers
+  // This ensures more reliable animation triggers and completions
   
   // Handle movement stopping animations
   useEffect(() => {
