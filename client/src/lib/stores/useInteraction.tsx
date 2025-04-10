@@ -155,90 +155,138 @@ export const useInteraction = create<InteractionState>((set, get) => ({
       case "ticTacToe":
       case "hangman":
       case "checkers":
-        console.log(`AUDIO CONTROL: Switching to game music for ${type}`);
-        // Get a direct reference to the audio store to ensure we're calling the latest version
+        console.log(`AUDIO CONTROL: Switching to game music for ${type} mini-game`);
+        // Get the audio store to play chess music for mini-games
         const audioStore = useAudio.getState();
-        if (audioStore.chessMusicOrSimilar) {
-          // First pause any currently playing music
+        
+        // EXPLICITLY CALL playActivityMusic directly with chess music type
+        if (!audioStore.isMuted && !audioStore.isMusicMuted) {
+          console.log("AUDIO CONTROL: Directly playing chess music for mini-game");
+          
+          // First stop any current music
           if (audioStore.currentActivityMusic) {
+            console.log("AUDIO CONTROL: Stopping current activity music");
             audioStore.currentActivityMusic.pause();
+            audioStore.currentActivityMusic.currentTime = 0;
           }
+          
           if (audioStore.backgroundMusic) {
+            console.log("AUDIO CONTROL: Stopping background music");
             audioStore.backgroundMusic.pause();
           }
           
-          // Set new current activity music and track
-          useAudio.setState({
-            currentActivityMusic: audioStore.chessMusicOrSimilar,
-            currentTrack: "chess"
-          });
-          
-          // Play if not muted
-          if (!audioStore.isMuted && !audioStore.isMusicMuted) {
+          // Use the chess music
+          if (audioStore.chessMusicOrSimilar) {
+            // Set it as current and start playing
+            console.log("AUDIO CONTROL: Playing chess music specifically for mini-game");
             audioStore.chessMusicOrSimilar.currentTime = 0;
-            audioStore.chessMusicOrSimilar.play().catch(e => console.error("Failed to play game music:", e));
-            console.log("AUDIO CONTROL: Now playing game music");
+            audioStore.chessMusicOrSimilar.volume = 0.4;
+            
+            // Update the state
+            useAudio.setState({
+              currentActivityMusic: audioStore.chessMusicOrSimilar,
+              currentTrack: "chess"
+            });
+            
+            // Start playing
+            audioStore.chessMusicOrSimilar.play().catch(e => 
+              console.error("AUDIO ERROR: Failed to play chess music for mini-game:", e)
+            );
           } else {
-            console.log("AUDIO CONTROL: Game music not played because audio is muted");
+            console.error("AUDIO ERROR: Chess music not available for mini-game");
           }
+        } else {
+          console.log("AUDIO CONTROL: Audio is muted, not playing chess music for mini-game");
         }
         break;
         
       case "seesaw":
         console.log("AUDIO CONTROL: Switching to seesaw music");
         const seesawAudioStore = useAudio.getState();
-        if (seesawAudioStore.seesawMusic) {
-          // First pause any currently playing music
+        
+        // Perform direct music switching using the same pattern as mini-games
+        if (!seesawAudioStore.isMuted && !seesawAudioStore.isMusicMuted) {
+          console.log("AUDIO CONTROL: Directly playing seesaw music");
+          
+          // First stop any current music
           if (seesawAudioStore.currentActivityMusic) {
+            console.log("AUDIO CONTROL: Stopping current activity music");
             seesawAudioStore.currentActivityMusic.pause();
+            seesawAudioStore.currentActivityMusic.currentTime = 0;
           }
+          
           if (seesawAudioStore.backgroundMusic) {
+            console.log("AUDIO CONTROL: Stopping background music");
             seesawAudioStore.backgroundMusic.pause();
           }
           
-          // Set new current activity music and track
-          useAudio.setState({
-            currentActivityMusic: seesawAudioStore.seesawMusic,
-            currentTrack: "seesaw"
-          });
-          
-          // Play if not muted
-          if (!seesawAudioStore.isMuted && !seesawAudioStore.isMusicMuted) {
+          // Use the seesaw music
+          if (seesawAudioStore.seesawMusic) {
+            // Set it as current and start playing
+            console.log("AUDIO CONTROL: Playing seesaw music specifically");
             seesawAudioStore.seesawMusic.currentTime = 0;
-            seesawAudioStore.seesawMusic.play().catch(e => console.error("Failed to play seesaw music:", e));
-            console.log("AUDIO CONTROL: Now playing seesaw music");
+            seesawAudioStore.seesawMusic.volume = 0.4;
+            
+            // Update the state
+            useAudio.setState({
+              currentActivityMusic: seesawAudioStore.seesawMusic,
+              currentTrack: "seesaw"
+            });
+            
+            // Start playing
+            seesawAudioStore.seesawMusic.play().catch(e => 
+              console.error("AUDIO ERROR: Failed to play seesaw music:", e)
+            );
           } else {
-            console.log("AUDIO CONTROL: Seesaw music not played because audio is muted");
+            console.error("AUDIO ERROR: Seesaw music not available");
           }
+        } else {
+          console.log("AUDIO CONTROL: Audio is muted, not playing seesaw music");
         }
         break;
         
       case "fountain":
         console.log("AUDIO CONTROL: Switching to fountain music");
         const fountainAudioStore = useAudio.getState();
-        if (fountainAudioStore.fountainMusic) {
-          // First pause any currently playing music
+        
+        // Perform direct music switching using the same pattern as mini-games
+        if (!fountainAudioStore.isMuted && !fountainAudioStore.isMusicMuted) {
+          console.log("AUDIO CONTROL: Directly playing fountain music");
+          
+          // First stop any current music
           if (fountainAudioStore.currentActivityMusic) {
+            console.log("AUDIO CONTROL: Stopping current activity music");
             fountainAudioStore.currentActivityMusic.pause();
+            fountainAudioStore.currentActivityMusic.currentTime = 0;
           }
+          
           if (fountainAudioStore.backgroundMusic) {
+            console.log("AUDIO CONTROL: Stopping background music");
             fountainAudioStore.backgroundMusic.pause();
           }
           
-          // Set new current activity music and track
-          useAudio.setState({
-            currentActivityMusic: fountainAudioStore.fountainMusic,
-            currentTrack: "fountain"
-          });
-          
-          // Play if not muted
-          if (!fountainAudioStore.isMuted && !fountainAudioStore.isMusicMuted) {
+          // Use the fountain music
+          if (fountainAudioStore.fountainMusic) {
+            // Set it as current and start playing
+            console.log("AUDIO CONTROL: Playing fountain music specifically");
             fountainAudioStore.fountainMusic.currentTime = 0;
-            fountainAudioStore.fountainMusic.play().catch(e => console.error("Failed to play fountain music:", e));
-            console.log("AUDIO CONTROL: Now playing fountain music");
+            fountainAudioStore.fountainMusic.volume = 0.4;
+            
+            // Update the state
+            useAudio.setState({
+              currentActivityMusic: fountainAudioStore.fountainMusic,
+              currentTrack: "fountain"
+            });
+            
+            // Start playing
+            fountainAudioStore.fountainMusic.play().catch(e => 
+              console.error("AUDIO ERROR: Failed to play fountain music:", e)
+            );
           } else {
-            console.log("AUDIO CONTROL: Fountain music not played because audio is muted");
+            console.error("AUDIO ERROR: Fountain music not available");
           }
+        } else {
+          console.log("AUDIO CONTROL: Audio is muted, not playing fountain music");
         }
         break;
     }

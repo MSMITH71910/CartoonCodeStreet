@@ -107,14 +107,19 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
     const interactionType = getInteractionType();
     const miniGameType = getMiniGameType();
     
+    console.log(`MUSIC DEBUG: Object clicked - interactionType=${interactionType}, miniGameType=${miniGameType}`);
+    
+    // Get music type before starting interaction
+    const musicType = getActivityMusicType();
+    console.log(`MUSIC DEBUG: Activity music type: ${musicType}`);
+    
     if (interactionType !== "none") {
+      console.log(`MUSIC DEBUG: Starting standard interaction with music: ${musicType}`);
       startInteraction(interactionType, objectId, interactPos, interactRot);
-      const musicType = getActivityMusicType();
-      if (musicType) playActivityMusic(musicType);
-    } else if (miniGameType) {
+    } 
+    else if (miniGameType) {
+      console.log(`MUSIC DEBUG: Starting mini-game interaction: ${miniGameType} with music: ${musicType}`);
       startInteraction(miniGameType, objectId, interactPos, interactRot);
-      const musicType = getActivityMusicType();
-      if (musicType) playActivityMusic(musicType);
     }
   };
   
