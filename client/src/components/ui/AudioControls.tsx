@@ -22,8 +22,6 @@ const AudioControls: React.FC = () => {
   
   // Toggle all audio mute
   const handleToggleMute = () => {
-    console.log("DIRECT MUTE: Toggling all audio mute");
-    
     // Get current state
     const currentlyMuted = useAudio.getState().isMuted;
     const newMuteState = !currentlyMuted;
@@ -47,11 +45,9 @@ const AudioControls: React.FC = () => {
         audio.currentTime = 0;
         audio.volume = 0;
       });
-      console.log("DIRECT MUTE: All audio muted");
     } else {
       // Only restore if music is not separately muted
       if (!useAudio.getState().isMusicMuted) {
-        console.log("DIRECT MUTE: Restoring audio");
         // Set volumes
         if (backgroundMusic) backgroundMusic.volume = 0.3;
         if (chessMusicOrSimilar) chessMusicOrSimilar.volume = 0.4;
@@ -60,9 +56,9 @@ const AudioControls: React.FC = () => {
         
         // Play appropriate track
         if (currentActivityMusic) {
-          currentActivityMusic.play().catch(e => console.error("Failed to play activity music:", e));
+          currentActivityMusic.play().catch(() => {});
         } else if (backgroundMusic) {
-          backgroundMusic.play().catch(e => console.error("Failed to play background music:", e));
+          backgroundMusic.play().catch(() => {});
         }
       }
     }
@@ -70,8 +66,6 @@ const AudioControls: React.FC = () => {
   
   // Toggle just music mute
   const handleToggleMusicMute = () => {
-    console.log("DIRECT MUTE: Toggling just music mute");
-    
     // Get current state
     const currentlyMusicMuted = useAudio.getState().isMusicMuted;
     const newMusicMuteState = !currentlyMusicMuted;
@@ -95,11 +89,8 @@ const AudioControls: React.FC = () => {
         audio.currentTime = 0;
         audio.volume = 0;
       });
-      console.log("DIRECT MUTE: All music muted");
     } else if (!useAudio.getState().isMuted) {
       // Only restore if all audio is not muted
-      console.log("DIRECT MUTE: Restoring music");
-      
       // Set volumes
       if (backgroundMusic) backgroundMusic.volume = 0.3;
       if (chessMusicOrSimilar) chessMusicOrSimilar.volume = 0.4;
@@ -108,18 +99,15 @@ const AudioControls: React.FC = () => {
       
       // Play appropriate track
       if (currentActivityMusic) {
-        currentActivityMusic.play().catch(e => console.error("Failed to play activity music:", e));
+        currentActivityMusic.play().catch(() => {});
       } else if (backgroundMusic) {
-        backgroundMusic.play().catch(e => console.error("Failed to play background music:", e));
+        backgroundMusic.play().catch(() => {});
       }
     }
   };
   
   // Force music to be muted on initial load
   useEffect(() => {
-    // Make sure music is muted by default when app loads
-    console.log("AUDIO CONTROLS: Initial setup");
-    
     // Initialize with music muted (using direct approach)
     if (!useAudio.getState().isMusicMuted) {
       handleToggleMusicMute();
@@ -149,7 +137,6 @@ const AudioControls: React.FC = () => {
         trackName = "Playing...";
     }
     
-    console.log(`AUDIO DEBUG: Current track is "${currentTrack}" (${trackName})`);
     return trackName;
   };
 
@@ -208,15 +195,8 @@ const AudioControls: React.FC = () => {
             </p>
           </div>
           
-          {/* Information */}
-          <div className="text-gray-300 text-xs mt-2">
-            <p className="mb-1">Music changes with:</p>
-            <ul className="list-disc pl-4 text-xs">
-              <li>Games (TicTacToe, etc)</li>
-              <li>Fountain</li>
-              <li>Seesaw</li>
-            </ul>
-          </div>
+          {/* Just a little space at the bottom */}
+          <div className="mt-2"></div>
         </div>
       )}
       
