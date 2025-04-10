@@ -1,13 +1,13 @@
 import { useRef, useEffect, useState } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useKeyboardControls } from "@react-three/drei";
 import * as THREE from "three";
+import { ControlName } from "../lib/constants";
 import { usePortfolio } from "../lib/stores/usePortfolio";
 import { useAudio } from "../lib/stores/useAudio";
 import { useInteraction } from "../lib/stores/useInteraction";
-import { useKeyboard } from "../hooks/useKeyboard";
-import { useAnimations, AnimationType } from "../hooks/useAnimations";
 
-const Character = () => {
+const SimpleCharacter = () => {
   // Core refs and states
   const characterRef = useRef<THREE.Group>(null);
   const { setCharacterRef, isViewingProject } = usePortfolio();
@@ -15,18 +15,21 @@ const Character = () => {
   const [isMoving, setIsMoving] = useState(false);
   const { playHit, playSuccess } = useAudio();
   
-  // New direct keyboard handling
-  const keys = useKeyboard();
+  // Animation states
+  const [isDancing, setIsDancing] = useState(false);
+  const [isWaving, setIsWaving] = useState(false);
+  const [waveArm, setWaveArm] = useState<'left' | 'right'>('right');
+  const [animationTime, setAnimationTime] = useState(0);
   
-  // New animation system
-  const {
-    animationType,
-    animationTime,
-    isAnimating,
-    startAnimation,
-    stopAnimation,
-    updateAnimation
-  } = useAnimations(3000); // 3 seconds animation duration
+  // Use Drei's keyboard controls
+  const forward = useKeyboardControls<ControlName>(state => state.forward);
+  const backward = useKeyboardControls<ControlName>(state => state.backward);
+  const leftward = useKeyboardControls<ControlName>(state => state.leftward);
+  const rightward = useKeyboardControls<ControlName>(state => state.rightward);
+  const interact = useKeyboardControls<ControlName>(state => state.interact);
+  const dance = useKeyboardControls<ControlName>(state => state.dance);
+  const waveLeft = useKeyboardControls<ControlName>(state => state.waveLeft);
+  const waveRight = useKeyboardControls<ControlName>(state => state.waveRight);
   
   // Interaction state
   const { 
@@ -35,50 +38,6 @@ const Character = () => {
     interactionRotation,
     endInteraction
   } = useInteraction();
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'KeyW' || e.code === 'ArrowUp') setKeys(prev => ({...prev, forward: true}));
-      if (e.code === 'KeyS' || e.code === 'ArrowDown') setKeys(prev => ({...prev, backward: true}));
-      if (e.code === 'KeyA' || e.code === 'ArrowLeft') setKeys(prev => ({...prev, leftward: true}));
-      if (e.code === 'KeyD' || e.code === 'ArrowRight') setKeys(prev => ({...prev, rightward: true}));
-      if (e.code === 'KeyE' || e.code === 'Space') setKeys(prev => ({...prev, interact: true}));
-      if (e.code === 'KeyZ') { 
-        console.log("Z key pressed down");
-        setKeys(prev => ({...prev, dance: true}));
-      }
-      if (e.code === 'KeyQ') {
-        console.log("Q key pressed down");
-        setKeys(prev => ({...prev, waveLeft: true}));
-      }
-      if (e.code === 'KeyR') {
-        console.log("R key pressed down");
-        setKeys(prev => ({...prev, waveRight: true}));
-      }
-    };
-    
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'KeyW' || e.code === 'ArrowUp') setKeys(prev => ({...prev, forward: false}));
-      if (e.code === 'KeyS' || e.code === 'ArrowDown') setKeys(prev => ({...prev, backward: false}));
-      if (e.code === 'KeyA' || e.code === 'ArrowLeft') setKeys(prev => ({...prev, leftward: false}));
-      if (e.code === 'KeyD' || e.code === 'ArrowRight') setKeys(prev => ({...prev, rightward: false}));
-      if (e.code === 'KeyE' || e.code === 'Space') setKeys(prev => ({...prev, interact: false}));
-      if (e.code === 'KeyZ') setKeys(prev => ({...prev, dance: false}));
-      if (e.code === 'KeyQ') setKeys(prev => ({...prev, waveLeft: false}));
-      if (e.code === 'KeyR') setKeys(prev => ({...prev, waveRight: false}));
-    };
-    
-    // Add direct event listeners to window
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, []);
-  
-  // Destructure keys object for easy use
-  const { forward, backward, leftward, rightward, interact, dance: danceKey, waveLeft: waveLeftKey, waveRight: waveRightKey } = keys;
 
   // Register character reference to the store
   useEffect(() => {
@@ -143,8 +102,7 @@ const Character = () => {
       setIsMoving(false);
     }
     
-    // COMPLETELY OVERHAULED ROTATION HANDLING
-    // Use direct immediate rotation to ensure it works reliably
+    // Rotation handling
     let rotationChanged = false;
     let newRotation = rotation;
     
@@ -169,12 +127,10 @@ const Character = () => {
       // CRITICAL: Force an immediate update to the mesh rotation
       if (characterRef.current) {
         characterRef.current.rotation.y = newRotation;
-        console.log(`Applied rotation: ${newRotation.toFixed(2)}`);
       }
     }
     
     // Calculate forward direction based on character rotation
-    // The forward vector is in positive Z with our camera setup
     const forwardDir = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), characterRef.current.rotation.y);
     
     // Apply movement along the forward direction
@@ -182,11 +138,6 @@ const Character = () => {
       const moveAmount = movingForward * speed * delta;
       const movement = forwardDir.clone().multiplyScalar(moveAmount);
       characterRef.current.position.add(movement);
-      
-      // Log movement for debugging
-      if (Math.random() < 0.05) {
-        console.log(`Moving: dir=[${forwardDir.x.toFixed(2)}, ${forwardDir.y.toFixed(2)}, ${forwardDir.z.toFixed(2)}], amount=${moveAmount.toFixed(2)}`);
-      }
     }
     
     // Update animation time for skating motion
@@ -206,116 +157,75 @@ const Character = () => {
     characterRef.current.position.z = Math.max(bounds.minZ, Math.min(bounds.maxZ, characterRef.current.position.z));
     
     // Log character position occasionally for debugging
-    if (Math.random() < 0.05) {
+    if (Math.random() < 0.01) {
       console.log(`Character position: (${characterRef.current.position.x.toFixed(2)}, ${characterRef.current.position.y.toFixed(2)}, ${characterRef.current.position.z.toFixed(2)})`);
     }
   });
-
-  // Debug logging for controls
-  useEffect(() => {
-    console.log(`Controls: forward=${forward}, backward=${backward}, left=${leftward}, right=${rightward}, interact=${interact}`);
-  }, [forward, backward, leftward, rightward, interact]);
   
-  // COMPLETELY REWRITTEN ANIMATION SYSTEM
-  // Separate direct key handlers for animations
-  
-  // Dancing Z key handler
+  // Animation handlers
   useEffect(() => {
-    if (!danceKey) return; // Exit if key not pressed
-    
-    // Only log on initial press, not continuously
-    console.log("Z KEY PRESSED: Dance animation triggered!");
-    
-    // Only allow animation when not moving and not in interaction
-    if (isMoving || interactionType !== "none") {
-      console.log("Cannot dance while moving or during interaction");
-      return;
+    if (dance && !isMoving && interactionType === "none" && !isDancing && !isWaving) {
+      console.log("Dance animation triggered!");
+      setIsDancing(true);
+      setIsWaving(false);
+      setAnimationTime(0);
+      
+      // Set a timeout to stop dancing after 3 seconds
+      const timer = setTimeout(() => {
+        setIsDancing(false);
+        console.log("Dance animation completed");
+      }, 3000);
+      
+      return () => clearTimeout(timer);
     }
-    
-    // Forcefully set animation state
-    setIsDancing(true);
-    setIsWaving(false); // Cancel other animations
-    setAnimationTime(0);  // Reset animation timer
-    
-    // Set a timeout to stop the dance after 3 seconds
-    const timer = setTimeout(() => {
+  }, [dance, isMoving, interactionType, isDancing, isWaving]);
+  
+  useEffect(() => {
+    if (waveLeft && !isMoving && interactionType === "none" && !isDancing && !isWaving) {
+      console.log("Left wave animation triggered!");
       setIsDancing(false);
-      console.log("Dance animation completed");
-    }, 3000);
-    
-    return () => clearTimeout(timer); // Cleanup when unmounting
-  }, [danceKey]); // Only depend on danceKey to catch every press
-  
-  // Left wave Q key handler
-  useEffect(() => {
-    if (!waveLeftKey) return; // Exit if key not pressed
-    
-    // Only log on initial press, not continuously
-    console.log("Q KEY PRESSED: Left wave animation triggered!");
-    
-    // Only allow animation when not moving and not in interaction
-    if (isMoving || interactionType !== "none") {
-      console.log("Cannot wave while moving or during interaction");
-      return;
+      setIsWaving(true);
+      setWaveArm('left');
+      setAnimationTime(0);
+      
+      // Set a timeout to stop waving after 3 seconds
+      const timer = setTimeout(() => {
+        setIsWaving(false);
+        console.log("Left wave animation completed");
+      }, 3000);
+      
+      return () => clearTimeout(timer);
     }
-    
-    // Forcefully set animation state
-    setIsDancing(false); // Cancel other animations
-    setIsWaving(true);
-    setWaveArm('left');
-    setAnimationTime(0); // Reset animation timer
-    
-    // Set a timeout to stop the wave after 3 seconds
-    const timer = setTimeout(() => {
-      setIsWaving(false);
-      console.log("Left wave animation completed");
-    }, 3000);
-    
-    return () => clearTimeout(timer); // Cleanup when unmounting
-  }, [waveLeftKey]); // Only depend on waveLeftKey to catch every press
+  }, [waveLeft, isMoving, interactionType, isDancing, isWaving]);
   
-  // Right wave R key handler
   useEffect(() => {
-    if (!waveRightKey) return; // Exit if key not pressed
-    
-    // Only log on initial press, not continuously
-    console.log("R KEY PRESSED: Right wave animation triggered!");
-    
-    // Only allow animation when not moving and not in interaction
-    if (isMoving || interactionType !== "none") {
-      console.log("Cannot wave while moving or during interaction");
-      return;
+    if (waveRight && !isMoving && interactionType === "none" && !isDancing && !isWaving) {
+      console.log("Right wave animation triggered!");
+      setIsDancing(false);
+      setIsWaving(true);
+      setWaveArm('right');
+      setAnimationTime(0);
+      
+      // Set a timeout to stop waving after 3 seconds
+      const timer = setTimeout(() => {
+        setIsWaving(false);
+        console.log("Right wave animation completed");
+      }, 3000);
+      
+      return () => clearTimeout(timer);
     }
-    
-    // Forcefully set animation state
-    setIsDancing(false); // Cancel other animations
-    setIsWaving(true);
-    setWaveArm('right');
-    setAnimationTime(0); // Reset animation timer
-    
-    // Set a timeout to stop the wave after 3 seconds
-    const timer = setTimeout(() => {
-      setIsWaving(false);
-      console.log("Right wave animation completed");
-    }, 3000);
-    
-    return () => clearTimeout(timer); // Cleanup when unmounting
-  }, [waveRightKey]); // Only depend on waveRightKey to catch every press
+  }, [waveRight, isMoving, interactionType, isDancing, isWaving]);
   
-  // Update animation time for dancing/waving animations
+  // Update animation time for dancing/waving
   useFrame((state, delta) => {
     if (isDancing || isWaving) {
-      setAnimationTime(prev => prev + delta * 8); // Faster animation for dancing/waving
+      setAnimationTime(prev => prev + delta * 8);
     }
   });
   
-  // Animation timeouts are now handled directly in the key press handlers
-  // This ensures more reliable animation triggers and completions
-  
-  // Handle movement stopping animations
+  // Stop animations when moving
   useEffect(() => {
     if (isMoving && (isDancing || isWaving)) {
-      // Stop animations when character starts moving
       setIsDancing(false);
       setIsWaving(false);
     }
@@ -323,46 +233,43 @@ const Character = () => {
   
   // Click handlers for character parts
   const handleLegClick = (e: any) => {
-    // Try to stop event propagation
     if (e && typeof e.stopPropagation === 'function') {
       e.stopPropagation();
     }
     
     if (!isMoving && !isDancing && !isWaving && interactionType === "none") {
-      console.log("Dancing animation triggered!");
+      console.log("Dancing animation triggered by click!");
       setIsDancing(true);
-      setAnimationTime(0); // Reset animation timer
-      playSuccess(); // Play a sound effect
+      setAnimationTime(0);
+      playSuccess();
     }
   };
   
   const handleLeftArmClick = (e: any) => {
-    // Try to stop event propagation
     if (e && typeof e.stopPropagation === 'function') {
       e.stopPropagation();
     }
     
     if (!isMoving && !isDancing && !isWaving && interactionType === "none") {
-      console.log("Left arm wave animation triggered!");
+      console.log("Left arm wave animation triggered by click!");
       setIsWaving(true);
       setWaveArm('left');
-      setAnimationTime(0); // Reset animation timer
-      playHit(); // Play a sound effect
+      setAnimationTime(0);
+      playHit();
     }
   };
   
   const handleRightArmClick = (e: any) => {
-    // Try to stop event propagation
     if (e && typeof e.stopPropagation === 'function') {
       e.stopPropagation();
     }
     
     if (!isMoving && !isDancing && !isWaving && interactionType === "none") {
-      console.log("Right arm wave animation triggered!");
+      console.log("Right arm wave animation triggered by click!");
       setIsWaving(true);
       setWaveArm('right');
-      setAnimationTime(0); // Reset animation timer
-      playHit(); // Play a sound effect
+      setAnimationTime(0);
+      playHit();
     }
   };
 
@@ -372,7 +279,6 @@ const Character = () => {
         Render different character styles based on interaction:
         - Regular standing character when not interacting
         - Special pose for seesaw interaction
-        - Specific poses for other interactions
       */}
       {interactionType === "seesaw" ? (
         // Simple seated character facing directly forward
@@ -432,19 +338,18 @@ const Character = () => {
             <meshStandardMaterial color="#E53935" />
           </mesh>
           
-          {/* Arms resting on lap for seesaw */}
+          {/* Arms */}
           <mesh castShadow position={[0.2, -0.05, 0.1]} rotation={[0.3, 0, -0.2]}>
             <capsuleGeometry args={[0.05, 0.15, 4, 8]} />
             <meshStandardMaterial color="#4285F4" />
           </mesh>
-          
           <mesh castShadow position={[-0.2, -0.05, 0.1]} rotation={[0.3, 0, 0.2]}>
             <capsuleGeometry args={[0.05, 0.15, 4, 8]} />
             <meshStandardMaterial color="#4285F4" />
           </mesh>
         </group>
       ) : (
-        // Regular standing character
+        // Standing character for normal gameplay
         <group>
           {/* Character body */}
           <mesh castShadow position={[0, 0.8, 0]}>
@@ -468,8 +373,14 @@ const Character = () => {
             <meshBasicMaterial color="black" />
           </mesh>
           
-          {/* Left rollerblade with dancing animation */}
-          <group position={[-0.2, isDancing ? Math.sin(animationTime) * 0.3 : 0, 0]}>
+          {/* Left rollerblade with animation */}
+          <group 
+            position={[
+              -0.2, 
+              isDancing ? Math.sin(animationTime) * 0.3 : 0, 
+              0
+            ]}
+          >
             <mesh 
               castShadow 
               position={[0, 0.05, 0]} 
@@ -478,6 +389,7 @@ const Character = () => {
                 0, 
                 isMoving ? Math.sin(animationTime) * 0.2 : 0
               ]}
+              onClick={handleLegClick}
             >
               <boxGeometry args={[0.2, 0.1, 0.5]} />
               <meshStandardMaterial color="#E53935" />
@@ -494,8 +406,14 @@ const Character = () => {
             </mesh>
           </group>
           
-          {/* Right rollerblade with dancing animation */}
-          <group position={[0.2, isDancing ? -Math.sin(animationTime) * 0.3 : 0, 0]}>
+          {/* Right rollerblade with animation */}
+          <group 
+            position={[
+              0.2, 
+              isDancing ? -Math.sin(animationTime) * 0.3 : 0, 
+              0
+            ]}
+          >
             <mesh 
               castShadow 
               position={[0, 0.05, 0]} 
@@ -504,6 +422,7 @@ const Character = () => {
                 0, 
                 isMoving ? -Math.sin(animationTime) * 0.2 : 0
               ]}
+              onClick={handleLegClick}
             >
               <boxGeometry args={[0.2, 0.1, 0.5]} />
               <meshStandardMaterial color="#E53935" />
@@ -520,20 +439,11 @@ const Character = () => {
             </mesh>
           </group>
           
-          {/* Click area for legs - invisible since we're using keyboard controls now */}
-          <mesh
-            position={[0, 0.1, 0]}
-            onClick={handleLegClick}
-            visible={false}
-          >
-            <boxGeometry args={[0.7, 0.3, 0.7]} />
-            <meshBasicMaterial color="red" transparent opacity={0.5} />
-          </mesh>
-          
           {/* Right arm with waving animation */}
           <group position={[0.5, 1.0, 0]}>
             <mesh 
               castShadow 
+              onClick={handleRightArmClick}
               rotation={[
                 isWaving && waveArm === 'right' ? Math.sin(animationTime) * 0.8 : 0,
                 0, 
@@ -549,6 +459,7 @@ const Character = () => {
           <group position={[-0.5, 1.0, 0]}>
             <mesh 
               castShadow 
+              onClick={handleLeftArmClick}
               rotation={[
                 isWaving && waveArm === 'left' ? Math.sin(animationTime) * 0.8 : 0,
                 0, 
@@ -559,30 +470,10 @@ const Character = () => {
               <meshStandardMaterial color="#4285F4" />
             </mesh>
           </group>
-          
-          {/* Right arm clickable area - hidden since we're using keyboard now */}
-          <mesh
-            position={[0.5, 1.0, 0]}
-            onClick={handleRightArmClick}
-            visible={false}
-          >
-            <boxGeometry args={[0.25, 0.8, 0.25]} />
-            <meshBasicMaterial color="blue" transparent opacity={0.5} />
-          </mesh>
-          
-          {/* Left arm clickable area - hidden since we're using keyboard now */}
-          <mesh
-            position={[-0.5, 1.0, 0]}
-            onClick={handleLeftArmClick}
-            visible={false}
-          >
-            <boxGeometry args={[0.25, 0.8, 0.25]} />
-            <meshBasicMaterial color="blue" transparent opacity={0.5} />
-          </mesh>
         </group>
       )}
     </group>
   );
 };
 
-export default Character;
+export default SimpleCharacter;
