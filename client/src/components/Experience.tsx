@@ -3,7 +3,7 @@ import { useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import Street from "./Street";
-import SimpleCharacter from "./SimpleCharacter"; // Using our completely rewritten character
+import MinimalCharacter from "./MinimalCharacter"; // Using our completely rewritten character
 import { usePortfolio } from "../lib/stores/usePortfolio";
 import { useAudio } from "../lib/stores/useAudio";
 import { useStreetSign } from "../lib/stores/useStreetSign";
@@ -204,7 +204,7 @@ const Experience = () => {
       <Street />
       
       {/* Player character */}
-      <SimpleCharacter />
+      <MinimalCharacter />
       
       {/* Simplified street sign with much easier-to-read text */}
       <group position={[0, 0, 15]} rotation={[0, Math.PI, 0]}>
