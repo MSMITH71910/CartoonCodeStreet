@@ -12,7 +12,10 @@ const WorkingCharacter = () => {
   const [moving, setMoving] = useState(false);
   const [animationTime, setAnimationTime] = useState(0);
   
-  // Setup for keyboard controls
+  // Setup for keyboard controls - FIXED
+  const [subscribeKeys, getKeys] = useKeyboardControls();
+  
+  // We'll use these variables in our useFrame for more responsive control
   const forward = useKeyboardControls((state) => state[ControlName.forward]);
   const backward = useKeyboardControls((state) => state[ControlName.backward]);
   const leftward = useKeyboardControls((state) => state[ControlName.leftward]);
@@ -20,6 +23,35 @@ const WorkingCharacter = () => {
   const dance = useKeyboardControls((state) => state[ControlName.dance]);
   const waveLeft = useKeyboardControls((state) => state[ControlName.waveLeft]);
   const waveRight = useKeyboardControls((state) => state[ControlName.waveRight]);
+  
+  // Log key states at startup
+  useEffect(() => {
+    console.log("Initial keyboard control state:", {
+      forward, backward, leftward, rightward, dance, waveLeft, waveRight
+    });
+    
+    // Subscribe to all animation keys for debugging
+    const unsubscribeDance = subscribeKeys(
+      state => state[ControlName.dance],
+      pressed => console.log(`Dance key pressed: ${pressed}`)
+    );
+    
+    const unsubscribeWaveLeft = subscribeKeys(
+      state => state[ControlName.waveLeft],
+      pressed => console.log(`Wave left key pressed: ${pressed}`)
+    );
+    
+    const unsubscribeWaveRight = subscribeKeys(
+      state => state[ControlName.waveRight],
+      pressed => console.log(`Wave right key pressed: ${pressed}`)
+    );
+    
+    return () => {
+      unsubscribeDance();
+      unsubscribeWaveLeft();
+      unsubscribeWaveRight();
+    };
+  }, []);
   
   // Animation states
   const [isDancing, setIsDancing] = useState(false);
@@ -34,53 +66,39 @@ const WorkingCharacter = () => {
     }
   }, [setCharacterRef]);
   
-  // Handle animation controls
-  useEffect(() => {
+  // COMPLETELY REVISED animation controls to fix issues
+  useFrame((state, delta) => {
+    // Check keyboard state on every frame for more responsive animations 
     if (dance && !moving && !isDancing && !isWaving) {
-      console.log("Dance animation triggered");
+      console.log("Dance animation triggered now!");
       setIsDancing(true);
       setIsWaving(false);
       
-      // Auto-stop after 3 seconds
-      const timer = setTimeout(() => {
-        setIsDancing(false);
-      }, 3000);
-      
-      return () => clearTimeout(timer);
+      // No need for timeout - we'll handle this in the main update loop
     }
-  }, [dance, moving, isDancing, isWaving]);
-  
-  useEffect(() => {
+    
     if (waveLeft && !moving && !isDancing && !isWaving) {
-      console.log("Left wave animation triggered");
+      console.log("Left wave animation triggered now!");
       setIsWaving(true);
       setWaveArm('left');
       setIsDancing(false);
-      
-      // Auto-stop after 3 seconds
-      const timer = setTimeout(() => {
-        setIsWaving(false);
-      }, 3000);
-      
-      return () => clearTimeout(timer);
     }
-  }, [waveLeft, moving, isDancing, isWaving]);
-  
-  useEffect(() => {
+    
     if (waveRight && !moving && !isDancing && !isWaving) {
-      console.log("Right wave animation triggered");
+      console.log("Right wave animation triggered now!");
       setIsWaving(true);
       setWaveArm('right');
       setIsDancing(false);
-      
-      // Auto-stop after 3 seconds
-      const timer = setTimeout(() => {
-        setIsWaving(false);
-      }, 3000);
-      
-      return () => clearTimeout(timer);
     }
-  }, [waveRight, moving, isDancing, isWaving]);
+    
+    // Add auto-timeout for animations - when key is released
+    if ((isDancing && !dance) || (isWaving && waveArm === 'left' && !waveLeft) || 
+        (isWaving && waveArm === 'right' && !waveRight)) {
+      console.log("Animation released, stopping");
+      setIsDancing(false);
+      setIsWaving(false);
+    }
+  });
   
   // Main update loop
   useFrame((state, delta) => {
@@ -97,14 +115,14 @@ const WorkingCharacter = () => {
     const speed = PHYSICS.CHARACTER_SPEED;
     const turnSpeed = PHYSICS.CHARACTER_TURN_SPEED;
     
-    // Handle rotation
+    // Handle rotation - FIXED: Sign was rotating with character because the rotation was backward
     if (leftward) {
-      characterRef.current.rotation.y += turnSpeed * delta;
+      characterRef.current.rotation.y -= turnSpeed * delta;
       console.log("Turning left");
     }
     
     if (rightward) {
-      characterRef.current.rotation.y -= turnSpeed * delta;
+      characterRef.current.rotation.y += turnSpeed * delta;
       console.log("Turning right");
     }
     
@@ -118,8 +136,8 @@ const WorkingCharacter = () => {
     if (forward || backward) {
       // Calculate movement direction based on character's rotation
       const direction = new THREE.Vector3();
-      // Forward vector is negative Z in local space (character faces -Z)
-      direction.set(0, 0, forward ? -1 : 1);
+      // FIXED: Direction was reversed, change to positive Z for forward
+      direction.set(0, 0, forward ? 1 : -1);
       direction.applyQuaternion(characterRef.current.quaternion);
       
       // Scale by speed and delta time
@@ -178,13 +196,13 @@ const WorkingCharacter = () => {
         <meshBasicMaterial color="black" />
       </mesh>
       
-      {/* Left rollerblade with animation */}
-      <group position={[-0.2, isDancing ? Math.sin(animationTime) * 0.3 : 0, 0]}>
+      {/* Left rollerblade with animation - ENHANCED ANIMATIONS */}
+      <group position={[-0.2, isDancing ? Math.sin(animationTime) * 0.5 : 0, 0]}>
         <mesh 
           castShadow 
           position={[0, 0.05, 0]} 
           rotation={[
-            isDancing ? Math.sin(animationTime * 2) * 0.3 : 0,
+            isDancing ? Math.sin(animationTime * 2) * 0.5 : 0,
             0, 
             moving ? Math.sin(animationTime) * 0.2 : 0
           ]}
@@ -204,13 +222,13 @@ const WorkingCharacter = () => {
         </mesh>
       </group>
       
-      {/* Right rollerblade with animation */}
-      <group position={[0.2, isDancing ? -Math.sin(animationTime) * 0.3 : 0, 0]}>
+      {/* Right rollerblade with animation - ENHANCED ANIMATIONS */}
+      <group position={[0.2, isDancing ? -Math.sin(animationTime) * 0.5 : 0, 0]}>
         <mesh 
           castShadow 
           position={[0, 0.05, 0]} 
           rotation={[
-            isDancing ? -Math.sin(animationTime * 2) * 0.3 : 0,
+            isDancing ? -Math.sin(animationTime * 2) * 0.5 : 0,
             0, 
             moving ? -Math.sin(animationTime) * 0.2 : 0
           ]}
@@ -230,33 +248,33 @@ const WorkingCharacter = () => {
         </mesh>
       </group>
       
-      {/* Right arm with waving animation */}
+      {/* Right arm with waving animation - ENHANCED */}
       <group position={[0.5, 1.0, 0]}>
         <mesh 
           castShadow 
           rotation={[
-            isWaving && waveArm === 'right' ? Math.sin(animationTime) * 0.8 : 0,
-            0, 
+            isWaving && waveArm === 'right' ? Math.sin(animationTime) * 1.2 : 0,
+            isWaving && waveArm === 'right' ? Math.sin(animationTime * 0.5) * 0.3 : 0, 
             moving ? Math.sin(animationTime) * 0.5 : 0
           ]}
         >
           <capsuleGeometry args={[0.1, 0.6, 8, 4]} />
-          <meshStandardMaterial color="#4285F4" />
+          <meshStandardMaterial color={isWaving && waveArm === 'right' ? "#FFA500" : "#4285F4"} />
         </mesh>
       </group>
       
-      {/* Left arm with waving animation */}
+      {/* Left arm with waving animation - ENHANCED */}
       <group position={[-0.5, 1.0, 0]}>
         <mesh 
           castShadow 
           rotation={[
-            isWaving && waveArm === 'left' ? Math.sin(animationTime) * 0.8 : 0,
-            0, 
+            isWaving && waveArm === 'left' ? Math.sin(animationTime) * 1.2 : 0,
+            isWaving && waveArm === 'left' ? Math.sin(animationTime * 0.5) * 0.3 : 0,
             moving ? -Math.sin(animationTime) * 0.5 : 0
           ]}
         >
           <capsuleGeometry args={[0.1, 0.6, 8, 4]} />
-          <meshStandardMaterial color="#4285F4" />
+          <meshStandardMaterial color={isWaving && waveArm === 'left' ? "#FFA500" : "#4285F4"} />
         </mesh>
       </group>
     </group>
