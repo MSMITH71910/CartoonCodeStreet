@@ -93,21 +93,28 @@ const Street = () => {
       });
     }
     
-    // Add mailboxes only in front of houses
+    // Add mailboxes at the left front corner of each house
     projects.forEach((project, index) => {
       // Alternate houses on left and right side of the street
       const side = index % 2 === 0 ? -1 : 1;
       // Space houses evenly along the street
       const zPosition = -40 + index * 15;
+      // Calculate house position (same as in the house rendering below)
+      const xOffset = side * (10 + Math.sin(index * 0.5) * 2);
       
-      // Position mailbox in front of each house on the sidewalk
+      // Position mailbox at the left front corner of each house (relative to the house orientation)
+      // Houses on the left side of the street face right, so their "left front" is toward positive z
+      // Houses on the right side of the street face left, so their "left front" is toward negative z
       positions.push({
         type: "mailbox",
         position: [
-          side === -1 ? -5.5 : 5.5,  // Left or right side of street
+          // Move closer to the sidewalk from house position
+          side === -1 ? xOffset + 2 : xOffset - 2,
           0, 
-          zPosition + (side === -1 ? 2 : -2) // Slightly offset from house z-position
+          // Left front corner (accounting for house rotation)
+          side === -1 ? zPosition + 2 : zPosition - 2
         ],
+        // Rotate to face the street
         rotation: [0, side === -1 ? Math.PI / 4 : -Math.PI / 4, 0],
         scale: [1, 1, 1]
       });
