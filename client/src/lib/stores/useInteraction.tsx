@@ -28,6 +28,7 @@ export type GameState = {
     board: number[][];
     currentPlayer: 1 | 2;
     selectedPiece: [number, number] | null;
+    winner?: string | null;
   };
 };
 
@@ -134,7 +135,8 @@ export const useInteraction = create<InteractionState>((set, get) => ({
         gameState.checkers = {
           board,
           currentPlayer: 1,
-          selectedPiece: null
+          selectedPiece: null,
+          winner: null
         };
         showGameUI = true;
         break;
