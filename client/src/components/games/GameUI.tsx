@@ -23,9 +23,10 @@ const GameUI = () => {
   
   // Add effect to ensure mini-game music plays when UI opens
   useEffect(() => {
+    // Only play music once when first mounting or when gameUI becomes visible
     if (showGameUI && interactionType) {
-      console.log("MUSIC: GameUI detected show event, playing mini-game music");
-      playActivityMusic("chessMusicOrSimilar"); // Direct reference to ensure correct music plays
+      // Skip music playback in the effect to avoid infinite loops
+      console.log("MUSIC: GameUI detected show event, mini-game music handled by interaction");
     }
     
     // Add escape key handler

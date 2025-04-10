@@ -78,6 +78,9 @@ export const useInteraction = create<InteractionState>((set, get) => ({
       isOnSeesaw = true;
     }
     
+    // CRITICAL: We'll play the mini-game music when we update state
+    // No need to do it here as we already have code that handles it later
+    
     // Initialize appropriate game state based on interaction type
     let gameState: GameState = {};
     let showGameUI = false;
