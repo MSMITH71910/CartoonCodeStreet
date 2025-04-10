@@ -208,31 +208,32 @@ const House = ({ position, rotation, project }: HouseProps) => {
         <meshStandardMaterial color="#B3E5FC" roughness={0.2} metalness={0.2} />
       </mesh>
       
-      {/* Simple sign with project name */}
-      <group position={[0, 4.5, 0]}>
-        {/* Sign with text */}
+      {/* Simple sign with project name - raised higher above house */}
+      <group position={[0, 5.5, 0]}>
+        {/* Sign with text - wider for longer names */}
         <mesh position={[0, 0, 0]} castShadow receiveShadow>
-          <boxGeometry args={[3, 1, 0.1]} />
+          <boxGeometry args={[4, 1, 0.1]} />
           <meshStandardMaterial color="#FF7F00" />
         </mesh>
         
-        {/* Project name text */}
+        {/* Project name text - with auto-size adjustment for long names */}
         <Text
           position={[0, 0, 0.06]}
-          fontSize={0.4}
+          fontSize={project.title.length > 20 ? 0.25 : (project.title.length > 15 ? 0.3 : 0.4)}
           color="black"
           anchorX="center"
           anchorY="middle"
           outlineWidth={0.01}
           outlineColor="#000000"
           fontWeight="bold"
+          maxWidth={3.8}
         >
           {project.title}
         </Text>
         
-        {/* Sign post */}
-        <mesh position={[0, -1, 0]} castShadow>
-          <boxGeometry args={[0.1, 1, 0.1]} />
+        {/* Taller sign post */}
+        <mesh position={[0, -1.2, 0]} castShadow>
+          <boxGeometry args={[0.15, 1.4, 0.15]} />
           <meshStandardMaterial color="#4B3621" roughness={0.8} />
         </mesh>
       </group>
