@@ -160,6 +160,9 @@ function App() {
         isOpen={useStreetSign(state => state.showAboutInfo)}
         onClose={useStreetSign(state => state.closeAboutInfo)}
       />
+      
+      {/* Dynamic audio manager for unique sounds per activity */}
+      <AudioManager />
     </div>
   );
 }

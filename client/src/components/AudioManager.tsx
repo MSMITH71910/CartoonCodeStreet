@@ -72,8 +72,9 @@ const AudioManager: React.FC = () => {
 // Background music - calm, ambient pentatonic scale
 function createBackgroundMusic() {
   try {
-    // Create audio context
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    // Create audio context with TypeScript type assertions
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    const audioContext = new AudioContextClass();
     
     // Pentatonic scale notes
     const pentatonicNotes = [523.25, 587.33, 659.25, 783.99, 880.00];
@@ -165,8 +166,9 @@ function createBackgroundMusic() {
 // Board game music - classical style with rhythm
 function createBoardGameMusic() {
   try {
-    // Create audio context
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    // Create audio context with TypeScript type assertions
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    const audioContext = new AudioContextClass();
     
     // Master gain
     const masterGain = audioContext.createGain();
@@ -257,8 +259,9 @@ function createBoardGameMusic() {
 // Fountain music - water ambient with harmonic tones
 function createFountainMusic() {
   try {
-    // Create audio context
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    // Create audio context with TypeScript type assertions
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    const audioContext = new AudioContextClass();
     
     // Master gain
     const masterGain = audioContext.createGain();
@@ -364,8 +367,9 @@ function createFountainMusic() {
 // Playground music - bouncy playful tune
 function createPlaygroundMusic() {
   try {
-    // Create audio context
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    // Create audio context with TypeScript type assertions
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    const audioContext = new AudioContextClass();
     
     // Master gain
     const masterGain = audioContext.createGain();
