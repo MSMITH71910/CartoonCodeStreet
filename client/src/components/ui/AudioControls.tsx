@@ -128,13 +128,29 @@ const AudioControls: React.FC = () => {
   
   // Helper function to determine which activity music is playing
   const getCurrentMusicType = () => {
-    if (!currentActivityMusic) return "Background";
+    // Use the currentTrack from the store directly
+    const currentTrack = useAudio.getState().currentTrack;
+    let trackName = "";
     
-    if (currentActivityMusic === chessMusicOrSimilar) return "Game Music";
-    if (currentActivityMusic === fountainMusic) return "Fountain";
-    if (currentActivityMusic === seesawMusic) return "Playground";
+    switch (currentTrack) {
+      case "background":
+        trackName = "Background";
+        break;
+      case "chess":
+        trackName = "Game Music";
+        break;
+      case "fountain":
+        trackName = "Fountain";
+        break;
+      case "seesaw":
+        trackName = "Playground";
+        break;
+      default:
+        trackName = "Playing...";
+    }
     
-    return "Playing...";
+    console.log(`AUDIO DEBUG: Current track is "${currentTrack}" (${trackName})`);
+    return trackName;
   };
 
   const togglePanel = () => {

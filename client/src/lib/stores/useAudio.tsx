@@ -1,5 +1,8 @@
 import { create } from "zustand";
 
+// Define music tracks
+type MusicTrack = "background" | "chess" | "fountain" | "seesaw";
+
 interface AudioState {
   // Main audio tracks
   backgroundMusic: HTMLAudioElement | null;
@@ -14,6 +17,7 @@ interface AudioState {
   
   // Currently playing activity music (if any)
   currentActivityMusic: HTMLAudioElement | null;
+  currentTrack: MusicTrack;
   
   // Audio control states
   isMuted: boolean;
@@ -50,6 +54,7 @@ export const useAudio = create<AudioState>((set, get) => ({
   
   // Currently playing activity music
   currentActivityMusic: null,
+  currentTrack: "background", // Default track
   
   // Audio states
   isMuted: false,
@@ -333,8 +338,21 @@ export const useAudio = create<AudioState>((set, get) => ({
         console.log(`AUDIO DEBUG: No music found for activity type "${activityType}"`);
     }
     
-    // Set as current activity music
-    set({ currentActivityMusic: activityMusic });
+    // Set as current activity music and track type
+    let trackType: MusicTrack = "background";
+    
+    if (activityType === "ticTacToe" || activityType === "checkers" || activityType === "hangman") {
+      trackType = "chess";
+    } else if (activityType === "fountain") {
+      trackType = "fountain";
+    } else if (activityType === "seesaw") {
+      trackType = "seesaw";
+    }
+    
+    set({ 
+      currentActivityMusic: activityMusic,
+      currentTrack: trackType 
+    });
     
     // Play the activity music if not muted
     if (activityMusic && !isMuted && !isMusicMuted) {
@@ -362,16 +380,27 @@ export const useAudio = create<AudioState>((set, get) => ({
     
     // Stop current activity music if playing
     if (currentActivityMusic) {
+      console.log("AUDIO DEBUG: Stopping current activity music");
       currentActivityMusic.pause();
       currentActivityMusic.currentTime = 0;
-      set({ currentActivityMusic: null });
     }
+    
+    // Reset to background track
+    set({ 
+      currentActivityMusic: null,
+      currentTrack: "background" 
+    });
     
     // Resume background music if not muted
     if (backgroundMusic && !isMuted && !isMusicMuted) {
+      console.log("AUDIO DEBUG: Resuming background music");
+      backgroundMusic.currentTime = 0;
+      backgroundMusic.volume = 0.3;
       backgroundMusic.play().catch(error => {
         console.log("Background music resume prevented:", error);
       });
+    } else {
+      console.log(`AUDIO DEBUG: Not resuming background music (isMuted=${isMuted}, isMusicMuted=${isMusicMuted})`);
     }
     
     console.log("Stopped activity music, resuming background music");
