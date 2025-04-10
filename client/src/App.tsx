@@ -14,6 +14,7 @@ import { ControlName } from "./lib/constants";
 import StreetSignDOM from "./components/ui/StreetSignDOM";
 import KeyLogger from "./KeyLogger";
 import AnimationController from "./AnimationController";
+import AnimationButtons from "./components/ui/AnimationButtons";
 
 // Define control keys for the character movement - UPDATED FOR ANIMATIONS & ZOOM
 const keyboardMap = [
@@ -237,6 +238,9 @@ function App() {
       
       {/* Animation controller and state debugger */}
       <AnimationController />
+      
+      {/* Direct animation buttons for when keyboard controls don't work */}
+      <AnimationButtons />
     </div>
   );
 }
