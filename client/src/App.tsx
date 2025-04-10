@@ -10,7 +10,7 @@ import GameUI from "./components/games/GameUI";
 import AboutInfoDialog from "./components/ui/AboutInfoDialog";
 import { usePortfolio } from "./lib/stores/usePortfolio";
 import { useStreetSign } from "./lib/stores/useStreetSign";
-// Import only modules we're using
+import ProceduralMusicLayer from "./components/ProceduralMusicLayer";
 import { ControlName } from "./lib/constants";
 
 // Define control keys for the character movement
@@ -161,7 +161,8 @@ function App() {
         onClose={useStreetSign(state => state.closeAboutInfo)}
       />
       
-      {/* Audio system is now managed directly via Zustand store */}
+      {/* Procedural music layer - generates unique sounds for each activity */}
+      <ProceduralMusicLayer />
     </div>
   );
 }
