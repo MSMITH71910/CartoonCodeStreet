@@ -184,82 +184,63 @@ export const useAudio = create<AudioState>((set, get) => ({
   
   // Toggle just music (sound effects still play)
   toggleMusicMute: () => {
+    console.log("DIRECT MUTE: Toggling just music mute");
+    
     const { 
       isMusicMuted, 
       backgroundMusic, 
-      currentActivityMusic, 
-      basketballMusic,
-      chessMusicOrSimilar,
-      fountainMusic,
-      seesawMusic,
+      currentActivityMusic,
+      currentTrack,
       isMuted 
     } = get();
     
     const newMusicMutedState = !isMusicMuted;
     
-    // Debug output to help diagnose music muting issues
-    console.log(`AUDIO DEBUG: Toggling music mute from ${isMusicMuted} to ${newMusicMutedState}`);
-    
-    // Update state
+    // Update state first
     set({ isMusicMuted: newMusicMutedState });
     
-    // Force complete stopping of all music elements
     if (newMusicMutedState) {
-      // Forcefully stop all music
-      const allMusic = [
-        backgroundMusic, 
-        currentActivityMusic, 
-        basketballMusic, 
-        chessMusicOrSimilar, 
-        fountainMusic, 
-        seesawMusic
-      ];
+      // MUTING MUSIC
+      console.log("DIRECT MUTE: All music muted");
       
-      allMusic.forEach(audio => {
-        if (audio) {
-          try {
-            // Simple approach - pause and reset
-            audio.pause();
-            audio.currentTime = 0;
-            audio.volume = 0;
-            console.log(`AUDIO DEBUG: Paused and muted a music track`);
-          } catch (e) {
-            console.error("Error while trying to mute music:", e);
-          }
-        }
-      });
-      
-      console.log("All music muted");
-    } else if (!isMuted) {
-      // Only unmute and restore volume if sound is not fully muted
-      console.log(`AUDIO DEBUG: Attempting to restore music (isMuted=${isMuted})`);
+      // First, stop any currently playing music
+      if (currentActivityMusic) {
+        currentActivityMusic.pause();
+        currentActivityMusic.currentTime = 0;
+      }
       
       if (backgroundMusic) {
-        backgroundMusic.volume = 0.3;
-        console.log(`AUDIO DEBUG: Restored background music volume to 0.3`);
+        backgroundMusic.pause();
+        backgroundMusic.currentTime = 0;
       }
-      if (basketballMusic) basketballMusic.volume = 0.4;
-      if (chessMusicOrSimilar) chessMusicOrSimilar.volume = 0.4;
-      if (fountainMusic) fountainMusic.volume = 0.4;
-      if (seesawMusic) seesawMusic.volume = 0.4;
+    } 
+    else if (!isMuted) {
+      // UNMUTING MUSIC (if master mute is not on)
+      console.log(`DIRECT MUTE: Unmuting music (current track: ${currentTrack})`);
       
-      // Play the appropriate track
-      if (currentActivityMusic) {
-        currentActivityMusic.play().catch(error => {
-          console.log("Activity music play prevented:", error);
-        });
-        console.log(`AUDIO DEBUG: Playing current activity music`);
-      } else if (backgroundMusic) {
+      // Determine which track should be playing based on currentTrack state
+      if (currentTrack === "background" && backgroundMusic) {
+        // Play background music
+        backgroundMusic.volume = 0.3;
+        backgroundMusic.currentTime = 0;
         backgroundMusic.play().catch(error => {
-          console.log("Background music play prevented:", error);
+          console.error("AUDIO ERROR: Background music play error:", error);
         });
-        console.log(`AUDIO DEBUG: Playing background music`);
+        console.log("DIRECT MUTE: Playing background music");
+      } 
+      else if (currentActivityMusic) {
+        // Play current activity music
+        currentActivityMusic.volume = 0.4;
+        currentActivityMusic.currentTime = 0;
+        currentActivityMusic.play().catch(error => {
+          console.error("AUDIO ERROR: Activity music play error:", error);
+        });
+        console.log(`DIRECT MUTE: Playing ${currentTrack} music`);
       }
-    } else {
-      console.log(`AUDIO DEBUG: Not playing music because isMuted=${isMuted}`);
+    } 
+    else {
+      console.log("DIRECT MUTE: Master mute is on, not playing any music");
     }
-    
-    console.log(`Music ${newMusicMutedState ? 'muted' : 'unmuted'}`);
   },
   
   // Play sound effects
@@ -287,6 +268,8 @@ export const useAudio = create<AudioState>((set, get) => ({
   
   // Activity music control
   playActivityMusic: (activityType) => {
+    console.log(`AUDIO CONTROL: Request to play music for activity: ${activityType}`);
+    
     const { 
       isMuted, 
       isMusicMuted, 
@@ -298,94 +281,121 @@ export const useAudio = create<AudioState>((set, get) => ({
       seesawMusic
     } = get();
     
-    console.log(`AUDIO DEBUG: Attempting to play ${activityType} music (muted=${isMuted}, musicMuted=${isMusicMuted})`);
+    // If all audio or music is muted, don't play anything
+    if (isMuted || isMusicMuted) {
+      console.log("AUDIO CONTROL: Music is muted, not playing activity music");
+      return;
+    }
     
-    // If already playing activity music, stop it first
+    // First pause any currently playing tracks
     if (currentActivityMusic) {
-      console.log("AUDIO DEBUG: Stopping currently playing activity music");
+      console.log("AUDIO CONTROL: Stopping currently playing activity music");
       currentActivityMusic.pause();
       currentActivityMusic.currentTime = 0;
     }
     
-    // Pause background music
     if (backgroundMusic) {
-      console.log("AUDIO DEBUG: Pausing background music");
+      console.log("AUDIO CONTROL: Pausing background music");
       backgroundMusic.pause();
     }
     
-    // Select the appropriate activity music
-    let activityMusic = null;
+    // Select the appropriate track and track type
+    let activityMusic: HTMLAudioElement | null = null;
+    let trackType: MusicTrack = "background";
+    
     switch (activityType) {
       case "basketball":
-        activityMusic = basketballMusic;
-        console.log("AUDIO DEBUG: Selected basketball music");
+        if (basketballMusic) {
+          activityMusic = basketballMusic;
+          trackType = "chess"; // Use chess track type for basketball
+          console.log("AUDIO CONTROL: Selected basketball music");
+        }
         break;
+        
       case "ticTacToe":
       case "checkers":
       case "hangman":
-        activityMusic = chessMusicOrSimilar;
-        console.log("AUDIO DEBUG: Selected chess/board game music");
+      case "chessMusicOrSimilar":
+        if (chessMusicOrSimilar) {
+          activityMusic = chessMusicOrSimilar;
+          trackType = "chess";
+          console.log("AUDIO CONTROL: Selected chess/board game music");
+        }
         break;
+        
       case "fountain":
-        activityMusic = fountainMusic;
-        console.log("AUDIO DEBUG: Selected fountain music");
+        if (fountainMusic) {
+          activityMusic = fountainMusic;
+          trackType = "fountain";
+          console.log("AUDIO CONTROL: Selected fountain music");
+        }
         break;
+        
       case "seesaw":
-        activityMusic = seesawMusic;
-        console.log("AUDIO DEBUG: Selected seesaw music");
+        if (seesawMusic) {
+          activityMusic = seesawMusic;
+          trackType = "seesaw";
+          console.log("AUDIO CONTROL: Selected seesaw music");
+        }
         break;
+        
+      case "background":
+        trackType = "background";
+        console.log("AUDIO CONTROL: Selected background music");
+        break;
+        
       default:
-        console.log(`AUDIO DEBUG: No music found for activity type "${activityType}"`);
+        console.log(`AUDIO CONTROL: No music found for activity type "${activityType}"`);
     }
     
-    // Set as current activity music and track type
-    let trackType: MusicTrack = "background";
-    
-    if (activityType === "ticTacToe" || activityType === "checkers" || activityType === "hangman") {
-      trackType = "chess";
-    } else if (activityType === "fountain") {
-      trackType = "fountain";
-    } else if (activityType === "seesaw") {
-      trackType = "seesaw";
-    }
-    
-    set({ 
-      currentActivityMusic: activityMusic,
-      currentTrack: trackType 
-    });
-    
-    // Play the activity music if not muted
-    if (activityMusic && !isMuted && !isMusicMuted) {
-      console.log("AUDIO DEBUG: Playing activity music");
+    // Update the current track type and activity music
+    if (activityMusic) {
+      set({ 
+        currentActivityMusic: activityMusic,
+        currentTrack: trackType 
+      });
+      
+      // Play the selected activity music
+      console.log(`AUDIO CONTROL: Playing ${activityType} music (track: ${trackType})`);
       activityMusic.currentTime = 0;
       activityMusic.volume = 0.4;
       activityMusic.play().catch(error => {
-        console.log(`AUDIO DEBUG: Activity music play prevented for ${activityType}:`, error);
+        console.error(`AUDIO ERROR: Couldn't play ${activityType} music:`, error);
       });
-    } else {
-      if (!activityMusic) {
-        console.log(`AUDIO DEBUG: Activity music for ${activityType} is not loaded`);
-      } else if (isMuted) {
-        console.log("AUDIO DEBUG: All sound is muted, not playing activity music");
-      } else if (isMusicMuted) {
-        console.log("AUDIO DEBUG: Music is muted, not playing activity music");
-      }
+    } 
+    else if (activityType === "background" && backgroundMusic) {
+      // Special case for background music
+      set({ 
+        currentActivityMusic: null,
+        currentTrack: "background" 
+      });
+      
+      // Play background music
+      console.log("AUDIO CONTROL: Playing background music");
+      backgroundMusic.currentTime = 0;
+      backgroundMusic.volume = 0.3;
+      backgroundMusic.play().catch(error => {
+        console.error("AUDIO ERROR: Couldn't play background music:", error);
+      });
     }
-    
-    console.log(`Playing ${activityType} music`);
+    else {
+      console.log(`AUDIO CONTROL: No music available for activity type "${activityType}"`);
+    }
   },
   
   stopActivityMusic: () => {
+    console.log("AUDIO CONTROL: Stop activity music requested - switching to background");
+    
     const { currentActivityMusic, backgroundMusic, isMuted, isMusicMuted } = get();
     
-    // Stop current activity music if playing
+    // First stop any active music
     if (currentActivityMusic) {
-      console.log("AUDIO DEBUG: Stopping current activity music");
+      console.log("AUDIO CONTROL: Stopping current activity music");
       currentActivityMusic.pause();
       currentActivityMusic.currentTime = 0;
     }
     
-    // Reset to background track
+    // Reset state to background track
     set({ 
       currentActivityMusic: null,
       currentTrack: "background" 
@@ -393,16 +403,20 @@ export const useAudio = create<AudioState>((set, get) => ({
     
     // Resume background music if not muted
     if (backgroundMusic && !isMuted && !isMusicMuted) {
-      console.log("AUDIO DEBUG: Resuming background music");
+      console.log("AUDIO CONTROL: Starting background music");
       backgroundMusic.currentTime = 0;
       backgroundMusic.volume = 0.3;
       backgroundMusic.play().catch(error => {
-        console.log("Background music resume prevented:", error);
+        console.error("AUDIO ERROR: Background music couldn't resume:", error);
       });
     } else {
-      console.log(`AUDIO DEBUG: Not resuming background music (isMuted=${isMuted}, isMusicMuted=${isMusicMuted})`);
+      if (isMuted) {
+        console.log("AUDIO CONTROL: Master mute is on, not playing background music");
+      } else if (isMusicMuted) {
+        console.log("AUDIO CONTROL: Music mute is on, not playing background music");
+      } else if (!backgroundMusic) {
+        console.log("AUDIO CONTROL: No background music available");
+      }
     }
-    
-    console.log("Stopped activity music, resuming background music");
   }
 }));
