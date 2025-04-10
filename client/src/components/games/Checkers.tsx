@@ -16,6 +16,9 @@ const Checkers = () => {
   const { board, currentPlayer, selectedPiece, winner } = gameState.checkers;
   
   const handleCellClick = (row: number, col: number) => {
+    // If winner is declared or it's not player's turn, ignore clicks
+    if (winner || currentPlayer !== 1) return;
+    
     // If a piece is already selected
     if (selectedPiece) {
       const [selectedRow, selectedCol] = selectedPiece;
@@ -24,8 +27,10 @@ const Checkers = () => {
       if (selectedRow === row && selectedCol === col) {
         updateGameState({
           checkers: {
-            ...gameState.checkers,
-            selectedPiece: null
+            board: [...board],
+            currentPlayer,
+            selectedPiece: null,
+            winner
           }
         });
         return;
@@ -56,7 +61,8 @@ const Checkers = () => {
           checkers: {
             board: newBoard,
             currentPlayer: nextPlayer,
-            selectedPiece: null
+            selectedPiece: null,
+            winner: null
           }
         });
         
@@ -72,8 +78,10 @@ const Checkers = () => {
     else if (board[row][col] === currentPlayer) {
       updateGameState({
         checkers: {
-          ...gameState.checkers,
-          selectedPiece: [row, col]
+          board: [...board],
+          currentPlayer,
+          selectedPiece: [row, col],
+          winner
         }
       });
     }
@@ -155,7 +163,8 @@ const Checkers = () => {
               checkers: {
                 board: newBoard,
                 currentPlayer: 1,
-                selectedPiece: null
+                selectedPiece: null,
+                winner: null
               }
             });
             
@@ -190,7 +199,8 @@ const Checkers = () => {
               checkers: {
                 board: newBoard,
                 currentPlayer: 1,
-                selectedPiece: null
+                selectedPiece: null,
+                winner: null
               }
             });
             
@@ -203,8 +213,9 @@ const Checkers = () => {
     // If no valid moves were found, player 1 wins - update the game state
     updateGameState({
       checkers: {
-        ...gameState.checkers,
+        board: [...board],
         currentPlayer: 1,
+        selectedPiece: null,
         winner: "player" // Add winner state
       }
     });
@@ -235,7 +246,8 @@ const Checkers = () => {
       checkers: {
         board: newBoard,
         currentPlayer: 1,
-        selectedPiece: null
+        selectedPiece: null,
+        winner: null
       }
     });
   };
