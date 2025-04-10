@@ -15,49 +15,45 @@ const Experience = () => {
   const { setIsNearSign } = useStreetSign();
   const orbitRef = useRef(null);
   
-  // Simple direct keyboard handler for zoom
+  // Use persistently stored zoom level instead of direct key handling
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    // Update camera zoom based on the current zoom level stored in window
+    const updateCameraZoom = () => {
       if (!orbitRef.current) return;
       
-      if (e.code === 'Equal' || e.code === 'NumpadAdd') {
-        console.log("DIRECT ZOOM IN KEY DETECTED");
-        // @ts-ignore - we know the ref has these properties
-        const control = orbitRef.current;
-        // @ts-ignore
-        const current = control.getDistance();
-        const newDistance = Math.max(5, current - 3);
-        // @ts-ignore
-        control.minDistance = 5;
-        // @ts-ignore
-        control.maxDistance = 100;
-        // Force the camera to zoom to this distance
-        // @ts-ignore
-        control.object.position.copy(control.target);
-        // @ts-ignore
-        control.object.position.addScaledVector(control.object.position.clone().sub(control.target).normalize(), newDistance);
-      }
-      else if (e.code === 'Minus' || e.code === 'NumpadSubtract') {
-        console.log("DIRECT ZOOM OUT KEY DETECTED");
-        // @ts-ignore - we know the ref has these properties
-        const control = orbitRef.current;
-        // @ts-ignore
-        const current = control.getDistance();
-        const newDistance = Math.min(100, current + 3);
-        // @ts-ignore
-        control.minDistance = 5;
-        // @ts-ignore
-        control.maxDistance = 100;
-        // Force the camera to zoom to this distance
-        // @ts-ignore
-        control.object.position.copy(control.target);
-        // @ts-ignore
-        control.object.position.addScaledVector(control.object.position.clone().sub(control.target).normalize(), newDistance);
-      }
+      // @ts-ignore
+      const control = orbitRef.current;
+      // The window.currentZoomLevel is set in App.tsx (-5 to +5 range)
+      const zoomLevel = window.currentZoomLevel || 0;
+      
+      // Base distance is 15 units, then adjust by zoom level
+      // Negative zoom levels (down to -5) are zoomed in
+      // Positive zoom levels (up to +5) are zoomed out
+      const baseDistance = 15;
+      const zoomFactor = 3; // Units to change per zoom level
+      const newDistance = Math.max(5, Math.min(100, baseDistance + (zoomLevel * zoomFactor)));
+      
+      console.log("ZOOM SYSTEM: Updating camera zoom to level", zoomLevel, "distance:", newDistance);
+      
+      // @ts-ignore
+      control.minDistance = 5;
+      // @ts-ignore
+      control.maxDistance = 100;
+      
+      // Force the camera to zoom to this distance
+      // @ts-ignore
+      control.object.position.copy(control.target);
+      // @ts-ignore
+      control.object.position.addScaledVector(control.object.position.clone().sub(control.target).normalize(), newDistance);
     };
     
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    // Run immediately
+    updateCameraZoom();
+    
+    // Also set up a listener for zoom level changes
+    const checkZoomInterval = setInterval(updateCameraZoom, 1000);
+    
+    return () => clearInterval(checkZoomInterval);
   }, []);
 
   // Set up camera following logic

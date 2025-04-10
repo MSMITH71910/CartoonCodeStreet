@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useRef } from "react";
 import { KeyboardControls } from "@react-three/drei";
 import { useAudio } from "./lib/stores/useAudio";
 import "@fontsource/inter";
@@ -11,6 +11,7 @@ import AboutInfoDialog from "./components/ui/AboutInfoDialog";
 import { usePortfolio } from "./lib/stores/usePortfolio";
 import { useStreetSign } from "./lib/stores/useStreetSign";
 import { ControlName } from "./lib/constants";
+import StreetSignDOM from "./components/ui/StreetSignDOM";
 
 // Define control keys for the character movement - UPDATED FOR ANIMATIONS & ZOOM
 const keyboardMap = [
@@ -28,12 +29,64 @@ const keyboardMap = [
   { name: ControlName.zoomOut, keys: ["Minus", "NumpadSubtract"] },  // - key to zoom out
 ];
 
+// Create a persistent zoom state using localStorage
+const useZoomState = () => {
+  // Default zoom level (0 = normal, negative = zoomed in, positive = zoomed out)
+  const [zoomLevel, setZoomLevel] = useState(0);
+  
+  // Initialize from localStorage if available
+  useEffect(() => {
+    const storedZoom = localStorage.getItem('portfolioZoomLevel');
+    if (storedZoom !== null) {
+      setZoomLevel(parseInt(storedZoom));
+    }
+  }, []);
+  
+  // Save to localStorage when changed
+  useEffect(() => {
+    localStorage.setItem('portfolioZoomLevel', zoomLevel.toString());
+    // Also expose to window for Experience component to access
+    window.currentZoomLevel = zoomLevel;
+  }, [zoomLevel]);
+  
+  // Handle zoom keys
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Equal' || e.code === 'NumpadAdd') {
+        // Zoom in (decrease level - smaller values are more zoomed in)
+        setZoomLevel(prev => Math.max(prev - 1, -5));
+        console.log("ZOOM SYSTEM: Zooming in to level", zoomLevel - 1);
+      }
+      else if (e.code === 'Minus' || e.code === 'NumpadSubtract') {
+        // Zoom out (increase level - larger values are more zoomed out)
+        setZoomLevel(prev => Math.min(prev + 1, 5)); 
+        console.log("ZOOM SYSTEM: Zooming out to level", zoomLevel + 1);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [zoomLevel]);
+  
+  return zoomLevel;
+};
+
 // Main App component
 function App() {
   const [showCanvas, setShowCanvas] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true); // State for collapsible instructions
   const { setBackgroundMusic, toggleMute, isMuted } = useAudio();
   const { activeProject, closeProject } = usePortfolio();
+  
+  // Initialize zoom system
+  const zoomLevel = useZoomState();
+  
+  // Make the zoom available globally
+  useEffect(() => {
+    // @ts-ignore - Adding custom property
+    window.currentZoomLevel = zoomLevel;
+    console.log("ZOOM SYSTEM: Current zoom level:", zoomLevel);
+  }, [zoomLevel]);
 
   // BACKUP KEYBOARD EVENT LISTENERS FOR ANIMATIONS
   useEffect(() => {
@@ -43,15 +96,40 @@ function App() {
       // Only handle our special animation keys
       if (e.code === 'KeyZ' || e.code === 'KeyQ' || e.code === 'KeyR') {
         console.log(`GLOBAL APP KEY DETECTED: ${e.code}`);
+        
+        // Store animation state in window for components to access
+        if (!window.animationKeys) {
+          window.animationKeys = {
+            Z: false,
+            Q: false,
+            R: false
+          };
+        }
+        
+        if (e.code === 'KeyZ') window.animationKeys.Z = true;
+        if (e.code === 'KeyQ') window.animationKeys.Q = true; 
+        if (e.code === 'KeyR') window.animationKeys.R = true;
       }
     };
     
-    // Add global event listener
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'KeyZ' || e.code === 'KeyQ' || e.code === 'KeyR') {
+        if (!window.animationKeys) return;
+        
+        if (e.code === 'KeyZ') window.animationKeys.Z = false;
+        if (e.code === 'KeyQ') window.animationKeys.Q = false;
+        if (e.code === 'KeyR') window.animationKeys.R = false;
+      }
+    };
+    
+    // Add global event listeners
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
     
     // Clean up
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
   
@@ -161,6 +239,9 @@ function App() {
         </div>
       </div>
 
+      {/* STREET SIGN OVERLAY - DOM-based for guaranteed fixed position */}
+      <StreetSignDOM />
+
       {showCanvas && (
         <KeyboardControls map={keyboardMap}>
           <Canvas
@@ -200,7 +281,10 @@ function App() {
         onClose={useStreetSign(state => state.closeAboutInfo)}
       />
       
-      {/* Simplified audio system - just background music that pauses during mini-games */}
+      {/* Current zoom level display - visible for debugging */}
+      <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 p-2 text-white rounded">
+        Zoom Level: {zoomLevel} {zoomLevel < 0 ? "(Zoomed In)" : zoomLevel > 0 ? "(Zoomed Out)" : "(Normal)"}
+      </div>
     </div>
   );
 }

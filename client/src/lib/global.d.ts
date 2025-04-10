@@ -2,6 +2,7 @@
 
 interface Window {
   isMouseRotating: boolean;
+  currentZoomLevel?: number; // For persistent zoom level
   animationKeys?: {
     Z: boolean; // For dancing animation
     Q: boolean; // For waving left arm
