@@ -1,10 +1,43 @@
 import { useInteraction } from "@/lib/stores/useInteraction";
+import { useAudio } from "@/lib/stores/useAudio";
 import TicTacToe from "./TicTacToe";
 import Hangman from "./Hangman";
 import Checkers from "./Checkers";
+import { useEffect } from "react";
 
 const GameUI = () => {
-  const { interactionType, showGameUI, toggleGameUI } = useInteraction();
+  const { interactionType, showGameUI, toggleGameUI, endInteraction } = useInteraction();
+  const { playActivityMusic, stopActivityMusic } = useAudio();
+  
+  // Handle closing the game properly with audio restoration
+  const handleClose = () => {
+    console.log("MUSIC: Closing game UI and restoring background music");
+    toggleGameUI(); // Close UI first
+    
+    // Return to background music
+    stopActivityMusic();
+    
+    // End interaction after audio is handled
+    endInteraction();
+  };
+  
+  // Add effect to ensure mini-game music plays when UI opens
+  useEffect(() => {
+    if (showGameUI && interactionType) {
+      console.log("MUSIC: GameUI detected show event, playing mini-game music");
+      playActivityMusic("chessMusicOrSimilar"); // Direct reference to ensure correct music plays
+    }
+    
+    // Add escape key handler
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showGameUI) {
+        handleClose();
+      }
+    };
+    
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showGameUI, interactionType, playActivityMusic, handleClose]);
   
   if (!showGameUI) return null;
   
@@ -18,7 +51,7 @@ const GameUI = () => {
             {interactionType === "checkers" && "Checkers"}
           </h2>
           <button 
-            onClick={toggleGameUI}
+            onClick={handleClose}
             className="p-2 rounded-full hover:bg-gray-200"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
