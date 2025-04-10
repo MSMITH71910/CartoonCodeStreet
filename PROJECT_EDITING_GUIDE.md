@@ -1,110 +1,116 @@
-# How to Edit Your Portfolio Project Information
+# Project Editing Guide
 
-All the project information displayed on the signs and in the popup windows is stored in a single file. To update this information with your own projects, follow these instructions.
+This guide explains how to edit your project information in the 3D Portfolio Street application.
 
-## Step 1: Open the projects data file
+## Project Data Structure
 
-The file is located at: `client/src/lib/data/projects.ts`
-
-## Step 2: Edit the project information
-
-For each project, you can modify the following fields:
-
-- `title`: The name displayed on the house sign
-- `description`: A brief overview of the project
-- `technologies`: List of technologies used in the project
-- `features`: Bullet points of key features (optional)
-- `challenges`: Description of challenges faced (optional)
-- `url`: Link to the live site (optional)
-- `githubUrl`: Link to the GitHub repository (optional)
-- `color`: House color in hex format
-
-## Example Project Template
-
-Here's a template you can use for each project:
+All project data is stored in the `client/src/lib/data/projects.ts` file. Each project is represented as an object in an array with the following structure:
 
 ```typescript
 {
-  id: "1", // Keep this unique for each project
-  title: "YOUR PROJECT NAME", // This appears on the house sign
-  description: "A detailed description of your project - what it does, its purpose, etc.",
-  technologies: ["Technology 1", "Technology 2", "Technology 3"],
-  features: [
-    "Key feature 1",
-    "Key feature 2",
-    "Key feature 3",
-    "Key feature 4",
-    "Key feature 5"
+  id: "1",                                                // Unique identifier
+  title: "Project Name",                                  // Project name (appears on house sign)
+  description: "This is a detailed project description.", // Longer description
+  technologies: ["React", "Node.js", "MongoDB"],          // Technologies used (displayed as tags)
+  url: "https://example.com/project",                     // Live site URL (optional)
+  githubUrl: "https://github.com/username/project-name",  // GitHub repository URL (optional)
+  houseColor: "#4CAF50",                                  // Color of the house (CSS color)
+  features: [                                             // Key features (bullet points, optional)
+    "Feature 1",
+    "Feature 2",
+    "Feature 3"
   ],
-  challenges: "Describe the main challenges you faced when building this project and how you overcame them.",
-  url: "https://your-live-project-url.com", // Live site URL
-  githubUrl: "https://github.com/yourusername/your-repo", // GitHub repository URL
-  color: "#E53935" // Color code for the house (red, blue, green, purple, orange)
+  challenges: "These were the challenges faced...",       // Challenges section (optional)
+  position: [10, 0, -20] as [number, number, number],     // Position in the 3D world
 }
 ```
 
-## Available Colors
+## How to Edit Projects
 
-- Red: `#E53935`
-- Blue: `#1E88E5`
-- Green: `#43A047`
-- Purple: `#8E24AA`
-- Orange: `#FB8C00`
-- Cyan: `#00ACC1`
-- Deep Purple: `#5E35B1`
-- Teal: `#00897B`
-- Deep Orange: `#F4511E`
+1. Open the file: `client/src/lib/data/projects.ts` in your code editor
+2. Locate the `projects` array
+3. Edit existing projects or add new ones by following the structure above
 
-## Important Notes
-
-1. Keep the `id` values sequential and unique
-2. The `title` field is what appears on the house sign
-3. For long titles, the text will automatically resize to fit the sign
-4. The `url` and `githubUrl` fields determine whether the "Live Site" and "GitHub" buttons are active
-5. After editing the file, save it and refresh the page to see your changes
-
-## Example: Updating the "Trip-App" Project
-
-Replace:
+### Example of Adding a New Project
 
 ```typescript
-{
-  id: "1",
-  title: "Trip-App",
-  description: "A full-featured travel planning application with itinerary management, destination guides, and budget tracking.",
-  technologies: ["React", "Node.js", "MongoDB", "Stripe", "Redux"],
-  features: [
-    "User authentication and profiles",
-    "Destination search and filtering",
-    "Itinerary planning and management",
-    "Budget tracking and expense management",
-    "Travel recommendations and tips"
-  ],
-  challenges: "Creating an intuitive user interface while handling complex trip planning scenarios and integration with multiple travel APIs.",
-  url: "https://example.com/tripapp",
-  githubUrl: "https://github.com/myusername/trip-app",
-  color: "#E53935" // Red
-}
+export const projects: Project[] = [
+  // Existing projects...
+  
+  // New project
+  {
+    id: "6",
+    title: "New Portfolio Project",
+    description: "This is my latest project, a portfolio website built with React and Three.js.",
+    technologies: ["React", "Three.js", "TypeScript", "Tailwind CSS"],
+    url: "https://my-portfolio-project.com",
+    githubUrl: "https://github.com/username/portfolio-project",
+    houseColor: "#9C27B0",
+    features: [
+      "Interactive 3D environment",
+      "Custom animations",
+      "Responsive design",
+      "Dark mode support"
+    ],
+    challenges: "Creating a performant 3D experience that works well across different devices was challenging but rewarding.",
+    position: [20, 0, 15] as [number, number, number],
+  }
+]
 ```
 
-With your actual project information:
+## Important Fields
 
-```typescript
-{
-  id: "1",
-  title: "Travel Buddy", // Your actual project name
-  description: "An all-in-one travel companion that helps users plan trips, discover local attractions, and manage their travel budget seamlessly.",
-  technologies: ["React", "Firebase", "Google Maps API", "Material UI"],
-  features: [
-    "Personalized travel itineraries",
-    "Real-time weather forecasts",
-    "Interactive maps with points of interest",
-    "Expense tracking in multiple currencies",
-    "Offline access to travel documents"
-  ],
-  challenges: "Integrating multiple third-party APIs while maintaining a smooth user experience and ensuring the application works reliably without internet connection.",
-  url: "https://travel-buddy-app.com",
-  githubUrl: "https://github.com/yourusername/travel-buddy",
-  color: "#E53935" // Red
-}
-```
+- **title**: This appears on the house sign, keep it concise
+- **position**: The [x, y, z] coordinates in the 3D world
+  - The y-value (middle number) should typically remain at 0 (ground level)
+  - Make sure houses don't overlap by giving them different x and z coordinates
+- **houseColor**: Can be any valid CSS color (hex, rgb, hsl, etc.)
+- **githubUrl**: Used for the automatic screenshot feature (see GITHUB_SCREENSHOT_FEATURE.md)
+
+## Positioning Tips
+
+- The street runs along the z-axis (north-south direction)
+- Houses are typically placed on either side of the street (positive and negative x values)
+- Maintain some distance between houses (usually at least 15-20 units apart)
+- Example positions for houses along a street:
+  - Left side: `[-10, 0, -40]`, `[-10, 0, -20]`, `[-10, 0, 0]`, `[-10, 0, 20]`
+  - Right side: `[10, 0, -30]`, `[10, 0, -10]`, `[10, 0, 10]`, `[10, 0, 30]`
+
+## House Colors
+
+You can use any of these common CSS colors for your houses:
+
+- Red: `"#F44336"`
+- Pink: `"#E91E63"`
+- Purple: `"#9C27B0"`
+- Deep Purple: `"#673AB7"`
+- Indigo: `"#3F51B5"`
+- Blue: `"#2196F3"`
+- Light Blue: `"#03A9F4"`
+- Cyan: `"#00BCD4"`
+- Teal: `"#009688"`
+- Green: `"#4CAF50"`
+- Light Green: `"#8BC34A"`
+- Lime: `"#CDDC39"`
+- Yellow: `"#FFEB3B"`
+- Amber: `"#FFC107"`
+- Orange: `"#FF9800"`
+- Deep Orange: `"#FF5722"`
+- Brown: `"#795548"`
+- Grey: `"#9E9E9E"`
+
+## After Editing
+
+After making changes to the project data:
+
+1. Save the file
+2. Refresh your browser to see the changes
+3. If running in development mode, the changes should be automatically applied
+
+## Tips for Best Results
+
+- Keep project titles concise for better display on house signs
+- Use high-quality images and consistent aspect ratios for screenshots
+- Make sure all URLs are correct and working
+- Add detailed descriptions and feature lists to make your projects stand out
+- Use contrasting house colors to make the street visually appealing
