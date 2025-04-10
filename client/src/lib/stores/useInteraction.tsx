@@ -348,6 +348,11 @@ export const useInteraction = create<InteractionState>((set, get) => ({
         audioStore.currentActivityMusic.playbackRate = 1.0;
       }
       
+      // Also update webAudioType to "background" for dynamic Web Audio API music
+      useAudio.setState({
+        webAudioType: "background"
+      });
+      
       // Reset to background music
       useAudio.setState({
         currentActivityMusic: null,

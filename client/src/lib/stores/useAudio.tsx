@@ -19,6 +19,9 @@ interface AudioState {
   currentActivityMusic: HTMLAudioElement | null;
   currentTrack: MusicTrack;
   
+  // Web Audio API music type for procedural generation
+  webAudioType: MusicTrack | null;
+  
   // Audio control states
   isMuted: boolean;
   isMusicMuted: boolean;  // Music can be muted separately from sound effects
@@ -60,6 +63,9 @@ export const useAudio = create<AudioState>((set, get) => ({
   // Currently playing activity music
   currentActivityMusic: null,
   currentTrack: "background", // Default track
+  
+  // Web Audio API music type for procedural generation
+  webAudioType: "background", // Default to background music
   
   // Audio states
   isMuted: false,
