@@ -57,7 +57,7 @@ function App() {
     seesawMusicElement.loop = true;
     seesawMusicElement.volume = 0.4;
     
-    // CRITICAL: START WITH ALL AUDIO UNMUTED BY DEFAULT FOR BETTER UX
+    // Set initial state - START WITH MUSIC UNMUTED by default
     // We'll explicitly manage tracks in the audio store
     useAudio.setState({
       // Reset all audio tracks
@@ -68,21 +68,13 @@ function App() {
       fountainMusic: fountainMusicElement,
       seesawMusic: seesawMusicElement,
       
-      // EXPLICITLY SET BOTH AUDIO CONTROLS TO UNMUTED
-      isMuted: false,          // Master mute off
-      isMusicMuted: false,     // Music mute off
+      // Start with music UNMUTED for better user experience
+      isMusicMuted: false,
       
       // Set the current track
       currentTrack: "background",
       currentActivityMusic: null
     });
-    
-    // IMPORTANT: Start playing background music immediately for better UX
-    backgroundMusicElement.currentTime = 0;
-    backgroundMusicElement.volume = 0.3;
-    backgroundMusicElement.play().catch(e => 
-      console.error("AUDIO ERROR: Could not autoplay background music on init:", e)
-    );
     
     // Ensure initialization is complete
     console.log("AUDIO SYSTEM: All audio elements initialized");

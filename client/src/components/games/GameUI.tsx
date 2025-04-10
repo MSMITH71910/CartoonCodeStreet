@@ -1,114 +1,10 @@
 import { useInteraction } from "@/lib/stores/useInteraction";
-import { useAudio } from "@/lib/stores/useAudio";
 import TicTacToe from "./TicTacToe";
 import Hangman from "./Hangman";
 import Checkers from "./Checkers";
-import { useEffect } from "react";
 
 const GameUI = () => {
-  const { interactionType, showGameUI, toggleGameUI, endInteraction } = useInteraction();
-  
-  // Define the close game handler BEFORE the useEffect
-  const handleCloseGame = () => {
-    console.log("GAME UI: Game closed, restoring background music");
-    
-    // First close the game UI
-    toggleGameUI();
-    
-    // Then end the interaction to restore background music
-    endInteraction();
-    
-    // For extra safety, directly trigger background music
-    const audioStore = useAudio.getState();
-    if (audioStore.backgroundMusic && !audioStore.isMuted && !audioStore.isMusicMuted) {
-      audioStore.backgroundMusic.currentTime = 0;
-      audioStore.backgroundMusic.volume = 0.3;
-      audioStore.backgroundMusic.play().catch(e => 
-        console.error("AUDIO ERROR: Failed to restore background music:", e)
-      );
-    }
-  };
-  
-  // CRITICAL: Handle audio directly in the GameUI component
-  useEffect(() => {
-    // When the game UI appears, play chess music IMMEDIATELY
-    if (showGameUI) {
-      console.log("GAME UI: Game opened, playing chess music directly");
-      
-      // IMMEDIATELY play mini-game music regardless of what's already playing
-      const playMiniGameMusic = () => {
-        const audioStore = useAudio.getState();
-        
-        // ALWAYS DOUBLE-CHECK: make sure we're not muted
-        if (audioStore.isMuted || audioStore.isMusicMuted) {
-          console.log("GAME UI: Audio is muted, unmuting for mini-game music");
-          
-          // Force-unmute for better user experience
-          useAudio.setState({
-            isMuted: false,
-            isMusicMuted: false
-          });
-        }
-        
-        // Stop any currently playing music
-        if (audioStore.currentActivityMusic) {
-          audioStore.currentActivityMusic.pause();
-          audioStore.currentActivityMusic.currentTime = 0;
-        }
-        
-        if (audioStore.backgroundMusic) {
-          audioStore.backgroundMusic.pause();
-        }
-        
-        // Play chess music specifically for mini-games
-        if (audioStore.chessMusicOrSimilar) {
-          // Reset audio
-          audioStore.chessMusicOrSimilar.currentTime = 0;
-          audioStore.chessMusicOrSimilar.volume = 0.5;
-          
-          // Set as current music
-          useAudio.setState({ 
-            currentActivityMusic: audioStore.chessMusicOrSimilar,
-            currentTrack: "chess"
-          });
-          
-          // Start playing IMMEDIATELY with delay to ensure it works
-          setTimeout(() => {
-            console.log("GAME UI: Attempting to play chess music after slight delay");
-            audioStore.chessMusicOrSimilar?.play()
-              .then(() => console.log("GAME UI: Chess music started successfully"))
-              .catch(e => console.error("AUDIO ERROR: Failed to play chess music in GameUI:", e));
-          }, 100);
-        } else {
-          console.error("AUDIO ERROR: No chess music available");
-        }
-      };
-      
-      // Execute immediately
-      playMiniGameMusic();
-      
-      // Also set a short timeout as a fallback to ensure it really plays
-      const delayedMusicTimer = setTimeout(playMiniGameMusic, 500);
-      
-      // Add keyboard handling for ESC key to close game properly
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          console.log("GAME UI: ESC key pressed, closing game and restoring audio");
-          handleCloseGame();
-        }
-      };
-      
-      // Add event listener
-      window.addEventListener('keydown', handleKeyDown);
-      
-      // Combined cleanup function for both timers and event listeners
-      return () => {
-        clearTimeout(delayedMusicTimer);
-        window.removeEventListener('keydown', handleKeyDown);
-        console.log("GAME UI: Cleaned up all events and timers");
-      };
-    }
-  }, [showGameUI, endInteraction, toggleGameUI]);
+  const { interactionType, showGameUI, toggleGameUI } = useInteraction();
   
   if (!showGameUI) return null;
   
@@ -122,7 +18,7 @@ const GameUI = () => {
             {interactionType === "checkers" && "Checkers"}
           </h2>
           <button 
-            onClick={handleCloseGame}
+            onClick={toggleGameUI}
             className="p-2 rounded-full hover:bg-gray-200"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
