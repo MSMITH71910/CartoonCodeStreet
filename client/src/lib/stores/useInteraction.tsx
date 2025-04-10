@@ -291,7 +291,7 @@ export const useInteraction = create<InteractionState>((set, get) => ({
             console.log("AUDIO CONTROL: Playing fountain music specifically");
             fountainAudioStore.fountainMusic.currentTime = 0;
             fountainAudioStore.fountainMusic.volume = 0.4;
-            fountainAudioStore.fountainMusic.playbackRate = 0.85; // Make it sound different/slower
+            fountainAudioStore.fountainMusic.playbackRate = fountainAudioStore.fountainPlaybackRate; // Make it sound different/slower
             
             // Update the state
             useAudio.setState({
