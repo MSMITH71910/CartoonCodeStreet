@@ -31,12 +31,25 @@ const GameUI = () => {
   
   // CRITICAL: Handle audio directly in the GameUI component
   useEffect(() => {
-    // When the game UI appears, play chess music
+    // When the game UI appears, play chess music IMMEDIATELY
     if (showGameUI) {
       console.log("GAME UI: Game opened, playing chess music directly");
-      const audioStore = useAudio.getState();
       
-      if (!audioStore.isMuted && !audioStore.isMusicMuted) {
+      // IMMEDIATELY play mini-game music regardless of what's already playing
+      const playMiniGameMusic = () => {
+        const audioStore = useAudio.getState();
+        
+        // ALWAYS DOUBLE-CHECK: make sure we're not muted
+        if (audioStore.isMuted || audioStore.isMusicMuted) {
+          console.log("GAME UI: Audio is muted, unmuting for mini-game music");
+          
+          // Force-unmute for better user experience
+          useAudio.setState({
+            isMuted: false,
+            isMusicMuted: false
+          });
+        }
+        
         // Stop any currently playing music
         if (audioStore.currentActivityMusic) {
           audioStore.currentActivityMusic.pause();
@@ -49,6 +62,7 @@ const GameUI = () => {
         
         // Play chess music specifically for mini-games
         if (audioStore.chessMusicOrSimilar) {
+          // Reset audio
           audioStore.chessMusicOrSimilar.currentTime = 0;
           audioStore.chessMusicOrSimilar.volume = 0.5;
           
@@ -58,11 +72,23 @@ const GameUI = () => {
             currentTrack: "chess"
           });
           
-          // Start playing
-          audioStore.chessMusicOrSimilar.play()
-            .catch(e => console.error("AUDIO ERROR: Failed to play chess music in GameUI:", e));
+          // Start playing IMMEDIATELY with delay to ensure it works
+          setTimeout(() => {
+            console.log("GAME UI: Attempting to play chess music after slight delay");
+            audioStore.chessMusicOrSimilar?.play()
+              .then(() => console.log("GAME UI: Chess music started successfully"))
+              .catch(e => console.error("AUDIO ERROR: Failed to play chess music in GameUI:", e));
+          }, 100);
+        } else {
+          console.error("AUDIO ERROR: No chess music available");
         }
-      }
+      };
+      
+      // Execute immediately
+      playMiniGameMusic();
+      
+      // Also set a short timeout as a fallback to ensure it really plays
+      const delayedMusicTimer = setTimeout(playMiniGameMusic, 500);
       
       // Add keyboard handling for ESC key to close game properly
       const handleKeyDown = (e: KeyboardEvent) => {
@@ -75,9 +101,11 @@ const GameUI = () => {
       // Add event listener
       window.addEventListener('keydown', handleKeyDown);
       
-      // Cleanup function
+      // Combined cleanup function for both timers and event listeners
       return () => {
+        clearTimeout(delayedMusicTimer);
         window.removeEventListener('keydown', handleKeyDown);
+        console.log("GAME UI: Cleaned up all events and timers");
       };
     }
   }, [showGameUI, endInteraction, toggleGameUI]);
