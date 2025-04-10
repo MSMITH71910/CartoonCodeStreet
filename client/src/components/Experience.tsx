@@ -3,7 +3,7 @@ import { useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import Street from "./Street";
-import Character from "./Character";
+import Character from "./NewCharacter"; // Using our completely rewritten character
 import { usePortfolio } from "../lib/stores/usePortfolio";
 import { useAudio } from "../lib/stores/useAudio";
 import { useStreetSign } from "../lib/stores/useStreetSign";

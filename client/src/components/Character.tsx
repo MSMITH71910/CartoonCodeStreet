@@ -1,52 +1,40 @@
 import { useRef, useEffect, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useKeyboardControls } from "@react-three/drei";
 import * as THREE from "three";
-import { ControlName } from "../lib/constants";
 import { usePortfolio } from "../lib/stores/usePortfolio";
 import { useAudio } from "../lib/stores/useAudio";
 import { useInteraction } from "../lib/stores/useInteraction";
+import { useKeyboard } from "../hooks/useKeyboard";
+import { useAnimations, AnimationType } from "../hooks/useAnimations";
 
 const Character = () => {
+  // Core refs and states
   const characterRef = useRef<THREE.Group>(null);
   const { setCharacterRef, isViewingProject } = usePortfolio();
-  const [velocity, setVelocity] = useState(new THREE.Vector3());
   const [rotation, setRotation] = useState(0);
+  const [isMoving, setIsMoving] = useState(false);
   const { playHit, playSuccess } = useAudio();
+  
+  // New direct keyboard handling
+  const keys = useKeyboard();
+  
+  // New animation system
+  const {
+    animationType,
+    animationTime,
+    isAnimating,
+    startAnimation,
+    stopAnimation,
+    updateAnimation
+  } = useAnimations(3000); // 3 seconds animation duration
   
   // Interaction state
   const { 
     interactionType, 
     interactionPosition, 
     interactionRotation,
-    isSitting,
-    isOnSeesaw,
     endInteraction
   } = useInteraction();
-  
-  // Animation states
-  const [isMoving, setIsMoving] = useState(false);
-  const [animationTime, setAnimationTime] = useState(0);
-  
-  // Special interaction animations
-  const [isDancing, setIsDancing] = useState(false);
-  const [isWaving, setIsWaving] = useState(false);
-  const [waveArm, setWaveArm] = useState<'left' | 'right'>('right');
-  
-  // Use a different approach to keyboard controls with direct subscriptions
-  // This fixes issues with key state not being properly detected
-  const [keys, setKeys] = useState({
-    forward: false,
-    backward: false,
-    leftward: false,
-    rightward: false,
-    interact: false,
-    dance: false,
-    waveLeft: false,
-    waveRight: false
-  });
-  
-  // Set up direct key handlers to work around useKeyboardControls issues
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'KeyW' || e.code === 'ArrowUp') setKeys(prev => ({...prev, forward: true}));
