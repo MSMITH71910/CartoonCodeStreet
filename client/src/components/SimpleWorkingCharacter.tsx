@@ -28,12 +28,14 @@ const SimpleWorkingCharacter = () => {
   // COMPLETELY REWRITTEN keyboard event handlers for dancing and waving
   useEffect(() => {
     // We'll add a global object to store animation key states
-    if (!window.animationKeys) {
-      window.animationKeys = {
-        Z: false, // For dancing
-        Q: false, // For left-arm waving
-        R: false  // For right-arm waving
-      };
+    if (typeof window !== 'undefined') {
+      if (!window.animationKeys) {
+        window.animationKeys = {
+          Z: false, // For dancing
+          Q: false, // For left-arm waving
+          R: false  // For right-arm waving
+        };
+      }
     }
     
     // Debug message to know when this is mounted

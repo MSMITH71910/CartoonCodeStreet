@@ -7,7 +7,9 @@ export enum ControlName {
   interact = "interact",
   dance = "dance",     // For dancing animation
   waveLeft = "waveLeft",  // For left arm wave
-  waveRight = "waveRight" // For right arm wave
+  waveRight = "waveRight", // For right arm wave
+  zoomIn = "zoomIn",    // For zooming in (+/= key)
+  zoomOut = "zoomOut"   // For zooming out (- key)
 }
 
 // Physics constants

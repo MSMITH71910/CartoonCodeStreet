@@ -12,7 +12,7 @@ import { usePortfolio } from "./lib/stores/usePortfolio";
 import { useStreetSign } from "./lib/stores/useStreetSign";
 import { ControlName } from "./lib/constants";
 
-// Define control keys for the character movement - UPDATED FOR ANIMATIONS
+// Define control keys for the character movement - UPDATED FOR ANIMATIONS & ZOOM
 const keyboardMap = [
   { name: ControlName.forward, keys: ["KeyW", "ArrowUp"] },
   { name: ControlName.backward, keys: ["KeyS", "ArrowDown"] },
@@ -23,6 +23,9 @@ const keyboardMap = [
   { name: ControlName.dance, keys: ["KeyZ"] },         // Z to dance
   { name: ControlName.waveLeft, keys: ["KeyQ"] },      // Q to wave left arm
   { name: ControlName.waveRight, keys: ["KeyR"] },     // R to wave right arm
+  // Zoom controls
+  { name: ControlName.zoomIn, keys: ["Equal", "NumpadAdd"] },   // + key to zoom in
+  { name: ControlName.zoomOut, keys: ["Minus", "NumpadSubtract"] },  // - key to zoom out
 ];
 
 // Main App component
@@ -131,6 +134,7 @@ function App() {
               <p>D/→ - Turn right</p>
               <p>E/Space - Interact with objects</p>
               <p className="text-yellow-300">Click and hold left mouse button to look around</p>
+              <p className="text-yellow-300">+/- keys to zoom in/out</p>
               
               <div className="mt-2 border-t pt-2 border-gray-600">
                 <p className="font-semibold text-green-300">Character Animations:</p>

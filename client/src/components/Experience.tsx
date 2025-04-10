@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import * as THREE from "three";
 import Street from "./Street";
-import BasicAnimatedCharacter from "./BasicAnimatedCharacter"; // Using our completely new character implementation
+import BasicAnimatedCharacter from "./BasicAnimatedCharacter"; 
 import { usePortfolio } from "../lib/stores/usePortfolio";
 import { useAudio } from "../lib/stores/useAudio";
 import { useStreetSign } from "../lib/stores/useStreetSign";
@@ -14,6 +14,58 @@ const Experience = () => {
   const { playHit } = useAudio();
   const [signHovered, setSignHovered] = useState(false);
   const { openAboutInfo } = useStreetSign();
+  const orbitRef = useRef(null);
+  
+  // Simple direct keyboard handler for zoom
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!orbitRef.current) return;
+      
+      if (e.code === 'Equal' || e.code === 'NumpadAdd') {
+        console.log("DIRECT ZOOM IN KEY DETECTED");
+        // @ts-ignore - we know the ref has these properties
+        const control = orbitRef.current;
+        // @ts-ignore
+        const current = control.getDistance();
+        const newDistance = Math.max(5, current - 3);
+        // @ts-ignore
+        control.minDistance = newDistance;
+        // @ts-ignore
+        control.maxDistance = newDistance;
+        setTimeout(() => {
+          if (orbitRef.current) {
+            // @ts-ignore
+            control.minDistance = 5;
+            // @ts-ignore
+            control.maxDistance = 100;
+          }
+        }, 100);
+      }
+      else if (e.code === 'Minus' || e.code === 'NumpadSubtract') {
+        console.log("DIRECT ZOOM OUT KEY DETECTED");
+        // @ts-ignore - we know the ref has these properties
+        const control = orbitRef.current;
+        // @ts-ignore
+        const current = control.getDistance();
+        const newDistance = Math.min(100, current + 3);
+        // @ts-ignore
+        control.minDistance = newDistance;
+        // @ts-ignore
+        control.maxDistance = newDistance;
+        setTimeout(() => {
+          if (orbitRef.current) {
+            // @ts-ignore
+            control.minDistance = 5;
+            // @ts-ignore
+            control.maxDistance = 100;
+          }
+        }, 100);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
   
   const handleSignClick = () => {
     openAboutInfo();
@@ -206,138 +258,142 @@ const Experience = () => {
       {/* Player character */}
       <BasicAnimatedCharacter />
       
-      {/* FIXED STREET SIGN - completely separate from character, fixed position */}
-      <group position={[0, 0, 15]} rotation={[0, Math.PI, 0]}>
-        {/* Posts */}
-        <mesh castShadow position={[-2, 2, 0]}>
-          <cylinderGeometry args={[0.2, 0.2, 4, 32]} />
-          <meshStandardMaterial color="#8B4513" side={THREE.DoubleSide} />
-        </mesh>
-        
-        <mesh castShadow position={[2, 2, 0]}>
-          <cylinderGeometry args={[0.2, 0.2, 4, 32]} />
-          <meshStandardMaterial color="#8B4513" side={THREE.DoubleSide} />
-        </mesh>
-        
-        {/* FIXED AND SIMPLIFIED SIGN */}
-        <group position={[0, 3, 0]}>
-          {/* Sign board */}
-          <mesh 
-            castShadow 
-            position={[0, 0, 0]} 
-            receiveShadow
-            onPointerOver={() => setSignHovered(true)}
-            onPointerOut={() => setSignHovered(false)}
-            onClick={handleSignClick}
-          >
-            <boxGeometry args={[5, 3, 0.2]} />
-            <meshStandardMaterial color={signHovered ? "#4285F4" : "#1E88E5"} side={THREE.DoubleSide} />
+      {/* STATIC SIGN - completely independent object */}
+      <object3D>
+        {/* FIXED STREET SIGN at absolute world position */}
+        <group position={[0, 0, 15]} rotation={[0, Math.PI, 0]}>
+          {/* Posts */}
+          <mesh castShadow position={[-2, 2, 0]}>
+            <cylinderGeometry args={[0.2, 0.2, 4, 32]} />
+            <meshStandardMaterial color="#8B4513" side={THREE.DoubleSide} />
           </mesh>
-
-          {/* Front side text */}
-          <sprite position={[0, 0, 0.2]} scale={[4.8, 2.8, 1]}>
-            <spriteMaterial alphaTest={0.5}>
-              <canvasTexture attach="map" args={[(() => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 1024;
-                canvas.height = 1024;
-                const ctx = canvas.getContext('2d');
-                
-                if (ctx) {
-                  // Fill the background
-                  ctx.fillStyle = "#0D47A1";
-                  ctx.fillRect(0, 0, canvas.width, canvas.height);
-                  
-                  // Border
-                  ctx.strokeStyle = 'white';
-                  ctx.lineWidth = 12;
-                  ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-                  
-                  // Header
-                  ctx.font = 'bold 80px Arial';
-                  ctx.fillStyle = 'yellow';
-                  ctx.textAlign = 'center';
-                  ctx.textBaseline = 'middle';
-                  ctx.fillText('MICHAEL R. SMITH', canvas.width / 2, canvas.height * 0.25);
-                  
-                  // Subheader
-                  ctx.font = 'bold 75px Arial';
-                  ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height * 0.5);
-                  
-                  // Highlight box for bottom text
-                  ctx.fillStyle = '#1A237E';
-                  ctx.fillRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
-                  
-                  // Highlight border
-                  ctx.strokeStyle = 'white';
-                  ctx.lineWidth = 6;
-                  ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
-                  
-                  // Bottom text
-                  ctx.font = 'bold 68px Arial';
-                  ctx.fillStyle = 'yellow';
-                  ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height * 0.78);
-                }
-                
-                return canvas;
-              })()]} />
-            </spriteMaterial>
-          </sprite>
           
-          {/* Back side text */}
-          <sprite position={[0, 0, -0.2]} rotation={[0, Math.PI, 0]} scale={[4.8, 2.8, 1]}>
-            <spriteMaterial alphaTest={0.5}>
-              <canvasTexture attach="map" args={[(() => {
-                const canvas = document.createElement('canvas');
-                canvas.width = 1024;
-                canvas.height = 1024;
-                const ctx = canvas.getContext('2d');
-                
-                if (ctx) {
-                  // Fill the background
-                  ctx.fillStyle = "#0D47A1";
-                  ctx.fillRect(0, 0, canvas.width, canvas.height);
+          <mesh castShadow position={[2, 2, 0]}>
+            <cylinderGeometry args={[0.2, 0.2, 4, 32]} />
+            <meshStandardMaterial color="#8B4513" side={THREE.DoubleSide} />
+          </mesh>
+          
+          {/* FIXED SIGN */}
+          <group position={[0, 3, 0]}>
+            {/* Sign board */}
+            <mesh 
+              castShadow 
+              position={[0, 0, 0]} 
+              receiveShadow
+              onPointerOver={() => setSignHovered(true)}
+              onPointerOut={() => setSignHovered(false)}
+              onClick={handleSignClick}
+            >
+              <boxGeometry args={[5, 3, 0.2]} />
+              <meshStandardMaterial color={signHovered ? "#4285F4" : "#1E88E5"} side={THREE.DoubleSide} />
+            </mesh>
+
+            {/* Front side text */}
+            <sprite position={[0, 0, 0.2]} scale={[4.8, 2.8, 1]}>
+              <spriteMaterial alphaTest={0.5}>
+                <canvasTexture attach="map" args={[(() => {
+                  const canvas = document.createElement('canvas');
+                  canvas.width = 1024;
+                  canvas.height = 1024;
+                  const ctx = canvas.getContext('2d');
                   
-                  // Border
-                  ctx.strokeStyle = 'white';
-                  ctx.lineWidth = 12;
-                  ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+                  if (ctx) {
+                    // Fill the background
+                    ctx.fillStyle = "#0D47A1";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Border
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 12;
+                    ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+                    
+                    // Header
+                    ctx.font = 'bold 80px Arial';
+                    ctx.fillStyle = 'yellow';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('MICHAEL R. SMITH', canvas.width / 2, canvas.height * 0.25);
+                    
+                    // Subheader
+                    ctx.font = 'bold 75px Arial';
+                    ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height * 0.5);
+                    
+                    // Highlight box for bottom text
+                    ctx.fillStyle = '#1A237E';
+                    ctx.fillRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
+                    
+                    // Highlight border
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 6;
+                    ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
+                    
+                    // Bottom text
+                    ctx.font = 'bold 68px Arial';
+                    ctx.fillStyle = 'yellow';
+                    ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height * 0.78);
+                  }
                   
-                  // Header
-                  ctx.font = 'bold 80px Arial';
-                  ctx.fillStyle = 'yellow';
-                  ctx.textAlign = 'center';
-                  ctx.textBaseline = 'middle';
-                  ctx.fillText('MICHAEL R. SMITH', canvas.width / 2, canvas.height * 0.25);
+                  return canvas;
+                })()]} />
+              </spriteMaterial>
+            </sprite>
+            
+            {/* Back side text */}
+            <sprite position={[0, 0, -0.2]} rotation={[0, Math.PI, 0]} scale={[4.8, 2.8, 1]}>
+              <spriteMaterial alphaTest={0.5}>
+                <canvasTexture attach="map" args={[(() => {
+                  const canvas = document.createElement('canvas');
+                  canvas.width = 1024;
+                  canvas.height = 1024;
+                  const ctx = canvas.getContext('2d');
                   
-                  // Subheader
-                  ctx.font = 'bold 75px Arial';
-                  ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height * 0.5);
+                  if (ctx) {
+                    // Fill the background
+                    ctx.fillStyle = "#0D47A1";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Border
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 12;
+                    ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+                    
+                    // Header
+                    ctx.font = 'bold 80px Arial';
+                    ctx.fillStyle = 'yellow';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('MICHAEL R. SMITH', canvas.width / 2, canvas.height * 0.25);
+                    
+                    // Subheader
+                    ctx.font = 'bold 75px Arial';
+                    ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height * 0.5);
+                    
+                    // Highlight box for bottom text
+                    ctx.fillStyle = '#1A237E';
+                    ctx.fillRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
+                    
+                    // Highlight border
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 6;
+                    ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
+                    
+                    // Bottom text
+                    ctx.font = 'bold 68px Arial';
+                    ctx.fillStyle = 'yellow';
+                    ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height * 0.78);
+                  }
                   
-                  // Highlight box for bottom text
-                  ctx.fillStyle = '#1A237E';
-                  ctx.fillRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
-                  
-                  // Highlight border
-                  ctx.strokeStyle = 'white';
-                  ctx.lineWidth = 6;
-                  ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
-                  
-                  // Bottom text
-                  ctx.font = 'bold 68px Arial';
-                  ctx.fillStyle = 'yellow';
-                  ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height * 0.78);
-                }
-                
-                return canvas;
-              })()]} />
-            </spriteMaterial>
-          </sprite>
+                  return canvas;
+                })()]} />
+              </spriteMaterial>
+            </sprite>
+          </group>
         </group>
-      </group>
+      </object3D>
       
       {/* Camera controls - always enabled to allow viewing from different angles */}
       <OrbitControls 
+        ref={orbitRef}
         target={cameraTarget} 
         enableZoom={true} 
         enablePan={false}
