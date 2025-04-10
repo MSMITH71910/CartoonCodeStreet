@@ -109,12 +109,18 @@ const Character = () => {
       setIsMoving(false);
     }
     
+    // Reverse the rotation direction since the previous approach wasn't working
     if (leftward) {
-      rotating = 1;
+      rotating = -1; // Changed from 1 to -1
     } else if (rightward) {
-      rotating = -1;
+      rotating = 1;  // Changed from -1 to 1
     } else {
       rotating = 0;
+    }
+    
+    // Log control inputs for debugging
+    if (leftward || rightward) {
+      console.log(`Rotating: ${rotating}, Left: ${leftward}, Right: ${rightward}`);
     }
     
     // Update rotation
@@ -122,9 +128,14 @@ const Character = () => {
     setRotation(newRotation);
     characterRef.current.rotation.y = newRotation;
     
-    // Calculate forward direction based on character rotation
-    // Fix the vector direction to match the camera perspective
+    // Fix rotation direction by changing the vector
+    // Previous approach wasn't working correctly
     const forwardDir = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), newRotation);
+    
+    // Debug the rotation to make sure it's working correctly
+    if (rotating !== 0) {
+      console.log(`Rotation: ${newRotation}, Direction: [${forwardDir.x.toFixed(2)}, ${forwardDir.y.toFixed(2)}, ${forwardDir.z.toFixed(2)}]`);
+    }
     
     // Apply movement
     const newVelocity = forwardDir.multiplyScalar(movingForward * speed * delta);

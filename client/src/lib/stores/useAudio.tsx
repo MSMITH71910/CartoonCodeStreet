@@ -115,6 +115,9 @@ export const useAudio = create<AudioState>((set, get) => ({
     } = get();
     const newMutedState = !isMuted;
     
+    // Debug output to help diagnose muting issues
+    console.log(`AUDIO DEBUG: Toggling mute from ${isMuted} to ${newMutedState}`);
+    
     // Update the muted state
     set({ isMuted: newMutedState });
     
@@ -136,6 +139,7 @@ export const useAudio = create<AudioState>((set, get) => ({
             audio.pause();
             audio.currentTime = 0;
             audio.volume = 0;
+            console.log(`AUDIO DEBUG: Paused and muted an audio track`);
           } catch (e) {
             console.error("Error while trying to mute audio:", e);
           }
@@ -164,6 +168,8 @@ export const useAudio = create<AudioState>((set, get) => ({
             console.log("Background music play prevented:", error);
           });
         }
+      } else {
+        console.log(`AUDIO DEBUG: Not playing music because isMusicMuted=${get().isMusicMuted}`);
       }
     }
     
@@ -185,6 +191,9 @@ export const useAudio = create<AudioState>((set, get) => ({
     } = get();
     
     const newMusicMutedState = !isMusicMuted;
+    
+    // Debug output to help diagnose music muting issues
+    console.log(`AUDIO DEBUG: Toggling music mute from ${isMusicMuted} to ${newMusicMutedState}`);
     
     // Update state
     set({ isMusicMuted: newMusicMutedState });
@@ -208,8 +217,9 @@ export const useAudio = create<AudioState>((set, get) => ({
             audio.pause();
             audio.currentTime = 0;
             audio.volume = 0;
+            console.log(`AUDIO DEBUG: Paused and muted a music track`);
           } catch (e) {
-            console.error("Error while trying to mute audio:", e);
+            console.error("Error while trying to mute music:", e);
           }
         }
       });
@@ -217,7 +227,12 @@ export const useAudio = create<AudioState>((set, get) => ({
       console.log("All music muted");
     } else if (!isMuted) {
       // Only unmute and restore volume if sound is not fully muted
-      if (backgroundMusic) backgroundMusic.volume = 0.3;
+      console.log(`AUDIO DEBUG: Attempting to restore music (isMuted=${isMuted})`);
+      
+      if (backgroundMusic) {
+        backgroundMusic.volume = 0.3;
+        console.log(`AUDIO DEBUG: Restored background music volume to 0.3`);
+      }
       if (basketballMusic) basketballMusic.volume = 0.4;
       if (chessMusicOrSimilar) chessMusicOrSimilar.volume = 0.4;
       if (fountainMusic) fountainMusic.volume = 0.4;
@@ -228,11 +243,15 @@ export const useAudio = create<AudioState>((set, get) => ({
         currentActivityMusic.play().catch(error => {
           console.log("Activity music play prevented:", error);
         });
+        console.log(`AUDIO DEBUG: Playing current activity music`);
       } else if (backgroundMusic) {
         backgroundMusic.play().catch(error => {
           console.log("Background music play prevented:", error);
         });
+        console.log(`AUDIO DEBUG: Playing background music`);
       }
+    } else {
+      console.log(`AUDIO DEBUG: Not playing music because isMuted=${isMuted}`);
     }
     
     console.log(`Music ${newMusicMutedState ? 'muted' : 'unmuted'}`);
