@@ -118,12 +118,7 @@ function App() {
               <p className="text-yellow-300">Click and hold left mouse button to look around</p>
               <p className="text-yellow-300">+/- keys to zoom in/out</p>
               
-              <div className="mt-2 border-t pt-2 border-gray-600">
-                <p className="font-semibold text-green-300">Character Animations:</p>
-                <p>Z - Make character dance</p>
-                <p>Q - Wave left arm</p>
-                <p>R - Wave right arm</p>
-              </div>
+              {/* Character animations removed for now */}
               
               <div className="mt-2 border-t pt-2 border-gray-600">
                 <p className="font-semibold">Interactions:</p>
