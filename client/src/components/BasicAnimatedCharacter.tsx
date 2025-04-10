@@ -5,17 +5,53 @@ import { useKeyboardControls } from "@react-three/drei";
 import { ControlName, PHYSICS, STREET } from "../lib/constants";
 import { usePortfolio } from "../lib/stores/usePortfolio";
 
+// Ultra-direct animation tracking
+const useDirectKeyPress = (targetKey: string) => {
+  const [isKeyPressed, setIsKeyPressed] = useState(false);
+  
+  useEffect(() => {
+    const downHandler = (e: KeyboardEvent) => {
+      if (e.code === targetKey) {
+        setIsKeyPressed(true);
+      }
+    };
+    
+    const upHandler = (e: KeyboardEvent) => {
+      if (e.code === targetKey) {
+        setIsKeyPressed(false);
+      }
+    };
+    
+    window.addEventListener('keydown', downHandler);
+    window.addEventListener('keyup', upHandler);
+    
+    return () => {
+      window.removeEventListener('keydown', downHandler);
+      window.removeEventListener('keyup', upHandler);
+    };
+  }, [targetKey]);
+  
+  return isKeyPressed;
+};
+
 const BasicAnimatedCharacter = () => {
   // References
   const characterRef = useRef<THREE.Group>(null);
   const { setCharacterRef } = usePortfolio();
   
-  // State
+  // Local state for movement and animation
   const [moving, setMoving] = useState(false);
-  const [isDancing, setIsDancing] = useState(false);
-  const [isWaving, setIsWaving] = useState(false);
-  const [waveArm, setWaveArm] = useState<'left' | 'right'>('left');
   const [animationTime, setAnimationTime] = useState(0);
+  
+  // Direct key press tracking with our custom hook
+  const isDancePressed = useDirectKeyPress('KeyZ');
+  const isWaveLeftPressed = useDirectKeyPress('KeyQ');
+  const isWaveRightPressed = useDirectKeyPress('KeyR');
+  
+  // Animation states derived from key presses and movement
+  const isDancing = isDancePressed && !moving;
+  const isWavingLeft = isWaveLeftPressed && !moving && !isDancing;
+  const isWavingRight = isWaveRightPressed && !moving && !isDancing && !isWavingLeft;
   
   // Store character ref in portfolio store
   useEffect(() => {
@@ -24,147 +60,15 @@ const BasicAnimatedCharacter = () => {
     }
   }, [setCharacterRef]);
   
-  // Get keyboard controls from @react-three/drei
+  // Get keyboard controls from @react-three/drei for movement
   const forward = useKeyboardControls(state => state[ControlName.forward]);
   const backward = useKeyboardControls(state => state[ControlName.backward]);
   const leftward = useKeyboardControls(state => state[ControlName.leftward]);
   const rightward = useKeyboardControls(state => state[ControlName.rightward]);
-  const dance = useKeyboardControls(state => state[ControlName.dance]);
-  const waveLeft = useKeyboardControls(state => state[ControlName.waveLeft]);
-  const waveRight = useKeyboardControls(state => state[ControlName.waveRight]);
-  
-  // Use an interval to check window.animationKeys (set in App.tsx)
-  useEffect(() => {
-    console.log("Setting up global animation keys checker");
-    
-    // Function to check the global animation keys state
-    const checkAnimationKeys = () => {
-      if (!window.animationKeys) return;
-      
-      // Dance (Z key)
-      if (window.animationKeys.Z && !moving && !isDancing && !isWaving) {
-        console.log("GLOBAL Z KEY DETECTED - DANCE ANIMATION STARTING");
-        setIsDancing(true);
-        setIsWaving(false);
-      } else if (!window.animationKeys.Z && isDancing) {
-        console.log("GLOBAL Z KEY RELEASED - DANCE ANIMATION STOPPING");
-        setIsDancing(false);
-      }
-      
-      // Wave left (Q key)
-      if (window.animationKeys.Q && !moving && !isDancing && !isWaving) {
-        console.log("GLOBAL Q KEY DETECTED - WAVE LEFT ANIMATION STARTING");
-        setIsWaving(true);
-        setWaveArm('left');
-        setIsDancing(false);
-      } else if (!window.animationKeys.Q && isWaving && waveArm === 'left') {
-        console.log("GLOBAL Q KEY RELEASED - WAVE LEFT ANIMATION STOPPING");
-        setIsWaving(false);
-      }
-      
-      // Wave right (R key)
-      if (window.animationKeys.R && !moving && !isDancing && !isWaving) {
-        console.log("GLOBAL R KEY DETECTED - WAVE RIGHT ANIMATION STARTING");
-        setIsWaving(true);
-        setWaveArm('right');
-        setIsDancing(false);
-      } else if (!window.animationKeys.R && isWaving && waveArm === 'right') {
-        console.log("GLOBAL R KEY RELEASED - WAVE RIGHT ANIMATION STOPPING");
-        setIsWaving(false);
-      }
-    };
-    
-    // Run the check on an interval
-    const checkInterval = setInterval(checkAnimationKeys, 100);
-    
-    // Also add direct DOM event listeners as a backup
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'KeyZ' && !moving && !isDancing && !isWaving) {
-        console.log("DIRECT Z KEY DETECTED - DANCE ANIMATION STARTING");
-        setIsDancing(true);
-        setIsWaving(false);
-      }
-      else if (e.code === 'KeyQ' && !moving && !isDancing && !isWaving) {
-        console.log("DIRECT Q KEY DETECTED - WAVE LEFT ANIMATION STARTING");
-        setIsWaving(true);
-        setWaveArm('left');
-        setIsDancing(false);
-      }
-      else if (e.code === 'KeyR' && !moving && !isDancing && !isWaving) {
-        console.log("DIRECT R KEY DETECTED - WAVE RIGHT ANIMATION STARTING");
-        setIsWaving(true);
-        setWaveArm('right');
-        setIsDancing(false);
-      }
-    };
-    
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'KeyZ' && isDancing) {
-        console.log("DIRECT Z KEY RELEASED - DANCE ANIMATION STOPPING");
-        setIsDancing(false);
-      }
-      else if (e.code === 'KeyQ' && isWaving && waveArm === 'left') {
-        console.log("DIRECT Q KEY RELEASED - WAVE LEFT ANIMATION STOPPING");
-        setIsWaving(false);
-      }
-      else if (e.code === 'KeyR' && isWaving && waveArm === 'right') {
-        console.log("DIRECT R KEY RELEASED - WAVE RIGHT ANIMATION STOPPING");
-        setIsWaving(false);
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    
-    return () => {
-      clearInterval(checkInterval);
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [moving, isDancing, isWaving, waveArm]);
   
   // Animation update - runs every frame
   useFrame((state, delta) => {
     if (!characterRef.current) return;
-    
-    // Log keyboard controls periodically
-    if (Math.random() < 0.01) {
-      console.log("Keyboard controls:", { 
-        forward, backward, leftward, rightward, 
-        dance, waveLeft, waveRight 
-      });
-    }
-    
-    // Handle animations when they're triggered via the Drei controls
-    // (Keeping these as a backup method)
-    if (dance && !moving && !isDancing && !isWaving) {
-      console.log("DREI DANCE KEY PRESSED - ANIMATION STARTING");
-      setIsDancing(true);
-      setIsWaving(false);
-    } else if (!dance && isDancing) {
-      console.log("DREI DANCE KEY RELEASED - ANIMATION STOPPING");
-      setIsDancing(false);
-    }
-    
-    if (waveLeft && !moving && !isDancing && !isWaving) {
-      console.log("DREI WAVE LEFT KEY PRESSED - ANIMATION STARTING");
-      setIsWaving(true);
-      setWaveArm('left');
-      setIsDancing(false);
-    } else if (!waveLeft && isWaving && waveArm === 'left') {
-      console.log("DREI WAVE LEFT KEY RELEASED - ANIMATION STOPPING");
-      setIsWaving(false);
-    }
-    
-    if (waveRight && !moving && !isDancing && !isWaving) {
-      console.log("DREI WAVE RIGHT KEY PRESSED - ANIMATION STARTING");
-      setIsWaving(true);
-      setWaveArm('right');
-      setIsDancing(false);
-    } else if (!waveRight && isWaving && waveArm === 'right') {
-      console.log("DREI WAVE RIGHT KEY RELEASED - ANIMATION STOPPING");
-      setIsWaving(false);
-    }
     
     // Handle movement
     const speed = PHYSICS.CHARACTER_SPEED;
@@ -183,12 +87,6 @@ const BasicAnimatedCharacter = () => {
     const isMovingNow = forward || backward;
     if (isMovingNow !== moving) {
       setMoving(isMovingNow);
-      
-      // Stop animations if movement starts
-      if (isMovingNow && (isDancing || isWaving)) {
-        setIsDancing(false);
-        setIsWaving(false);
-      }
     }
     
     if (forward || backward) {
@@ -208,8 +106,8 @@ const BasicAnimatedCharacter = () => {
     position.x = Math.max(STREET.BOUNDARY_MIN_X, Math.min(STREET.BOUNDARY_MAX_X, position.x));
     position.z = Math.max(STREET.BOUNDARY_MIN_Z, Math.min(STREET.BOUNDARY_MAX_Z, position.z));
     
-    // Update animation time
-    if (moving || isDancing || isWaving) {
+    // Update animation time (only when needed)
+    if (moving || isDancing || isWavingLeft || isWavingRight) {
       setAnimationTime(prev => prev + delta * (moving ? 5 : 8));
     }
   });
@@ -295,13 +193,13 @@ const BasicAnimatedCharacter = () => {
         <mesh 
           castShadow 
           rotation={[
-            isWaving && waveArm === 'right' ? Math.sin(animationTime) * 1.2 : 0,
-            isWaving && waveArm === 'right' ? Math.sin(animationTime * 0.5) * 0.3 : 0, 
+            isWavingRight ? Math.sin(animationTime) * 1.2 : 0,
+            isWavingRight ? Math.sin(animationTime * 0.5) * 0.3 : 0, 
             moving ? Math.sin(animationTime) * 0.5 : 0
           ]}
         >
           <capsuleGeometry args={[0.1, 0.6, 8, 4]} />
-          <meshStandardMaterial color={isWaving && waveArm === 'right' ? "#FFA500" : "#4285F4"} />
+          <meshStandardMaterial color={isWavingRight ? "#FFA500" : "#4285F4"} />
         </mesh>
       </group>
       
@@ -310,13 +208,13 @@ const BasicAnimatedCharacter = () => {
         <mesh 
           castShadow 
           rotation={[
-            isWaving && waveArm === 'left' ? Math.sin(animationTime) * 1.2 : 0,
-            isWaving && waveArm === 'left' ? Math.sin(animationTime * 0.5) * 0.3 : 0,
+            isWavingLeft ? Math.sin(animationTime) * 1.2 : 0,
+            isWavingLeft ? Math.sin(animationTime * 0.5) * 0.3 : 0,
             moving ? -Math.sin(animationTime) * 0.5 : 0
           ]}
         >
           <capsuleGeometry args={[0.1, 0.6, 8, 4]} />
-          <meshStandardMaterial color={isWaving && waveArm === 'left' ? "#FFA500" : "#4285F4"} />
+          <meshStandardMaterial color={isWavingLeft ? "#FFA500" : "#4285F4"} />
         </mesh>
       </group>
     </group>
