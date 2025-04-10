@@ -206,7 +206,7 @@ const Experience = () => {
       {/* Player character */}
       <Character />
       
-      {/* Simple street sign implementation - no complex text rendering */}
+      {/* Simplified street sign with much easier-to-read text */}
       <group position={[0, 0, 15]} rotation={[0, Math.PI, 0]}>
         {/* Posts */}
         <mesh castShadow position={[-2, 2, 0]}>
@@ -219,243 +219,121 @@ const Experience = () => {
           <meshStandardMaterial color="#8B4513" side={THREE.DoubleSide} />
         </mesh>
         
-        {/* Sign board - interactive */}
-        <mesh 
-          castShadow 
-          position={[0, 3.5, 0]} 
-          receiveShadow
-          onPointerOver={() => setSignHovered(true)}
-          onPointerOut={() => setSignHovered(false)}
-          onClick={handleSignClick}
-        >
-          <boxGeometry args={[5, 1.8, 0.2]} />
-          <meshStandardMaterial color={signHovered ? "#4285F4" : "#1E88E5"} side={THREE.DoubleSide} />
-        </mesh>
-        
-        {/* Add text using a sprite - front side - MUCH BIGGER */}
-        <sprite position={[0, 3.7, 0.3]} scale={[10, 3, 1]}>
-          <spriteMaterial attach="material">
-            <canvasTexture attach="map" args={[(() => {
-              const canvas = document.createElement("canvas");
-              canvas.width = 1024;
-              canvas.height = 256;
-              const ctx = canvas.getContext("2d");
-              
-              if (ctx) {
-                // Fill with solid color
-                ctx.fillStyle = "#0D47A1";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Add border
-                ctx.strokeStyle = "white";
-                ctx.lineWidth = 10;
-                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-                
-                // Text - HUGE and bright yellow
-                ctx.font = "bold 76px Arial";
-                ctx.fillStyle = "yellow";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText("MICHAEL R. SMITH", canvas.width / 2, canvas.height / 2);
-              }
-              
-              return canvas;
-            })()]} />
-          </spriteMaterial>
-        </sprite>
+        {/* ENTIRELY NEW SIGN APPROACH - front side */}
+        <group position={[0, 3, 0]}>
+          {/* Sign board */}
+          <mesh 
+            castShadow 
+            position={[0, 0, 0]} 
+            receiveShadow
+            onPointerOver={() => setSignHovered(true)}
+            onPointerOut={() => setSignHovered(false)}
+            onClick={handleSignClick}
+          >
+            <boxGeometry args={[5, 3, 0.2]} />
+            <meshStandardMaterial color={signHovered ? "#4285F4" : "#1E88E5"} side={THREE.DoubleSide} />
+          </mesh>
 
-        {/* Back side text */}
-        <sprite position={[0, 3.7, -0.3]} rotation={[0, Math.PI, 0]} scale={[10, 3, 1]}>
-          <spriteMaterial attach="material">
-            <canvasTexture attach="map" args={[(() => {
-              const canvas = document.createElement("canvas");
-              canvas.width = 1024;
-              canvas.height = 256;
-              const ctx = canvas.getContext("2d");
-              
-              if (ctx) {
-                // Fill with solid color
-                ctx.fillStyle = "#0D47A1";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+          {/* Front side - ALL text in one sprite */}
+          <sprite position={[0, 0, 0.2]} scale={[5, 3, 1]}>
+            <spriteMaterial alphaTest={0.5}>
+              <canvasTexture attach="map" args={[(() => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1024;
+                canvas.height = 1024;
+                const ctx = canvas.getContext('2d');
                 
-                // Add border
-                ctx.strokeStyle = "white";
-                ctx.lineWidth = 10;
-                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+                if (ctx) {
+                  // Fill the background
+                  ctx.fillStyle = "#0D47A1";
+                  ctx.fillRect(0, 0, canvas.width, canvas.height);
+                  
+                  // Border
+                  ctx.strokeStyle = 'white';
+                  ctx.lineWidth = 12;
+                  ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+                  
+                  // Header
+                  ctx.font = 'bold 95px Arial';
+                  ctx.fillStyle = 'yellow';
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'middle';
+                  ctx.fillText('MICHAEL R. SMITH', canvas.width / 2, canvas.height * 0.25);
+                  
+                  // Subheader
+                  ctx.font = 'bold 85px Arial';
+                  ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height * 0.5);
+                  
+                  // Bottom text - highlight
+                  ctx.fillStyle = '#1A237E';
+                  ctx.fillRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
+                  
+                  // Border for highlight
+                  ctx.strokeStyle = 'white';
+                  ctx.lineWidth = 6;
+                  ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
+                  
+                  // Bottom text
+                  ctx.font = 'bold 76px Arial';
+                  ctx.fillStyle = 'yellow';
+                  ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height * 0.78);
+                }
                 
-                // Text - HUGE and bright yellow
-                ctx.font = "bold 76px Arial";
-                ctx.fillStyle = "yellow";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText("MICHAEL R. SMITH", canvas.width / 2, canvas.height / 2);
-              }
-              
-              return canvas;
-            })()]} />
-          </spriteMaterial>
-        </sprite>
-
-        {/* Second line of text - front */}
-        <sprite position={[0, 3.0, 0.3]} scale={[9, 1.6, 1]}>
-          <spriteMaterial attach="material">
-            <canvasTexture attach="map" args={[(() => {
-              const canvas = document.createElement("canvas");
-              canvas.width = 1024;
-              canvas.height = 256;
-              const ctx = canvas.getContext("2d");
-              
-              if (ctx) {
-                // Fill with dark blue
-                ctx.fillStyle = "#0D47A1";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                return canvas;
+              })()]} />
+            </spriteMaterial>
+          </sprite>
+          
+          {/* Back side - EXACT same content */}
+          <sprite position={[0, 0, -0.2]} rotation={[0, Math.PI, 0]} scale={[5, 3, 1]}>
+            <spriteMaterial alphaTest={0.5}>
+              <canvasTexture attach="map" args={[(() => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1024;
+                canvas.height = 1024;
+                const ctx = canvas.getContext('2d');
                 
-                // Add border
-                ctx.strokeStyle = "white";
-                ctx.lineWidth = 6;
-                ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
+                if (ctx) {
+                  // Fill the background
+                  ctx.fillStyle = "#0D47A1";
+                  ctx.fillRect(0, 0, canvas.width, canvas.height);
+                  
+                  // Border
+                  ctx.strokeStyle = 'white';
+                  ctx.lineWidth = 12;
+                  ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+                  
+                  // Header
+                  ctx.font = 'bold 95px Arial';
+                  ctx.fillStyle = 'yellow';
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'middle';
+                  ctx.fillText('MICHAEL R. SMITH', canvas.width / 2, canvas.height * 0.25);
+                  
+                  // Subheader
+                  ctx.font = 'bold 85px Arial';
+                  ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height * 0.5);
+                  
+                  // Bottom text - highlight
+                  ctx.fillStyle = '#1A237E';
+                  ctx.fillRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
+                  
+                  // Border for highlight
+                  ctx.strokeStyle = 'white';
+                  ctx.lineWidth = 6;
+                  ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
+                  
+                  // Bottom text
+                  ctx.font = 'bold 76px Arial';
+                  ctx.fillStyle = 'yellow';
+                  ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height * 0.78);
+                }
                 
-                // Text
-                ctx.font = "bold 64px Arial";
-                ctx.fillStyle = "yellow";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText("PORTFOLIO STREET", canvas.width / 2, canvas.height / 2);
-              }
-              
-              return canvas;
-            })()]} />
-          </spriteMaterial>
-        </sprite>
-
-        {/* Second line of text - back */}
-        <sprite position={[0, 3.0, -0.3]} rotation={[0, Math.PI, 0]} scale={[9, 1.6, 1]}>
-          <spriteMaterial attach="material">
-            <canvasTexture attach="map" args={[(() => {
-              const canvas = document.createElement("canvas");
-              canvas.width = 1024;
-              canvas.height = 256;
-              const ctx = canvas.getContext("2d");
-              
-              if (ctx) {
-                // Fill with dark blue
-                ctx.fillStyle = "#0D47A1";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Add border
-                ctx.strokeStyle = "white";
-                ctx.lineWidth = 6;
-                ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
-                
-                // Text
-                ctx.font = "bold 64px Arial";
-                ctx.fillStyle = "yellow";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText("PORTFOLIO STREET", canvas.width / 2, canvas.height / 2);
-              }
-              
-              return canvas;
-            })()]} />
-          </spriteMaterial>
-        </sprite>
-        
-        {/* Third line of text - "Click For Info" - front side */}
-        <sprite position={[0, 2.4, 0.3]} scale={[8, 1.5, 1]}>
-          <spriteMaterial attach="material">
-            <canvasTexture attach="map" args={[(() => {
-              const canvas = document.createElement("canvas");
-              canvas.width = 1024;
-              canvas.height = 256;
-              const ctx = canvas.getContext("2d");
-              
-              if (ctx) {
-                // Fill with dark blue background
-                ctx.fillStyle = "#1A237E";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Add border
-                ctx.strokeStyle = "white";
-                ctx.lineWidth = 6;
-                ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
-                
-                // Text - HUGE and bright
-                ctx.font = "bold 72px Arial";
-                ctx.fillStyle = "yellow";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText("CLICK FOR INFO", canvas.width / 2, canvas.height / 2);
-              }
-              
-              return canvas;
-            })()]} />
-          </spriteMaterial>
-        </sprite>
-        
-        {/* Third line of text - "Click For Info" - back side */}
-        <sprite position={[0, 2.4, -0.3]} rotation={[0, Math.PI, 0]} scale={[8, 1.5, 1]}>
-          <spriteMaterial attach="material">
-            <canvasTexture attach="map" args={[(() => {
-              const canvas = document.createElement("canvas");
-              canvas.width = 1024;
-              canvas.height = 256;
-              const ctx = canvas.getContext("2d");
-              
-              if (ctx) {
-                // Fill with dark blue background
-                ctx.fillStyle = "#1A237E";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Add border
-                ctx.strokeStyle = "white";
-                ctx.lineWidth = 6;
-                ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
-                
-                // Text - HUGE and bright
-                ctx.font = "bold 72px Arial";
-                ctx.fillStyle = "yellow";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText("CLICK FOR INFO", canvas.width / 2, canvas.height / 2);
-              }
-              
-              return canvas;
-            })()]} />
-          </spriteMaterial>
-        </sprite>
-        
-        {/* Simple white background for text - both sides */}
-        <mesh position={[0, 3.5, 0.12]}>
-          <boxGeometry args={[4.5, 1.5, 0.05]} />
-          <meshStandardMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-        </mesh>
-        
-        <mesh position={[0, 3.5, -0.12]}>
-          <boxGeometry args={[4.5, 1.5, 0.05]} />
-          <meshStandardMaterial color="#FFFFFF" side={THREE.DoubleSide} />
-        </mesh>
-        
-        {/* Blue accent strip on top - both sides */}
-        <mesh position={[0, 4.1, 0.14]}>
-          <boxGeometry args={[4.6, 0.2, 0.01]} />
-          <meshBasicMaterial color="#0D47A1" side={THREE.DoubleSide} />
-        </mesh>
-        
-        <mesh position={[0, 4.1, -0.14]} rotation={[0, Math.PI, 0]}>
-          <boxGeometry args={[4.6, 0.2, 0.01]} />
-          <meshBasicMaterial color="#0D47A1" side={THREE.DoubleSide} />
-        </mesh>
-        
-        {/* Blue accent strip on bottom - both sides */}
-        <mesh position={[0, 2.9, 0.14]}>
-          <boxGeometry args={[4.6, 0.2, 0.01]} />
-          <meshBasicMaterial color="#0D47A1" side={THREE.DoubleSide} />
-        </mesh>
-        
-        <mesh position={[0, 2.9, -0.14]} rotation={[0, Math.PI, 0]}>
-          <boxGeometry args={[4.6, 0.2, 0.01]} />
-          <meshBasicMaterial color="#0D47A1" side={THREE.DoubleSide} />
-        </mesh>
+                return canvas;
+              })()]} />
+            </spriteMaterial>
+          </sprite>
+        </group>
       </group>
       
       {/* Camera controls - always enabled to allow viewing from different angles */}
