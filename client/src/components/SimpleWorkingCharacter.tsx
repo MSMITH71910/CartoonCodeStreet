@@ -1,118 +1,23 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useKeyboardControls } from "@react-three/drei";
 import { ControlName, PHYSICS, STREET } from "../lib/constants";
 import { usePortfolio } from "../lib/stores/usePortfolio";
 
-// Map keycode to control name for direct DOM event handling
-const KEY_MAP: Record<string, ControlName> = {
-  'KeyZ': ControlName.dance,
-  'KeyQ': ControlName.waveLeft,
-  'KeyR': ControlName.waveRight,
-};
-
-const WorkingCharacter = () => {
-  // References and state
+const SimpleWorkingCharacter = () => {
+  // References
   const characterRef = useRef<THREE.Group>(null);
   const { setCharacterRef } = usePortfolio();
-  const [moving, setMoving] = useState(false);
-  const [animationTime, setAnimationTime] = useState(0);
   
-  // Animation states - MOVED UP to avoid initialization errors
+  // State
+  const [moving, setMoving] = useState(false);
   const [isDancing, setIsDancing] = useState(false);
   const [isWaving, setIsWaving] = useState(false);
   const [waveArm, setWaveArm] = useState<'left' | 'right'>('left');
+  const [animationTime, setAnimationTime] = useState(0);
   
-  // Setup for keyboard controls - FIXED
-  const [subscribeKeys, getKeys] = useKeyboardControls();
-  
-  // We'll use these variables in our useFrame for more responsive control
-  const forward = useKeyboardControls((state) => state[ControlName.forward]);
-  const backward = useKeyboardControls((state) => state[ControlName.backward]);
-  const leftward = useKeyboardControls((state) => state[ControlName.leftward]);
-  const rightward = useKeyboardControls((state) => state[ControlName.rightward]);
-  const dance = useKeyboardControls((state) => state[ControlName.dance]);
-  const waveLeft = useKeyboardControls((state) => state[ControlName.waveLeft]);
-  const waveRight = useKeyboardControls((state) => state[ControlName.waveRight]);
-  
-  // DIRECT KEYBOARD EVENT HANDLERS - bypassing Three.js keyboard system
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    const key = event.code;
-    
-    // Only process our special animation keys
-    if (key === 'KeyZ' || key === 'KeyQ' || key === 'KeyR') {
-      console.log(`DIRECT KEY DOWN DETECTED: ${key}`);
-      
-      // Process the animation directly
-      if (key === 'KeyZ' && !moving && !isDancing && !isWaving) {
-        console.log("Direct dance animation triggered!");
-        setIsDancing(true);
-        setIsWaving(false);
-      }
-      
-      if (key === 'KeyQ' && !moving && !isDancing && !isWaving) {
-        console.log("Direct left wave animation triggered!");
-        setIsWaving(true);
-        setWaveArm('left');
-        setIsDancing(false);
-      }
-      
-      if (key === 'KeyR' && !moving && !isDancing && !isWaving) {
-        console.log("Direct right wave animation triggered!");
-        setIsWaving(true);
-        setWaveArm('right');
-        setIsDancing(false);
-      }
-    }
-  }, [moving, isDancing, isWaving, setIsDancing, setIsWaving, setWaveArm]);
-  
-  const handleKeyUp = useCallback((event: KeyboardEvent) => {
-    const key = event.code;
-    
-    // Only process our special animation keys
-    if (key === 'KeyZ' || key === 'KeyQ' || key === 'KeyR') {
-      console.log(`DIRECT KEY UP DETECTED: ${key}`);
-      
-      // Stop the relevant animation
-      if (key === 'KeyZ' && isDancing) {
-        console.log("Direct dance animation stopped!");
-        setIsDancing(false);
-      }
-      
-      if (key === 'KeyQ' && isWaving && waveArm === 'left') {
-        console.log("Direct left wave animation stopped!");
-        setIsWaving(false);
-      }
-      
-      if (key === 'KeyR' && isWaving && waveArm === 'right') {
-        console.log("Direct right wave animation stopped!");
-        setIsWaving(false);
-      }
-    }
-  }, [isDancing, isWaving, waveArm]);
-  
-  // Set up direct DOM event listeners for animation keys
-  useEffect(() => {
-    console.log("Setting up direct keyboard event listeners for animations");
-    
-    // Add event listeners
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    
-    console.log("Initial keyboard control state:", {
-      forward, backward, leftward, rightward, dance, waveLeft, waveRight
-    });
-    
-    // Cleanup function
-    return () => {
-      console.log("Removing direct keyboard event listeners");
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [handleKeyDown, handleKeyUp, forward, backward, leftward, rightward, dance, waveLeft, waveRight]);
-  
-  // Register character ref with portfolio store
+  // Initialize character reference in the portfolio store
   useEffect(() => {
     if (characterRef.current) {
       setCharacterRef(characterRef);
@@ -120,101 +25,98 @@ const WorkingCharacter = () => {
     }
   }, [setCharacterRef]);
   
-  // COMPLETELY REVISED animation controls to fix issues
-  useFrame((state, delta) => {
-    // Check keyboard state on every frame for more responsive animations 
-    if (dance && !moving && !isDancing && !isWaving) {
-      console.log("Dance animation triggered now!");
-      setIsDancing(true);
-      setIsWaving(false);
-      
-      // No need for timeout - we'll handle this in the main update loop
-    }
+  // Direct keyboard event handlers for dancing and waving
+  useEffect(() => {
+    // Event handlers
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code === 'KeyZ' && !moving && !isDancing && !isWaving) {
+        console.log("DANCE KEY PRESSED");
+        setIsDancing(true);
+        setIsWaving(false);
+      } else if (event.code === 'KeyQ' && !moving && !isDancing && !isWaving) {
+        console.log("WAVE LEFT KEY PRESSED");
+        setIsWaving(true);
+        setWaveArm('left');
+        setIsDancing(false);
+      } else if (event.code === 'KeyR' && !moving && !isDancing && !isWaving) {
+        console.log("WAVE RIGHT KEY PRESSED");
+        setIsWaving(true);
+        setWaveArm('right');
+        setIsDancing(false);
+      }
+    };
     
-    if (waveLeft && !moving && !isDancing && !isWaving) {
-      console.log("Left wave animation triggered now!");
-      setIsWaving(true);
-      setWaveArm('left');
-      setIsDancing(false);
-    }
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.code === 'KeyZ' && isDancing) {
+        console.log("DANCE KEY RELEASED");
+        setIsDancing(false);
+      } else if (event.code === 'KeyQ' && isWaving && waveArm === 'left') {
+        console.log("WAVE LEFT KEY RELEASED");
+        setIsWaving(false);
+      } else if (event.code === 'KeyR' && isWaving && waveArm === 'right') {
+        console.log("WAVE RIGHT KEY RELEASED");
+        setIsWaving(false);
+      }
+    };
     
-    if (waveRight && !moving && !isDancing && !isWaving) {
-      console.log("Right wave animation triggered now!");
-      setIsWaving(true);
-      setWaveArm('right');
-      setIsDancing(false);
-    }
+    // Add event listeners
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
     
-    // Add auto-timeout for animations - when key is released
-    if ((isDancing && !dance) || (isWaving && waveArm === 'left' && !waveLeft) || 
-        (isWaving && waveArm === 'right' && !waveRight)) {
-      console.log("Animation released, stopping");
-      setIsDancing(false);
-      setIsWaving(false);
-    }
-  });
+    // Remove event listeners on cleanup
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [moving, isDancing, isWaving, waveArm]);
+  
+  // Use keyboard controls from drei
+  const forward = useKeyboardControls(state => state[ControlName.forward]);
+  const backward = useKeyboardControls(state => state[ControlName.backward]);
+  const leftward = useKeyboardControls(state => state[ControlName.leftward]);
+  const rightward = useKeyboardControls(state => state[ControlName.rightward]);
   
   // Main update loop
   useFrame((state, delta) => {
     if (!characterRef.current) return;
     
-    // Log keyboard state occasionally for debugging
-    if (Math.random() < 0.01) {
-      console.log("Keys:", {
-        forward, backward, leftward, rightward, dance, waveLeft, waveRight
-      });
-    }
-    
-    // Constants for movement
+    // Constants
     const speed = PHYSICS.CHARACTER_SPEED;
     const turnSpeed = PHYSICS.CHARACTER_TURN_SPEED;
     
-    // Handle rotation - FIXED: Sign was rotating with character because the rotation was backward
+    // Handle rotation - FIXED directions
     if (leftward) {
       characterRef.current.rotation.y -= turnSpeed * delta;
-      console.log("Turning left");
     }
     
     if (rightward) {
       characterRef.current.rotation.y += turnSpeed * delta;
-      console.log("Turning right");
     }
     
-    // Track if character is moving
+    // Update movement state
     const isMovingNow = forward || backward;
     if (isMovingNow !== moving) {
       setMoving(isMovingNow);
     }
     
-    // Handle movement
+    // Handle forward/backward movement - FIXED directions
     if (forward || backward) {
-      // Calculate movement direction based on character's rotation
       const direction = new THREE.Vector3();
-      // FIXED: Direction was reversed, change to positive Z for forward
-      direction.set(0, 0, forward ? 1 : -1);
+      direction.set(0, 0, forward ? 1 : -1); // Positive Z is forward
       direction.applyQuaternion(characterRef.current.quaternion);
       
-      // Scale by speed and delta time
       const moveAmount = speed * delta * (forward ? 1 : 0.5);
       direction.multiplyScalar(moveAmount);
       
-      // Apply movement
       characterRef.current.position.add(direction);
-      
-      // Log movement
-      if (forward) {
-        console.log("Moving forward");
-      } else {
-        console.log("Moving backward");
-      }
     }
     
-    // Enforce boundary constraints
+    // Apply boundary constraints
     const { position } = characterRef.current;
     position.x = Math.max(STREET.BOUNDARY_MIN_X, Math.min(STREET.BOUNDARY_MAX_X, position.x));
     position.z = Math.max(STREET.BOUNDARY_MIN_Z, Math.min(STREET.BOUNDARY_MAX_Z, position.z));
     
-    // Animate legs while moving
+    // Update animation time for moving parts
     if (moving || isDancing || isWaving) {
       setAnimationTime(prev => prev + delta * (moving ? 5 : 8));
     }
@@ -250,7 +152,7 @@ const WorkingCharacter = () => {
         <meshBasicMaterial color="black" />
       </mesh>
       
-      {/* Left rollerblade with animation - ENHANCED ANIMATIONS */}
+      {/* Left rollerblade with animation */}
       <group position={[-0.2, isDancing ? Math.sin(animationTime) * 0.5 : 0, 0]}>
         <mesh 
           castShadow 
@@ -276,7 +178,7 @@ const WorkingCharacter = () => {
         </mesh>
       </group>
       
-      {/* Right rollerblade with animation - ENHANCED ANIMATIONS */}
+      {/* Right rollerblade with animation */}
       <group position={[0.2, isDancing ? -Math.sin(animationTime) * 0.5 : 0, 0]}>
         <mesh 
           castShadow 
@@ -302,7 +204,7 @@ const WorkingCharacter = () => {
         </mesh>
       </group>
       
-      {/* Right arm with waving animation - ENHANCED */}
+      {/* Right arm with waving animation */}
       <group position={[0.5, 1.0, 0]}>
         <mesh 
           castShadow 
@@ -317,7 +219,7 @@ const WorkingCharacter = () => {
         </mesh>
       </group>
       
-      {/* Left arm with waving animation - ENHANCED */}
+      {/* Left arm with waving animation */}
       <group position={[-0.5, 1.0, 0]}>
         <mesh 
           castShadow 
@@ -335,4 +237,4 @@ const WorkingCharacter = () => {
   );
 };
 
-export default WorkingCharacter;
+export default SimpleWorkingCharacter;
