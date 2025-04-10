@@ -303,7 +303,10 @@ export const useAudio = create<AudioState>((set, get) => ({
     let activityMusic: HTMLAudioElement | null = null;
     let trackType: MusicTrack = "background";
     
-    switch (activityType) {
+    // Important debug info
+    console.log(`AUDIO SWITCH: Checking for music for activity: "${activityType}"`);
+    
+    switch (activityType.toLowerCase()) {
       case "basketball":
         if (basketballMusic) {
           activityMusic = basketballMusic;
@@ -312,14 +315,22 @@ export const useAudio = create<AudioState>((set, get) => ({
         }
         break;
         
-      case "ticTacToe":
+      // Add ALL variations of case for mini-games to match any format
+      case "tictactoe":
+      case "tic-tac-toe":
+      case "tic tac toe":
       case "checkers":
       case "hangman":
-      case "chessMusicOrSimilar":
+      case "chess":
+      case "boardgame":
+      case "board-game":
+      case "chessmusicorsimilar": // Direct store key
         if (chessMusicOrSimilar) {
           activityMusic = chessMusicOrSimilar;
           trackType = "chess";
-          console.log("AUDIO CONTROL: Selected chess/board game music");
+          console.log("AUDIO CONTROL: Selected chess/board game music for activity: " + activityType);
+        } else {
+          console.error("AUDIO ERROR: Chess music is null for: " + activityType);
         }
         break;
         

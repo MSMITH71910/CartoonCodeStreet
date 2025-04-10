@@ -57,7 +57,7 @@ function App() {
     seesawMusicElement.loop = true;
     seesawMusicElement.volume = 0.4;
     
-    // Set initial state - all music will be muted at the start
+    // Set initial state - START WITH MUSIC UNMUTED by default
     // We'll explicitly manage tracks in the audio store
     useAudio.setState({
       // Reset all audio tracks
@@ -68,8 +68,8 @@ function App() {
       fountainMusic: fountainMusicElement,
       seesawMusic: seesawMusicElement,
       
-      // Start with music muted
-      isMusicMuted: true,
+      // Start with music UNMUTED for better user experience
+      isMusicMuted: false,
       
       // Set the current track
       currentTrack: "background",

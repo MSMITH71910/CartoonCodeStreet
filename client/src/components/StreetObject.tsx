@@ -52,10 +52,19 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
   
   // Determine the music type based on activity
   const getActivityMusicType = () => {
+    // Get the mini-game type if applicable
+    const miniGame = getMiniGameType();
+    
+    console.log(`MUSIC DEBUG: Getting activity music for object type=${type}, miniGame=${miniGame}`);
+    
+    if (miniGame) {
+      // If this is a mini-game object, return the chess music
+      console.log(`MUSIC DEBUG: Using chess music for mini-game: ${miniGame}`);
+      return "chess"; // Use generic "chess" for all mini-games
+    }
+    
+    // Otherwise check regular interactions
     switch (type) {
-      case "mailbox":
-      case "hydrant":
-      case "tree": return "chessMusicOrSimilar";
       case "fountain": return "fountain";
       case "seesaw": return "seesaw";
       default: return null;
@@ -116,10 +125,22 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
     if (interactionType !== "none") {
       console.log(`MUSIC DEBUG: Starting standard interaction with music: ${musicType}`);
       startInteraction(interactionType, objectId, interactPos, interactRot);
+      
+      // DIRECTLY TRIGGER MUSIC - This ensures music plays for normal interactions
+      if (musicType) {
+        console.log(`MUSIC DEBUG: Directly playing music "${musicType}" for interaction: ${interactionType}`);
+        playActivityMusic(musicType);
+      }
     } 
     else if (miniGameType) {
       console.log(`MUSIC DEBUG: Starting mini-game interaction: ${miniGameType} with music: ${musicType}`);
       startInteraction(miniGameType, objectId, interactPos, interactRot);
+      
+      // DIRECTLY TRIGGER MUSIC - This ensures music plays for mini-games
+      if (musicType) {
+        console.log(`MUSIC DEBUG: Directly playing music "${musicType}" for mini-game: ${miniGameType}`);
+        playActivityMusic(musicType);
+      }
     }
   };
   
