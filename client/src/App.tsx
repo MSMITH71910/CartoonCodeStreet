@@ -12,6 +12,8 @@ import { usePortfolio } from "./lib/stores/usePortfolio";
 import { useStreetSign } from "./lib/stores/useStreetSign";
 import { ControlName } from "./lib/constants";
 import StreetSignDOM from "./components/ui/StreetSignDOM";
+import KeyLogger from "./KeyLogger";
+import AnimationController from "./AnimationController";
 
 // Define control keys for the character movement - UPDATED FOR ANIMATIONS & ZOOM
 const keyboardMap = [
@@ -229,6 +231,12 @@ function App() {
         isOpen={showAboutInfo}
         onClose={closeAboutInfo}
       />
+      
+      {/* Keyboard diagnostics */}
+      <KeyLogger />
+      
+      {/* Animation controller and state debugger */}
+      <AnimationController />
     </div>
   );
 }
