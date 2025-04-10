@@ -33,17 +33,64 @@ const Character = () => {
   const [isWaving, setIsWaving] = useState(false);
   const [waveArm, setWaveArm] = useState<'left' | 'right'>('right');
   
-  // Get keyboard controls
-  const forward = useKeyboardControls((state) => state[ControlName.forward]);
-  const backward = useKeyboardControls((state) => state[ControlName.backward]);
-  const leftward = useKeyboardControls((state) => state[ControlName.leftward]);
-  const rightward = useKeyboardControls((state) => state[ControlName.rightward]);
-  const interact = useKeyboardControls((state) => state[ControlName.interact]);
+  // Use a different approach to keyboard controls with direct subscriptions
+  // This fixes issues with key state not being properly detected
+  const [keys, setKeys] = useState({
+    forward: false,
+    backward: false,
+    leftward: false,
+    rightward: false,
+    interact: false,
+    dance: false,
+    waveLeft: false,
+    waveRight: false
+  });
   
-  // Animation keyboard controls
-  const danceKey = useKeyboardControls((state) => state[ControlName.dance]);
-  const waveLeftKey = useKeyboardControls((state) => state[ControlName.waveLeft]);
-  const waveRightKey = useKeyboardControls((state) => state[ControlName.waveRight]);
+  // Set up direct key handlers to work around useKeyboardControls issues
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'KeyW' || e.code === 'ArrowUp') setKeys(prev => ({...prev, forward: true}));
+      if (e.code === 'KeyS' || e.code === 'ArrowDown') setKeys(prev => ({...prev, backward: true}));
+      if (e.code === 'KeyA' || e.code === 'ArrowLeft') setKeys(prev => ({...prev, leftward: true}));
+      if (e.code === 'KeyD' || e.code === 'ArrowRight') setKeys(prev => ({...prev, rightward: true}));
+      if (e.code === 'KeyE' || e.code === 'Space') setKeys(prev => ({...prev, interact: true}));
+      if (e.code === 'KeyZ') { 
+        console.log("Z key pressed down");
+        setKeys(prev => ({...prev, dance: true}));
+      }
+      if (e.code === 'KeyQ') {
+        console.log("Q key pressed down");
+        setKeys(prev => ({...prev, waveLeft: true}));
+      }
+      if (e.code === 'KeyR') {
+        console.log("R key pressed down");
+        setKeys(prev => ({...prev, waveRight: true}));
+      }
+    };
+    
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'KeyW' || e.code === 'ArrowUp') setKeys(prev => ({...prev, forward: false}));
+      if (e.code === 'KeyS' || e.code === 'ArrowDown') setKeys(prev => ({...prev, backward: false}));
+      if (e.code === 'KeyA' || e.code === 'ArrowLeft') setKeys(prev => ({...prev, leftward: false}));
+      if (e.code === 'KeyD' || e.code === 'ArrowRight') setKeys(prev => ({...prev, rightward: false}));
+      if (e.code === 'KeyE' || e.code === 'Space') setKeys(prev => ({...prev, interact: false}));
+      if (e.code === 'KeyZ') setKeys(prev => ({...prev, dance: false}));
+      if (e.code === 'KeyQ') setKeys(prev => ({...prev, waveLeft: false}));
+      if (e.code === 'KeyR') setKeys(prev => ({...prev, waveRight: false}));
+    };
+    
+    // Add direct event listeners to window
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+  
+  // Destructure keys object for easy use
+  const { forward, backward, leftward, rightward, interact, dance: danceKey, waveLeft: waveLeftKey, waveRight: waveRightKey } = keys;
 
   // Register character reference to the store
   useEffect(() => {
