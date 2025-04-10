@@ -159,47 +159,25 @@ export const useInteraction = create<InteractionState>((set, get) => ({
       case "hangman":
       case "checkers":
         console.log(`AUDIO CONTROL: Switching to game music for ${type} mini-game`);
-        // Get the audio store to play chess music for mini-games
-        const audioStore = useAudio.getState();
         
-        // EXPLICITLY CALL playActivityMusic directly with chess music type
-        if (!audioStore.isMuted && !audioStore.isMusicMuted) {
-          console.log("AUDIO CONTROL: Directly playing chess music for mini-game");
-          
-          // First stop any current music
-          if (audioStore.currentActivityMusic) {
-            console.log("AUDIO CONTROL: Stopping current activity music");
-            audioStore.currentActivityMusic.pause();
-            audioStore.currentActivityMusic.currentTime = 0;
-          }
-          
-          if (audioStore.backgroundMusic) {
-            console.log("AUDIO CONTROL: Stopping background music");
-            audioStore.backgroundMusic.pause();
-          }
-          
-          // Use the chess music
-          if (audioStore.chessMusicOrSimilar) {
-            // Set it as current and start playing
-            console.log("AUDIO CONTROL: Playing chess music specifically for mini-game");
-            audioStore.chessMusicOrSimilar.currentTime = 0;
-            audioStore.chessMusicOrSimilar.volume = 0.4;
-            
-            // Update the state
-            useAudio.setState({
-              currentActivityMusic: audioStore.chessMusicOrSimilar,
-              currentTrack: "chess"
-            });
-            
-            // Start playing
-            audioStore.chessMusicOrSimilar.play().catch(e => 
-              console.error("AUDIO ERROR: Failed to play chess music for mini-game:", e)
-            );
-          } else {
-            console.error("AUDIO ERROR: Chess music not available for mini-game");
-          }
+        // Use our global helper function for mini-game music
+        // This is a much simpler approach than the previous complex code
+        if (window.playMiniGameMusic) {
+          console.log(`AUDIO CONTROL: Using global helper for ${type} mini-game music`);
+          window.playMiniGameMusic();
         } else {
-          console.log("AUDIO CONTROL: Audio is muted, not playing chess music for mini-game");
+          console.error("AUDIO ERROR: Global playMiniGameMusic function not available");
+          
+          // Fallback to more basic approach (should not be needed)
+          const audioStore = useAudio.getState();
+          if (!audioStore.isMuted && !audioStore.isMusicMuted && audioStore.chessMusicOrSimilar) {
+            console.log("AUDIO CONTROL: Using fallback method for mini-game music");
+            if (audioStore.backgroundMusic) audioStore.backgroundMusic.pause();
+            if (audioStore.currentActivityMusic) audioStore.currentActivityMusic.pause();
+            
+            audioStore.chessMusicOrSimilar.currentTime = 0;
+            audioStore.chessMusicOrSimilar.play();
+          }
         }
         break;
         
@@ -318,30 +296,38 @@ export const useInteraction = create<InteractionState>((set, get) => ({
     if (currentType !== "none") {
       console.log(`INTERACTION: Ending interaction of type ${currentType}`);
       
-      // Get the current audio state
-      const audioStore = useAudio.getState();
-      
-      // First stop any activity music
-      if (audioStore.currentActivityMusic) {
-        console.log("AUDIO CONTROL: Stopping current activity music");
-        audioStore.currentActivityMusic.pause();
-        audioStore.currentActivityMusic.currentTime = 0;
-      }
-      
-      // Reset to background music
-      useAudio.setState({
-        currentActivityMusic: null,
-        currentTrack: "background"
-      });
-      
-      // Play background music if not muted
-      if (audioStore.backgroundMusic && !audioStore.isMuted && !audioStore.isMusicMuted) {
-        console.log("AUDIO CONTROL: Resuming background music");
-        audioStore.backgroundMusic.currentTime = 0;
-        audioStore.backgroundMusic.volume = 0.3;
-        audioStore.backgroundMusic.play().catch(e => console.error("Failed to resume background music:", e));
+      // Use our global helper function for playing background music
+      if (window.playBackgroundMusic) {
+        console.log("AUDIO CONTROL: Using global helper to restore background music");
+        window.playBackgroundMusic();
       } else {
-        console.log("AUDIO CONTROL: Background music not resumed because audio is muted");
+        console.error("AUDIO ERROR: Global playBackgroundMusic function not available");
+        
+        // Fallback to original method
+        const audioStore = useAudio.getState();
+        
+        // First stop any activity music
+        if (audioStore.currentActivityMusic) {
+          console.log("AUDIO CONTROL: Stopping current activity music");
+          audioStore.currentActivityMusic.pause();
+          audioStore.currentActivityMusic.currentTime = 0;
+        }
+        
+        // Reset to background music
+        useAudio.setState({
+          currentActivityMusic: null,
+          currentTrack: "background"
+        });
+        
+        // Play background music if not muted
+        if (audioStore.backgroundMusic && !audioStore.isMuted && !audioStore.isMusicMuted) {
+          console.log("AUDIO CONTROL: Resuming background music");
+          audioStore.backgroundMusic.currentTime = 0;
+          audioStore.backgroundMusic.volume = 0.3;
+          audioStore.backgroundMusic.play();
+        } else {
+          console.log("AUDIO CONTROL: Background music not resumed because audio is muted");
+        }
       }
     }
     
