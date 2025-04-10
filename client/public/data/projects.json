@@ -1,0 +1,92 @@
+[
+  {
+    "id": "1",
+    "title": "Trip-App",
+    "description": "A comprehensive travel planning application that helps users organize their trips, discover attractions, and manage itineraries.",
+    "technologies": ["React", "Node.js", "MongoDB", "Express", "Google Maps API"],
+    "url": "https://trip-app-example.com",
+    "githubUrl": "https://github.com/yourusername/trip-app",
+    "houseColor": "#2196F3",
+    "features": [
+      "Interactive map integration",
+      "Customizable itineraries",
+      "Local attraction recommendations",
+      "Budget tracking",
+      "Weather forecasts"
+    ],
+    "challenges": "Integrating multiple APIs and optimizing performance for mobile devices were the main challenges faced during development.",
+    "position": [-10, 0, -40]
+  },
+  {
+    "id": "2",
+    "title": "Link-Plant",
+    "description": "A link management tool that helps creators organize and share multiple links from a single, customizable profile page.",
+    "technologies": ["React", "Firebase", "Tailwind CSS", "Analytics API"],
+    "url": "https://link-plant-example.com",
+    "githubUrl": "https://github.com/yourusername/link-plant",
+    "houseColor": "#4CAF50",
+    "features": [
+      "Customizable profile themes",
+      "Link click analytics",
+      "QR code generation",
+      "Social media integration",
+      "SEO optimization"
+    ],
+    "challenges": "Creating an intuitive interface that supports complete customization while maintaining performance was challenging.",
+    "position": [10.958851077208406, 0, -25]
+  },
+  {
+    "id": "3",
+    "title": "My_Link_Shortener_Web-app",
+    "description": "A URL shortening service that creates compact, memorable links for easy sharing across platforms.",
+    "technologies": ["Vue.js", "Node.js", "PostgreSQL", "Redis", "REST API"],
+    "url": "https://my-link-shortener-example.com",
+    "githubUrl": "https://github.com/yourusername/my-link-shortener",
+    "houseColor": "#9C27B0",
+    "features": [
+      "Custom short URLs",
+      "Click tracking",
+      "QR code generation",
+      "Link expiration settings",
+      "API for developers"
+    ],
+    "challenges": "Ensuring high availability and low latency for link redirections at scale was the primary technical challenge.",
+    "position": [-11.682941969615793, 0, -10]
+  },
+  {
+    "id": "4",
+    "title": "Simplefolio",
+    "description": "A clean, responsive portfolio template for developers and designers to showcase their work and skills.",
+    "technologies": ["HTML5", "CSS3", "JavaScript", "SCSS", "Bootstrap"],
+    "url": "https://simplefolio-example.com",
+    "githubUrl": "https://github.com/yourusername/simplefolio",
+    "houseColor": "#FF9800",
+    "features": [
+      "Responsive design",
+      "Project showcases",
+      "Skills visualization",
+      "Contact form integration",
+      "Dark/light mode"
+    ],
+    "challenges": "Creating a template that could be easily customized while maintaining visual coherence across different screen sizes proved challenging.",
+    "position": [11.994989973208108, 0, 5]
+  },
+  {
+    "id": "5",
+    "title": "Movies-App",
+    "description": "A movie discovery application that allows users to browse, search, and learn about films across various genres and time periods.",
+    "technologies": ["React", "Redux", "TMDB API", "Styled Components", "Jest"],
+    "url": "https://movies-app-example.com",
+    "githubUrl": "https://github.com/yourusername/movies-app",
+    "houseColor": "#F44336",
+    "features": [
+      "Movie search and filtering",
+      "Watchlist functionality",
+      "Detailed movie information",
+      "User reviews and ratings",
+      "Recommendations engine"
+    ],
+    "challenges": "Managing the complex state across the application and optimizing API calls to provide a smooth user experience were significant challenges.",
+    "position": [-11.818594853651364, 0, 20]
+  }
+]
