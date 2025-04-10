@@ -208,100 +208,31 @@ const House = ({ position, rotation, project }: HouseProps) => {
         <meshStandardMaterial color="#B3E5FC" roughness={0.2} metalness={0.2} />
       </mesh>
       
-      {/* Billboard sign that always faces camera */}
-      <group position={[0, 6.5, 0]}>
-        {/* Strong light to make sure text is visible */}
-        <pointLight 
-          position={[0, 0, 2]} 
-          intensity={50} 
-          distance={5} 
-          color="#FFFFFF" 
-          castShadow={false}
-        />
+      {/* Simple sign with project name */}
+      <group position={[0, 4.5, 0]}>
+        {/* Sign with text */}
+        <mesh position={[0, 0, 0]} castShadow receiveShadow>
+          <boxGeometry args={[3, 1, 0.1]} />
+          <meshStandardMaterial color="#FF7F00" />
+        </mesh>
         
-        <Billboard
-          follow={true}
-          lockX={false}
-          lockY={false}
-          lockZ={false}
+        {/* Project name text */}
+        <Text
+          position={[0, 0, 0.06]}
+          fontSize={0.4}
+          color="black"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.01}
+          outlineColor="#000000"
+          fontWeight="bold"
         >
-          {/* Main billboard backing */}
-          <mesh castShadow receiveShadow position={[0, 0, 0]}>
-            <boxGeometry args={[4.0, 1.5, 0.1]} />
-            <meshStandardMaterial color="#FF7F00" emissive="#FF7F00" emissiveIntensity={0.2} />
-          </mesh>
-          
-          {/* Project name - using both approaches for maximum visibility */}
-          <mesh position={[0, 0, 0.06]}>
-            <planeGeometry args={[3.9, 1.4]} />
-            <meshBasicMaterial>
-              {(() => {
-                // Create a canvas for the texture
-                const canvas = document.createElement('canvas');
-                canvas.width = 1024; // High resolution
-                canvas.height = 256;  // High resolution
-                const context = canvas.getContext('2d');
-                
-                if (context) {
-                  // Background
-                  context.fillStyle = '#FF7F00';
-                  context.fillRect(0, 0, canvas.width, canvas.height);
-                  
-                  // Black border
-                  context.strokeStyle = '#000000';
-                  context.lineWidth = 10;
-                  context.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
-                  
-                  // Text
-                  context.textAlign = 'center';
-                  context.textBaseline = 'middle';
-                  
-                  // Adjust text size based on length
-                  let fontSize = 90; // Start with large font
-                  if (project.title.length > 12) {
-                    fontSize = 70;
-                  }
-                  if (project.title.length > 18) {
-                    fontSize = 60;
-                  }
-                  if (project.title.length > 24) {
-                    fontSize = 48;
-                  }
-                  
-                  // Bold black text
-                  context.font = `bold ${fontSize}px Arial`;
-                  context.fillStyle = '#000000';
-                  
-                  // Add shadow for better readability
-                  context.shadowColor = 'rgba(0, 0, 0, 0.5)';
-                  context.shadowBlur = 4;
-                  context.shadowOffsetX = 2;
-                  context.shadowOffsetY = 2;
-                  
-                  // Draw text in the center
-                  context.fillText(project.title, canvas.width / 2, canvas.height / 2);
-                  
-                  // Create texture
-                  const texture = new THREE.CanvasTexture(canvas);
-                  texture.needsUpdate = true;
-                  return <primitive attach="map" object={texture} />;
-                }
-                
-                return null;
-              })()}
-            </meshBasicMaterial>
-          </mesh>
-          
-          {/* Border for emphasis */}
-          <mesh position={[0, 0, 0.01]} scale={[0.99, 0.98, 1]}>
-            <planeGeometry args={[4.0, 1.5]} />
-            <meshBasicMaterial color="#000000" />
-          </mesh>
-        </Billboard>
+          {project.title}
+        </Text>
         
         {/* Sign post */}
-        <mesh position={[0, -2, 0]} castShadow>
-          <boxGeometry args={[0.3, 2.5, 0.3]} />
+        <mesh position={[0, -1, 0]} castShadow>
+          <boxGeometry args={[0.1, 1, 0.1]} />
           <meshStandardMaterial color="#4B3621" roughness={0.8} />
         </mesh>
       </group>
