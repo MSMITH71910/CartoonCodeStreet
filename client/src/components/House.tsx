@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useMemo } from "react";
 import { useFrame, useThree, ThreeEvent } from "@react-three/fiber";
-import { useKeyboardControls } from "@react-three/drei";
+import { useKeyboardControls, Billboard, Text } from "@react-three/drei";
 import * as THREE from "three";
 import { ControlName } from "../lib/constants";
 import { Project } from "../lib/data/projects";
@@ -208,77 +208,90 @@ const House = ({ position, rotation, project }: HouseProps) => {
         <meshStandardMaterial color="#B3E5FC" roughness={0.2} metalness={0.2} />
       </mesh>
       
-      {/* Project sign on roof - more visible */}
-      <group position={[0, 4.2, 0]} rotation={[0, Math.PI/4, 0]}>
-        {/* Sign board - larger and more visible */}
-        <mesh castShadow receiveShadow>
-          <boxGeometry args={[3.0, 1.2, 0.15]} />
-          <meshStandardMaterial color="#FFD700" metalness={0.3} roughness={0.4} />
-        </mesh>
+      {/* Ultra-visible floating project name sign */}
+      <group position={[0, 7.5, 0]}>
+        {/* Multiple lights to ensure visibility from all angles */}
+        <pointLight 
+          position={[0, 0, 3]} 
+          intensity={80} 
+          distance={8} 
+          color="#FFFFFF" 
+          castShadow={false}
+        />
         
-        {/* Project name (canvas texture with text) */}
-        <mesh position={[0, 0, 0.08]} rotation={[0, 0, 0]}>
-          <planeGeometry args={[2.8, 1.0]} />
-          <meshStandardMaterial 
-            color="#8B0000" 
-            emissive="#8B0000" 
-            emissiveIntensity={0.5}
+        <pointLight 
+          position={[0, 0, -3]} 
+          intensity={80} 
+          distance={8} 
+          color="#FFFFFF" 
+          castShadow={false}
+        />
+        
+        <Billboard
+          follow={true}
+          lockX={false}
+          lockY={false}
+          lockZ={false}
+        >
+          {/* Main billboard backing - camera-facing */}
+          <mesh castShadow receiveShadow position={[0, 0, 0]}>
+            <boxGeometry args={[5.0, 2.0, 0.1]} />
+            <meshStandardMaterial color="#000000" />
+          </mesh>
+          
+          {/* Red background with golden frame */}
+          <mesh position={[0, 0, 0.06]}>
+            <boxGeometry args={[4.8, 1.8, 0.1]} />
+            <meshStandardMaterial 
+              color="#FF0000" 
+              emissive="#FF0000" 
+              emissiveIntensity={0.7}
+            />
+          </mesh>
+          
+          {/* Project name as 3D Text - this will always face the camera */}
+          <Text
+            position={[0, 0, 0.12]}
+            fontSize={0.7}
+            color="white"
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.08}
+            outlineColor="#000000"
+            maxWidth={4.5}
+            fontWeight="bold"
+            letterSpacing={0.05}
+            strokeColor="#FFFFFF"
+            strokeWidth={0.01}
+            fillOpacity={1}
           >
-            {/* Create dynamic canvas texture with project name */}
-            {(() => {
-              // Create a canvas for the texture
-              const canvas = document.createElement('canvas');
-              canvas.width = 512;  // Higher resolution
-              canvas.height = 128; // Higher resolution
-              const context = canvas.getContext('2d');
-              
-              if (context) {
-                // Background
-                context.fillStyle = '#8B0000';
-                context.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Border
-                context.strokeStyle = '#FFD700';
-                context.lineWidth = 8;
-                context.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
-                
-                // Text
-                context.font = 'bold 38px Arial';
-                context.textAlign = 'center';
-                context.textBaseline = 'middle';
-                context.fillStyle = '#FFFFFF';
-                
-                // Add project name, handle long names by reducing font size
-                let displayName = project.title;
-                if (displayName.length > 18) {
-                  context.font = 'bold 28px Arial';
-                }
-                if (displayName.length > 25) {
-                  context.font = 'bold 24px Arial';
-                }
-                
-                context.fillText(displayName, canvas.width / 2, canvas.height / 2);
-                
-                // Create texture from canvas
-                const texture = new THREE.CanvasTexture(canvas);
-                texture.needsUpdate = true;
-                return <primitive attach="map" object={texture} />;
-              }
-              
-              return null;
-            })()}
-          </meshStandardMaterial>
-        </mesh>
+            {project.title}
+          </Text>
+          
+          {/* Decorative elements */}
+          <mesh position={[-2.2, 0, 0.07]} rotation={[0, 0, 0]}>
+            <boxGeometry args={[0.2, 1.7, 0.12]} />
+            <meshStandardMaterial 
+              color="#FFD700" 
+              emissive="#FFD700" 
+              emissiveIntensity={0.8}
+            />
+          </mesh>
+          
+          <mesh position={[2.2, 0, 0.07]} rotation={[0, 0, 0]}>
+            <boxGeometry args={[0.2, 1.7, 0.12]} />
+            <meshStandardMaterial 
+              color="#FFD700" 
+              emissive="#FFD700" 
+              emissiveIntensity={0.8}
+            />
+          </mesh>
+        </Billboard>
         
-        {/* Sign supports */}
-        <mesh position={[-1.3, -0.4, 0]} castShadow>
-          <boxGeometry args={[0.2, 0.4, 0.2]} />
-          <meshStandardMaterial color="#8B4513" roughness={0.9} />
-        </mesh>
-        
-        <mesh position={[1.3, -0.4, 0]} castShadow>
-          <boxGeometry args={[0.2, 0.4, 0.2]} />
-          <meshStandardMaterial color="#8B4513" roughness={0.9} />
+        {/* Support pole (these don't rotate with the billboard) */}
+        <mesh position={[0, -2, 0]} castShadow>
+          <boxGeometry args={[0.4, 2.0, 0.4]} />
+          <meshStandardMaterial color="#555555" metalness={0.6} roughness={0.4} />
         </mesh>
       </group>
       
