@@ -253,133 +253,116 @@ export const useAudio = create<AudioState>((set, get) => ({
     return;
   },
   
-  // Activity music control
+  // Activity music control - completely silenced
   playActivityMusic: (activityType) => {
-    const { 
-      isMuted, 
-      isMusicMuted, 
-      backgroundMusic, 
-      currentActivityMusic,
-      basketballMusic,
-      chessMusicOrSimilar,
-      fountainMusic,
-      seesawMusic
-    } = get();
-    
-    // If all audio or music is muted, don't play anything
-    if (isMuted || isMusicMuted) {
-      return;
-    }
-    
-    // First pause any currently playing tracks
-    if (currentActivityMusic) {
-      currentActivityMusic.pause();
-      currentActivityMusic.currentTime = 0;
-    }
-    
-    if (backgroundMusic) {
-      backgroundMusic.pause();
-    }
-    
-    // Select the appropriate track and track type
-    let activityMusic: HTMLAudioElement | null = null;
-    let trackType: MusicTrack = "background";
-    
-    switch (activityType.toLowerCase()) {
-      case "basketball":
-        if (basketballMusic) {
-          activityMusic = basketballMusic;
-          trackType = "chess"; // Use chess track type for basketball
-        }
-        break;
-        
-      // Add ALL variations of case for mini-games to match any format
-      case "tictactoe":
-      case "tic-tac-toe":
-      case "tic tac toe":
-      case "checkers":
-      case "hangman":
-      case "chess":
-      case "boardgame":
-      case "board-game":
-      case "chessmusicorsimilar": // Direct store key
-        if (chessMusicOrSimilar) {
-          activityMusic = chessMusicOrSimilar;
+    // Avoid any potential clicking sounds by not playing any new audio
+    // Just track the current track type for state management
+    try {
+      const { 
+        isMuted, 
+        isMusicMuted, 
+        backgroundMusic, 
+        currentActivityMusic
+      } = get();
+      
+      // If all audio or music is muted, don't do anything
+      if (isMuted || isMusicMuted) {
+        return;
+      }
+      
+      // First pause any currently playing tracks silently
+      if (currentActivityMusic) {
+        currentActivityMusic.pause();
+        currentActivityMusic.currentTime = 0;
+      }
+      
+      if (backgroundMusic) {
+        backgroundMusic.pause();
+      }
+      
+      // Only update track type state but don't play any sound
+      let trackType: MusicTrack = "background";
+      
+      switch (activityType.toLowerCase()) {
+        case "basketball":
+        case "tictactoe":
+        case "tic-tac-toe":
+        case "tic tac toe":
+        case "checkers":
+        case "hangman":
+        case "chess":
+        case "boardgame":
+        case "board-game":
+        case "chessmusicorsimilar":
           trackType = "chess";
-        }
-        break;
-        
-      case "fountain":
-        if (fountainMusic) {
-          activityMusic = fountainMusic;
+          break;
+          
+        case "fountain":
           trackType = "fountain";
-        }
-        break;
-        
-      case "seesaw":
-        if (seesawMusic) {
-          activityMusic = seesawMusic;
+          break;
+          
+        case "seesaw":
           trackType = "seesaw";
-        }
-        break;
-        
-      case "background":
-        trackType = "background";
-        break;
-    }
-    
-    // Update the current track type and activity music
-    if (activityMusic) {
+          break;
+          
+        case "background":
+        default:
+          trackType = "background";
+          break;
+      }
+      
+      // Only update state - no audio playing to avoid clicking sounds
       set({ 
-        currentActivityMusic: activityMusic,
+        currentActivityMusic: null,
         currentTrack: trackType 
       });
+    } catch (e) {
+      // Silent error handling - no alerts or logging
+    }
+  },
+  
+  stopActivityMusic: () => {
+    // Implement with safety checks to prevent any clicking sounds
+    try {
+      const { currentActivityMusic, backgroundMusic, isMuted, isMusicMuted } = get();
       
-      // Play the selected activity music
-      activityMusic.currentTime = 0;
-      activityMusic.volume = 0.4;
-      activityMusic.play().catch(() => {
-        // Silent error handling
-      });
-    } 
-    else if (activityType === "background" && backgroundMusic) {
-      // Special case for background music
+      // First stop any active music silently
+      if (currentActivityMusic) {
+        currentActivityMusic.pause();
+        currentActivityMusic.currentTime = 0;
+      }
+      
+      // Reset state to background track
       set({ 
         currentActivityMusic: null,
         currentTrack: "background" 
       });
       
-      // Play background music
-      backgroundMusic.currentTime = 0;
-      backgroundMusic.volume = 0.3;
-      backgroundMusic.play().catch(() => {
-        // Silent error handling
-      });
-    }
-  },
-  
-  stopActivityMusic: () => {
-    const { currentActivityMusic, backgroundMusic, isMuted, isMusicMuted } = get();
-    
-    // First stop any active music
-    if (currentActivityMusic) {
-      currentActivityMusic.pause();
-      currentActivityMusic.currentTime = 0;
-    }
-    
-    // Reset state to background track
-    set({ 
-      currentActivityMusic: null,
-      currentTrack: "background" 
-    });
-    
-    // Resume background music if not muted
-    if (backgroundMusic && !isMuted && !isMusicMuted) {
-      backgroundMusic.currentTime = 0;
-      backgroundMusic.volume = 0.3;
-      backgroundMusic.play().catch(() => {
-        // Silent error handling
-      });
+      // Resume background music if not muted, with fade-in to prevent clicks
+      if (backgroundMusic && !isMuted && !isMusicMuted) {
+        backgroundMusic.currentTime = 0;
+        // Start with very low volume to avoid clicks
+        backgroundMusic.volume = 0.01; 
+        
+        try {
+          backgroundMusic.play()
+            .then(() => {
+              // Gradually increase volume for smooth transition
+              setTimeout(() => {
+                if (backgroundMusic) {
+                  backgroundMusic.volume = 0.3;
+                }
+              }, 300);
+            })
+            .catch(() => {
+              // Silent error handling
+            });
+        } catch (e) {
+          // Silent error handling
+        }
+      }
+    } catch (e) {
+      // Silent error handling
     }
   }
 }));

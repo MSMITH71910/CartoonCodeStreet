@@ -48,6 +48,8 @@ const Hangman = () => {
         maxAttempts: 6
       }
     });
+    
+    // No sound effect - removed to avoid clicking sound
   };
   
   // Display the word with guessed letters revealed and others as underscores

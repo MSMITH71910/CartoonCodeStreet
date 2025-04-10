@@ -154,63 +154,59 @@ export const useInteraction = create<InteractionState>((set, get) => ({
       showGameUI
     });
     
-    // IMPORTANT: Play the appropriate activity music AFTER state is updated
-    // This allows the audio system to properly detect what type of interaction is happening
-    switch (type) {
-      case "ticTacToe":
-      case "hangman":
-      case "checkers":
-        console.log(`AUDIO CONTROL: Switching to game music for ${type} mini-game`);
-        
-        // Use the audio store directly
-        const audioStore = useAudio.getState();
-        
-        // SIMPLIFIED AUDIO: Just pause background music for mini-games
-        if (audioStore.backgroundMusic) {
-          console.log(`AUDIO CONTROL: Simply pausing background music for ${type} mini-game`);
-          audioStore.backgroundMusic.pause();
-        }
-        
-        // Update state to indicate we're in a mini-game
-        useAudio.setState({
-          currentActivityMusic: null,
-          currentTrack: "chess" // Just for state tracking
-        });
-        break;
-        
-      case "seesaw":
-        console.log("AUDIO CONTROL: Switching to seesaw interaction");
-        const seesawAudioStore = useAudio.getState();
-        
-        // SIMPLIFIED AUDIO: Just pause background music for seesaw
-        if (seesawAudioStore.backgroundMusic) {
-          console.log("AUDIO CONTROL: Simply pausing background music for seesaw");
-          seesawAudioStore.backgroundMusic.pause();
-        }
-        
-        // Update state to indicate we're in an activity
-        useAudio.setState({
-          currentActivityMusic: null,
-          currentTrack: "seesaw" // Just for state tracking
-        });
-        break;
-        
-      case "fountain":
-        console.log("AUDIO CONTROL: Switching to fountain interaction");
-        const fountainAudioStore = useAudio.getState();
-        
-        // SIMPLIFIED AUDIO: Just pause background music for fountain
-        if (fountainAudioStore.backgroundMusic) {
-          console.log("AUDIO CONTROL: Simply pausing background music for fountain");
-          fountainAudioStore.backgroundMusic.pause();
-        }
-        
-        // Update state to indicate we're in an activity
-        useAudio.setState({
-          currentActivityMusic: null,
-          currentTrack: "fountain" // Just for state tracking
-        });
-        break;
+    // SILENTLY switch audio tracks - no sound effects to avoid clicks
+    try {
+      switch (type) {
+        case "ticTacToe":
+        case "hangman":
+        case "checkers":
+          // Get audio store
+          const audioStore = useAudio.getState();
+          
+          // Silently pause background music
+          if (audioStore.backgroundMusic) {
+            audioStore.backgroundMusic.pause();
+          }
+          
+          // Update state without playing any new audio or sound effects
+          useAudio.setState({
+            currentActivityMusic: null,
+            currentTrack: "chess" // Just for state tracking
+          });
+          break;
+          
+        case "seesaw":
+          const seesawAudioStore = useAudio.getState();
+          
+          // Silently pause background music
+          if (seesawAudioStore.backgroundMusic) {
+            seesawAudioStore.backgroundMusic.pause();
+          }
+          
+          // Update state without playing any new audio or sound effects
+          useAudio.setState({
+            currentActivityMusic: null,
+            currentTrack: "seesaw" // Just for state tracking
+          });
+          break;
+          
+        case "fountain":
+          const fountainAudioStore = useAudio.getState();
+          
+          // Silently pause background music
+          if (fountainAudioStore.backgroundMusic) {
+            fountainAudioStore.backgroundMusic.pause();
+          }
+          
+          // Update state without playing any new audio or sound effects
+          useAudio.setState({
+            currentActivityMusic: null,
+            currentTrack: "fountain" // Just for state tracking
+          });
+          break;
+      }
+    } catch (e) {
+      // Silent error handling - no alerts or console errors
     }
     
     console.log(`INTERACTION: Started ${type} interaction with object ${objectId}`);
@@ -233,43 +229,50 @@ export const useInteraction = create<InteractionState>((set, get) => ({
       showGameUI: false
     });
     
-    // Only switch audio if we were in an active interaction
-    if (currentType !== "none") {
-      console.log(`INTERACTION: Ending interaction of type ${currentType}`);
-      
-      // Get the audio store
-      const audioStore = useAudio.getState();
-      
-      // First stop any activity music
-      if (audioStore.currentActivityMusic) {
-        console.log("AUDIO CONTROL: Stopping current activity music");
-        audioStore.currentActivityMusic.pause();
-        audioStore.currentActivityMusic.currentTime = 0;
-        // Reset playback rate to normal
-        audioStore.currentActivityMusic.playbackRate = 1.0;
-      }
-      
-      // Previously tried to use Web Audio API - now simplified
-      
-      // Reset to background music
-      useAudio.setState({
-        currentActivityMusic: null,
-        currentTrack: "background"
-      });
-      
-      // Play background music if not muted
-      if (audioStore.backgroundMusic && !audioStore.isMuted && !audioStore.isMusicMuted) {
-        console.log("AUDIO CONTROL: Resuming background music");
-        audioStore.backgroundMusic.currentTime = 0;
-        audioStore.backgroundMusic.volume = 0.3;
-        try {
-          audioStore.backgroundMusic.play();
-        } catch (e) {
-          console.error("AUDIO ERROR: Failed to resume background music:", e);
+    // Only switch audio if we were in an active interaction - SILENTLY
+    try {
+      if (currentType !== "none") {
+        // Get the audio store
+        const audioStore = useAudio.getState();
+        
+        // First silently stop any activity music
+        if (audioStore.currentActivityMusic) {
+          audioStore.currentActivityMusic.pause();
+          audioStore.currentActivityMusic.currentTime = 0;
+          // Reset playback rate to normal
+          audioStore.currentActivityMusic.playbackRate = 1.0;
         }
-      } else {
-        console.log("AUDIO CONTROL: Background music not resumed because audio is muted");
+        
+        // Reset to background music state
+        useAudio.setState({
+          currentActivityMusic: null,
+          currentTrack: "background"
+        });
+        
+        // Silently resume background music if not muted
+        if (audioStore.backgroundMusic && !audioStore.isMuted && !audioStore.isMusicMuted) {
+          audioStore.backgroundMusic.currentTime = 0;
+          audioStore.backgroundMusic.volume = 0.3;
+          try {
+            // Set extremely low volume at first to avoid clicks
+            audioStore.backgroundMusic.volume = 0.01;
+            audioStore.backgroundMusic.play()
+              .then(() => {
+                // Then gradually increase volume
+                setTimeout(() => {
+                  audioStore.backgroundMusic.volume = 0.3;
+                }, 300);
+              })
+              .catch(() => {
+                // Silent error handling
+              });
+          } catch (e) {
+            // Silent error handling
+          }
+        }
       }
+    } catch (e) {
+      // Silent error handling
     }
     
     console.log("INTERACTION: Interaction ended completely");
