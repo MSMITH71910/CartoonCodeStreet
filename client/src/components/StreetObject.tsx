@@ -35,7 +35,7 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
     switch (type) {
       case "seesaw": return "seesaw";
       case "lamppost": return "lamp";
-      case "fountain": return "none"; // Custom handling
+      case "fountain": return "fountain"; // Now handled directly
       default: return "none";
     }
   };
@@ -75,9 +75,17 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
     
     // Special case for fountain
     if (type === "fountain") {
-      // Toggle fountain particles
-      const musicType = getActivityMusicType();
-      if (musicType) playActivityMusic(musicType);
+      console.log("INTERACTION: Handling fountain interaction");
+      
+      // Create interaction position for fountain (just for state tracking)
+      const fountainPos = new THREE.Vector3(
+        position[0],
+        position[1],
+        position[2]
+      );
+      
+      // Start a proper interaction with the fountain to track it correctly
+      startInteraction("fountain", objectId, fountainPos, rotation[1]);
       return;
     }
     

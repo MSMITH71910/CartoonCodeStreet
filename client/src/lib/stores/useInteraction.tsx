@@ -9,7 +9,8 @@ export type InteractionType =
   | "ticTacToe" 
   | "hangman" 
   | "checkers" 
-  | "lamp";
+  | "lamp"
+  | "fountain";
 
 export type GameState = {
   ticTacToe?: {
@@ -61,13 +62,16 @@ export const useInteraction = create<InteractionState>((set, get) => ({
   isOnSeesaw: false,
   
   startInteraction: (type, objectId, position, rotation) => {
-    // End any existing interaction
+    console.log(`INTERACTION: Starting interaction with ${type} (object ${objectId})`);
+    
+    // End any existing interaction first
     if (get().interactionType !== "none") {
+      console.log(`INTERACTION: Ending previous interaction (${get().interactionType}) before starting new one`);
       get().endInteraction();
     }
     
-    // Setup special interaction states
-    let isSitting = false; // "sitting" type removed
+    // Setup special states based on interaction type
+    let isSitting = false;
     let isOnSeesaw = false;
     
     if (type === "seesaw") {
@@ -78,21 +82,19 @@ export const useInteraction = create<InteractionState>((set, get) => ({
     let gameState: GameState = {};
     let showGameUI = false;
     
-    // Play the appropriate activity music
     switch (type) {
       case "ticTacToe":
+        console.log("INTERACTION: Initializing TicTacToe game");
         gameState.ticTacToe = {
           board: Array(9).fill(null),
           currentPlayer: "X",
           winner: null
         };
         showGameUI = true;
-        // Play board game music
-        useAudio.getState().playActivityMusic("ticTacToe");
-        console.log("AUDIO DEBUG: Playing tic-tac-toe music");
         break;
         
       case "hangman":
+        console.log("INTERACTION: Initializing Hangman game");
         const words = ["JAVASCRIPT", "REACT", "THREE", "PORTFOLIO", "DEVELOPER"];
         const randomWord = words[Math.floor(Math.random() * words.length)];
         gameState.hangman = {
@@ -102,12 +104,10 @@ export const useInteraction = create<InteractionState>((set, get) => ({
           maxAttempts: 6
         };
         showGameUI = true;
-        // Play board game music
-        useAudio.getState().playActivityMusic("hangman");
-        console.log("AUDIO DEBUG: Playing hangman music");
         break;
         
       case "checkers":
+        console.log("INTERACTION: Initializing Checkers game");
         // Initialize checkers board (0 = empty, 1 = player 1, 2 = player 2)
         const board = Array(8).fill(0).map(() => Array(8).fill(0));
         
@@ -134,22 +134,10 @@ export const useInteraction = create<InteractionState>((set, get) => ({
           selectedPiece: null
         };
         showGameUI = true;
-        // Play board game music
-        useAudio.getState().playActivityMusic("checkers");
-        console.log("AUDIO DEBUG: Playing checkers music");
-        break;
-        
-      case "seesaw":
-        // Play seesaw music
-        useAudio.getState().playActivityMusic("seesaw");
-        console.log("AUDIO DEBUG: Playing seesaw music");
-        break;
-        
-      case "lamp":
-        // No special music for lamp
         break;
     }
     
+    // Update interaction state
     set({
       interactionType: type,
       interactingWithId: objectId,
@@ -161,19 +149,110 @@ export const useInteraction = create<InteractionState>((set, get) => ({
       showGameUI
     });
     
-    console.log(`Started ${type} interaction with object ${objectId}`);
+    // IMPORTANT: Play the appropriate activity music AFTER state is updated
+    // This allows the audio system to properly detect what type of interaction is happening
+    switch (type) {
+      case "ticTacToe":
+      case "hangman":
+      case "checkers":
+        console.log(`AUDIO CONTROL: Switching to game music for ${type}`);
+        // Get a direct reference to the audio store to ensure we're calling the latest version
+        const audioStore = useAudio.getState();
+        if (audioStore.chessMusicOrSimilar) {
+          // First pause any currently playing music
+          if (audioStore.currentActivityMusic) {
+            audioStore.currentActivityMusic.pause();
+          }
+          if (audioStore.backgroundMusic) {
+            audioStore.backgroundMusic.pause();
+          }
+          
+          // Set new current activity music and track
+          useAudio.setState({
+            currentActivityMusic: audioStore.chessMusicOrSimilar,
+            currentTrack: "chess"
+          });
+          
+          // Play if not muted
+          if (!audioStore.isMuted && !audioStore.isMusicMuted) {
+            audioStore.chessMusicOrSimilar.currentTime = 0;
+            audioStore.chessMusicOrSimilar.play().catch(e => console.error("Failed to play game music:", e));
+            console.log("AUDIO CONTROL: Now playing game music");
+          } else {
+            console.log("AUDIO CONTROL: Game music not played because audio is muted");
+          }
+        }
+        break;
+        
+      case "seesaw":
+        console.log("AUDIO CONTROL: Switching to seesaw music");
+        const seesawAudioStore = useAudio.getState();
+        if (seesawAudioStore.seesawMusic) {
+          // First pause any currently playing music
+          if (seesawAudioStore.currentActivityMusic) {
+            seesawAudioStore.currentActivityMusic.pause();
+          }
+          if (seesawAudioStore.backgroundMusic) {
+            seesawAudioStore.backgroundMusic.pause();
+          }
+          
+          // Set new current activity music and track
+          useAudio.setState({
+            currentActivityMusic: seesawAudioStore.seesawMusic,
+            currentTrack: "seesaw"
+          });
+          
+          // Play if not muted
+          if (!seesawAudioStore.isMuted && !seesawAudioStore.isMusicMuted) {
+            seesawAudioStore.seesawMusic.currentTime = 0;
+            seesawAudioStore.seesawMusic.play().catch(e => console.error("Failed to play seesaw music:", e));
+            console.log("AUDIO CONTROL: Now playing seesaw music");
+          } else {
+            console.log("AUDIO CONTROL: Seesaw music not played because audio is muted");
+          }
+        }
+        break;
+        
+      case "fountain":
+        console.log("AUDIO CONTROL: Switching to fountain music");
+        const fountainAudioStore = useAudio.getState();
+        if (fountainAudioStore.fountainMusic) {
+          // First pause any currently playing music
+          if (fountainAudioStore.currentActivityMusic) {
+            fountainAudioStore.currentActivityMusic.pause();
+          }
+          if (fountainAudioStore.backgroundMusic) {
+            fountainAudioStore.backgroundMusic.pause();
+          }
+          
+          // Set new current activity music and track
+          useAudio.setState({
+            currentActivityMusic: fountainAudioStore.fountainMusic,
+            currentTrack: "fountain"
+          });
+          
+          // Play if not muted
+          if (!fountainAudioStore.isMuted && !fountainAudioStore.isMusicMuted) {
+            fountainAudioStore.fountainMusic.currentTime = 0;
+            fountainAudioStore.fountainMusic.play().catch(e => console.error("Failed to play fountain music:", e));
+            console.log("AUDIO CONTROL: Now playing fountain music");
+          } else {
+            console.log("AUDIO CONTROL: Fountain music not played because audio is muted");
+          }
+        }
+        break;
+    }
+    
+    console.log(`INTERACTION: Started ${type} interaction with object ${objectId}`);
   },
   
   endInteraction: () => {
+    console.log("INTERACTION: Ending current interaction");
+    
     // Get current interaction type before clearing it
     const currentType = get().interactionType;
     
-    // Stop any activity-specific music and return to background music
-    if (currentType !== "none") {
-      useAudio.getState().stopActivityMusic();
-      console.log("AUDIO DEBUG: Stopping activity music and returning to background music");
-    }
-    
+    // First reset the interaction state
     set({
       interactionType: "none",
       interactingWithId: null,
@@ -184,7 +263,38 @@ export const useInteraction = create<InteractionState>((set, get) => ({
       showGameUI: false
     });
     
-    console.log("Ended interaction");
+    // Only switch audio if we were in an active interaction
+    if (currentType !== "none") {
+      console.log(`INTERACTION: Ending interaction of type ${currentType}`);
+      
+      // Get the current audio state
+      const audioStore = useAudio.getState();
+      
+      // First stop any activity music
+      if (audioStore.currentActivityMusic) {
+        console.log("AUDIO CONTROL: Stopping current activity music");
+        audioStore.currentActivityMusic.pause();
+        audioStore.currentActivityMusic.currentTime = 0;
+      }
+      
+      // Reset to background music
+      useAudio.setState({
+        currentActivityMusic: null,
+        currentTrack: "background"
+      });
+      
+      // Play background music if not muted
+      if (audioStore.backgroundMusic && !audioStore.isMuted && !audioStore.isMusicMuted) {
+        console.log("AUDIO CONTROL: Resuming background music");
+        audioStore.backgroundMusic.currentTime = 0;
+        audioStore.backgroundMusic.volume = 0.3;
+        audioStore.backgroundMusic.play().catch(e => console.error("Failed to resume background music:", e));
+      } else {
+        console.log("AUDIO CONTROL: Background music not resumed because audio is muted");
+      }
+    }
+    
+    console.log("INTERACTION: Interaction ended completely");
   },
   
   updateGameState: (newState) => {

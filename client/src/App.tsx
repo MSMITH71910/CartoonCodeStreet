@@ -30,48 +30,58 @@ function App() {
   const { setBackgroundMusic, toggleMute, isMuted } = useAudio();
   const { activeProject, closeProject } = usePortfolio();
 
-  // Initialize audio elements
+  // Complete audio initialization
   useEffect(() => {
-    // Setup background music - start MUTED by default
-    const bgMusic = new Audio("/sounds/background.mp3");
-    bgMusic.loop = true;
-    bgMusic.volume = 0;
-    setBackgroundMusic(bgMusic);
-
-    // Setup sound effects in useAudio store
-    const hitSound = new Audio("/sounds/hit.mp3");
-    const successSound = new Audio("/sounds/success.mp3");
+    console.log("AUDIO SYSTEM: Initializing all audio elements");
     
-    // Setup activity-specific music - all muted by default
-    const basketballMusic = new Audio("/sounds/basketball.mp3");
-    basketballMusic.volume = 0;
+    // First, create audio elements
+    const backgroundMusicElement = new Audio("/sounds/background.mp3");
+    backgroundMusicElement.loop = true;
+    backgroundMusicElement.volume = 0.3;
     
-    const chessMusicOrSimilar = new Audio("/sounds/board-game.mp3");
-    chessMusicOrSimilar.volume = 0;
+    const hitSoundElement = new Audio("/sounds/hit.mp3");
+    hitSoundElement.volume = 0.5;
     
-    const fountainMusic = new Audio("/sounds/fountain.mp3");
-    fountainMusic.volume = 0;
+    const successSoundElement = new Audio("/sounds/success.mp3");
+    successSoundElement.volume = 0.5;
     
-    const seesawMusic = new Audio("/sounds/playground.mp3");
-    seesawMusic.volume = 0;
+    const boardGameMusicElement = new Audio("/sounds/board-game.mp3");
+    boardGameMusicElement.loop = true;
+    boardGameMusicElement.volume = 0.4;
     
-    // Initialize all audio in store - start with music muted
+    const fountainMusicElement = new Audio("/sounds/fountain.mp3");
+    fountainMusicElement.loop = true;
+    fountainMusicElement.volume = 0.4;
+    
+    const seesawMusicElement = new Audio("/sounds/playground.mp3");
+    seesawMusicElement.loop = true;
+    seesawMusicElement.volume = 0.4;
+    
+    // Set initial state - all music will be muted at the start
+    // We'll explicitly manage tracks in the audio store
     useAudio.setState({
-      hitSound,
-      successSound,
-      basketballMusic,
-      chessMusicOrSimilar,
-      fountainMusic,
-      seesawMusic,
-      isMusicMuted: true, // Start with music muted
+      // Reset all audio tracks
+      backgroundMusic: backgroundMusicElement,
+      hitSound: hitSoundElement,
+      successSound: successSoundElement,
+      chessMusicOrSimilar: boardGameMusicElement,
+      fountainMusic: fountainMusicElement,
+      seesawMusic: seesawMusicElement,
+      
+      // Start with music muted
+      isMusicMuted: true,
+      
+      // Set the current track
+      currentTrack: "background",
+      currentActivityMusic: null
     });
     
-    // Make sure the audio store knows music is muted
-    useAudio.getState().toggleMusicMute();
-
+    // Ensure initialization is complete
+    console.log("AUDIO SYSTEM: All audio elements initialized");
+    
     // Show the canvas once everything is loaded
     setShowCanvas(true);
-  }, [setBackgroundMusic]);
+  }, []);
 
   return (
     <div className="w-screen h-screen relative overflow-hidden">
