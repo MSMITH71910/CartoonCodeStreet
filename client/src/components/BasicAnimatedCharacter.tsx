@@ -33,6 +33,55 @@ const BasicAnimatedCharacter = () => {
   const waveLeft = useKeyboardControls(state => state[ControlName.waveLeft]);
   const waveRight = useKeyboardControls(state => state[ControlName.waveRight]);
   
+  // Direct keyboard event handlers HARDCODED for animations
+  useEffect(() => {
+    // Handle direct DOM keyboard events for animations
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'KeyZ' && !moving && !isDancing && !isWaving) {
+        console.log("DIRECT Z KEY DETECTED - DANCE ANIMATION STARTING");
+        setIsDancing(true);
+        setIsWaving(false);
+      }
+      else if (e.code === 'KeyQ' && !moving && !isDancing && !isWaving) {
+        console.log("DIRECT Q KEY DETECTED - WAVE LEFT ANIMATION STARTING");
+        setIsWaving(true);
+        setWaveArm('left');
+        setIsDancing(false);
+      }
+      else if (e.code === 'KeyR' && !moving && !isDancing && !isWaving) {
+        console.log("DIRECT R KEY DETECTED - WAVE RIGHT ANIMATION STARTING");
+        setIsWaving(true);
+        setWaveArm('right');
+        setIsDancing(false);
+      }
+    };
+    
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'KeyZ' && isDancing) {
+        console.log("DIRECT Z KEY RELEASED - DANCE ANIMATION STOPPING");
+        setIsDancing(false);
+      }
+      else if (e.code === 'KeyQ' && isWaving && waveArm === 'left') {
+        console.log("DIRECT Q KEY RELEASED - WAVE LEFT ANIMATION STOPPING");
+        setIsWaving(false);
+      }
+      else if (e.code === 'KeyR' && isWaving && waveArm === 'right') {
+        console.log("DIRECT R KEY RELEASED - WAVE RIGHT ANIMATION STOPPING");
+        setIsWaving(false);
+      }
+    };
+    
+    // Add listeners directly to the DOM
+    console.log("Setting up DIRECT DOM animation key listeners");
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [moving, isDancing, isWaving, waveArm]);
+  
   // Animation update - runs every frame
   useFrame((state, delta) => {
     if (!characterRef.current) return;
@@ -45,33 +94,34 @@ const BasicAnimatedCharacter = () => {
       });
     }
     
-    // Handle animations - SIMPLIFIED APPROACH
+    // Handle animations when they're triggered via the Drei controls
+    // (Keeping these as a backup method)
     if (dance && !moving && !isDancing && !isWaving) {
-      console.log("DANCE KEY PRESSED - ANIMATION STARTING");
+      console.log("DREI DANCE KEY PRESSED - ANIMATION STARTING");
       setIsDancing(true);
       setIsWaving(false);
     } else if (!dance && isDancing) {
-      console.log("DANCE KEY RELEASED - ANIMATION STOPPING");
+      console.log("DREI DANCE KEY RELEASED - ANIMATION STOPPING");
       setIsDancing(false);
     }
     
     if (waveLeft && !moving && !isDancing && !isWaving) {
-      console.log("WAVE LEFT KEY PRESSED - ANIMATION STARTING");
+      console.log("DREI WAVE LEFT KEY PRESSED - ANIMATION STARTING");
       setIsWaving(true);
       setWaveArm('left');
       setIsDancing(false);
     } else if (!waveLeft && isWaving && waveArm === 'left') {
-      console.log("WAVE LEFT KEY RELEASED - ANIMATION STOPPING");
+      console.log("DREI WAVE LEFT KEY RELEASED - ANIMATION STOPPING");
       setIsWaving(false);
     }
     
     if (waveRight && !moving && !isDancing && !isWaving) {
-      console.log("WAVE RIGHT KEY PRESSED - ANIMATION STARTING");
+      console.log("DREI WAVE RIGHT KEY PRESSED - ANIMATION STARTING");
       setIsWaving(true);
       setWaveArm('right');
       setIsDancing(false);
     } else if (!waveRight && isWaving && waveArm === 'right') {
-      console.log("WAVE RIGHT KEY RELEASED - ANIMATION STOPPING");
+      console.log("DREI WAVE RIGHT KEY RELEASED - ANIMATION STOPPING");
       setIsWaving(false);
     }
     

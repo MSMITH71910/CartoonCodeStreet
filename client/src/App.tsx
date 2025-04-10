@@ -12,13 +12,14 @@ import { usePortfolio } from "./lib/stores/usePortfolio";
 import { useStreetSign } from "./lib/stores/useStreetSign";
 import { ControlName } from "./lib/constants";
 
-// Define control keys for the character movement
+// Define control keys for the character movement - UPDATED FOR ANIMATIONS
 const keyboardMap = [
   { name: ControlName.forward, keys: ["KeyW", "ArrowUp"] },
   { name: ControlName.backward, keys: ["KeyS", "ArrowDown"] },
   { name: ControlName.leftward, keys: ["KeyA", "ArrowLeft"] },
   { name: ControlName.rightward, keys: ["KeyD", "ArrowRight"] },
   { name: ControlName.interact, keys: ["KeyE", "Space"] },
+  // Animation keys explicitly set as priorities
   { name: ControlName.dance, keys: ["KeyZ"] },         // Z to dance
   { name: ControlName.waveLeft, keys: ["KeyQ"] },      // Q to wave left arm
   { name: ControlName.waveRight, keys: ["KeyR"] },     // R to wave right arm
@@ -31,6 +32,26 @@ function App() {
   const { setBackgroundMusic, toggleMute, isMuted } = useAudio();
   const { activeProject, closeProject } = usePortfolio();
 
+  // BACKUP KEYBOARD EVENT LISTENERS FOR ANIMATIONS
+  useEffect(() => {
+    // These direct event listeners will handle animation keys as a backup
+    // in case the regular keyboard controls don't work
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle our special animation keys
+      if (e.code === 'KeyZ' || e.code === 'KeyQ' || e.code === 'KeyR') {
+        console.log(`GLOBAL APP KEY DETECTED: ${e.code}`);
+      }
+    };
+    
+    // Add global event listener
+    window.addEventListener('keydown', handleKeyDown);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+  
   // Complete audio initialization
   useEffect(() => {
     console.log("AUDIO SYSTEM: Initializing all audio elements");
