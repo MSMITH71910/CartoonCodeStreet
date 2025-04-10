@@ -208,34 +208,28 @@ const House = ({ position, rotation, project }: HouseProps) => {
         <meshStandardMaterial color="#B3E5FC" roughness={0.2} metalness={0.2} />
       </mesh>
       
-      {/* Project sign - always visible */}
-      <group position={[0, 4.5, 0]}>
-        {/* Sign board */}
-        <mesh castShadow>
-          <boxGeometry args={[2.5, 0.8, 0.1]} />
-          <meshStandardMaterial color="#FFD700" />
-        </mesh>
-        
-        {/* Sign post */}
-        <mesh position={[0, -1, 0]} castShadow>
-          <boxGeometry args={[0.15, 1.5, 0.15]} />
-          <meshStandardMaterial color="#8B4513" roughness={0.9} />
+      {/* Project sign on roof - more visible */}
+      <group position={[0, 4.2, 0]} rotation={[0, Math.PI/4, 0]}>
+        {/* Sign board - larger and more visible */}
+        <mesh castShadow receiveShadow>
+          <boxGeometry args={[3.0, 1.2, 0.15]} />
+          <meshStandardMaterial color="#FFD700" metalness={0.3} roughness={0.4} />
         </mesh>
         
         {/* Project name (canvas texture with text) */}
-        <mesh position={[0, 0, 0.06]}>
-          <planeGeometry args={[2.2, 0.5]} />
+        <mesh position={[0, 0, 0.08]} rotation={[0, 0, 0]}>
+          <planeGeometry args={[2.8, 1.0]} />
           <meshStandardMaterial 
             color="#8B0000" 
             emissive="#8B0000" 
-            emissiveIntensity={0.2}
+            emissiveIntensity={0.5}
           >
             {/* Create dynamic canvas texture with project name */}
             {(() => {
               // Create a canvas for the texture
               const canvas = document.createElement('canvas');
-              canvas.width = 256;
-              canvas.height = 64;
+              canvas.width = 512;  // Higher resolution
+              canvas.height = 128; // Higher resolution
               const context = canvas.getContext('2d');
               
               if (context) {
@@ -243,27 +237,48 @@ const House = ({ position, rotation, project }: HouseProps) => {
                 context.fillStyle = '#8B0000';
                 context.fillRect(0, 0, canvas.width, canvas.height);
                 
+                // Border
+                context.strokeStyle = '#FFD700';
+                context.lineWidth = 8;
+                context.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
+                
                 // Text
-                context.font = 'bold 28px Arial';
+                context.font = 'bold 38px Arial';
                 context.textAlign = 'center';
                 context.textBaseline = 'middle';
                 context.fillStyle = '#FFFFFF';
                 
-                // Add project name, truncate if too long
+                // Add project name, handle long names by reducing font size
                 let displayName = project.title;
                 if (displayName.length > 18) {
-                  displayName = displayName.substring(0, 16) + "...";
+                  context.font = 'bold 28px Arial';
                 }
+                if (displayName.length > 25) {
+                  context.font = 'bold 24px Arial';
+                }
+                
                 context.fillText(displayName, canvas.width / 2, canvas.height / 2);
                 
                 // Create texture from canvas
                 const texture = new THREE.CanvasTexture(canvas);
+                texture.needsUpdate = true;
                 return <primitive attach="map" object={texture} />;
               }
               
               return null;
             })()}
           </meshStandardMaterial>
+        </mesh>
+        
+        {/* Sign supports */}
+        <mesh position={[-1.3, -0.4, 0]} castShadow>
+          <boxGeometry args={[0.2, 0.4, 0.2]} />
+          <meshStandardMaterial color="#8B4513" roughness={0.9} />
+        </mesh>
+        
+        <mesh position={[1.3, -0.4, 0]} castShadow>
+          <boxGeometry args={[0.2, 0.4, 0.2]} />
+          <meshStandardMaterial color="#8B4513" roughness={0.9} />
         </mesh>
       </group>
       
