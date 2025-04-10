@@ -259,27 +259,17 @@ export const useAudio = create<AudioState>((set, get) => ({
     }
   },
   
-  // Play sound effects
+  // Play sound effects - removed cloning to prevent continuous sounds
   playHit: () => {
-    const { hitSound, isMuted } = get();
-    if (hitSound && !isMuted) {
-      // Clone the sound to allow overlapping playback
-      const soundClone = hitSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.3;
-      soundClone.play().catch(error => {
-        console.log("Hit sound play prevented:", error);
-      });
-    }
+    // SIMPLIFIED AUDIO: Don't play sound effects in mini-games to avoid the clicking issue
+    // This ensures mini-games stay silent and don't have any clicking or sound loops
+    return;
   },
   
   playSuccess: () => {
-    const { successSound, isMuted } = get();
-    if (successSound && !isMuted) {
-      successSound.currentTime = 0;
-      successSound.play().catch(error => {
-        console.log("Success sound play prevented:", error);
-      });
-    }
+    // SIMPLIFIED AUDIO: Don't play sound effects in mini-games to avoid the clicking issue
+    // This ensures mini-games stay silent and don't have any clicking or sound loops
+    return;
   },
   
   // Activity music control

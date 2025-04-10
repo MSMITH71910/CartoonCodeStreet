@@ -117,7 +117,10 @@ function App() {
         <div className="mt-2 border-t pt-2 border-gray-600">
           <p className="font-semibold text-cyan-300">Audio Features:</p>
           <p>• Background music plays during exploration</p>
-          <p>• Music pauses during mini-games for focus</p>
+          <p>• Music changes with different activities:</p>
+          <p>&nbsp;&nbsp;- Mini-games (TicTacToe, etc.)</p>
+          <p>&nbsp;&nbsp;- Fountain</p>
+          <p>&nbsp;&nbsp;- Seesaw</p>
           <p>• Toggle audio with the controls in top-right</p>
         </div>
       </div>
