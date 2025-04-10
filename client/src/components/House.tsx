@@ -208,91 +208,74 @@ const House = ({ position, rotation, project }: HouseProps) => {
         <meshStandardMaterial color="#B3E5FC" roughness={0.2} metalness={0.2} />
       </mesh>
       
-      {/* Ultra-visible floating project name sign */}
-      <group position={[0, 7.5, 0]}>
-        {/* Multiple lights to ensure visibility from all angles */}
-        <pointLight 
-          position={[0, 0, 3]} 
-          intensity={80} 
-          distance={8} 
-          color="#FFFFFF" 
-          castShadow={false}
-        />
-        
-        <pointLight 
-          position={[0, 0, -3]} 
-          intensity={80} 
-          distance={8} 
-          color="#FFFFFF" 
-          castShadow={false}
-        />
-        
-        <Billboard
-          follow={true}
-          lockX={false}
-          lockY={false}
-          lockZ={false}
-        >
-          {/* Main billboard backing - camera-facing */}
-          <mesh castShadow receiveShadow position={[0, 0, 0]}>
-            <boxGeometry args={[5.0, 2.0, 0.1]} />
-            <meshStandardMaterial color="#000000" />
-          </mesh>
-          
-          {/* Red background with golden frame */}
-          <mesh position={[0, 0, 0.06]}>
-            <boxGeometry args={[4.8, 1.8, 0.1]} />
-            <meshStandardMaterial 
-              color="#FF0000" 
-              emissive="#FF0000" 
-              emissiveIntensity={0.7}
-            />
-          </mesh>
-          
-          {/* Project name as 3D Text - this will always face the camera */}
-          <Text
-            position={[0, 0, 0.12]}
-            fontSize={0.7}
-            color="white"
-            anchorX="center"
-            anchorY="middle"
-            outlineWidth={0.08}
-            outlineColor="#000000"
-            maxWidth={4.5}
-            fontWeight="bold"
-            letterSpacing={0.05}
-            strokeColor="#FFFFFF"
-            strokeWidth={0.01}
-            fillOpacity={1}
-          >
-            {project.title}
-          </Text>
-          
-          {/* Decorative elements */}
-          <mesh position={[-2.2, 0, 0.07]} rotation={[0, 0, 0]}>
-            <boxGeometry args={[0.2, 1.7, 0.12]} />
-            <meshStandardMaterial 
-              color="#FFD700" 
-              emissive="#FFD700" 
-              emissiveIntensity={0.8}
-            />
-          </mesh>
-          
-          <mesh position={[2.2, 0, 0.07]} rotation={[0, 0, 0]}>
-            <boxGeometry args={[0.2, 1.7, 0.12]} />
-            <meshStandardMaterial 
-              color="#FFD700" 
-              emissive="#FFD700" 
-              emissiveIntensity={0.8}
-            />
-          </mesh>
-        </Billboard>
-        
-        {/* Support pole (these don't rotate with the billboard) */}
-        <mesh position={[0, -2, 0]} castShadow>
-          <boxGeometry args={[0.4, 2.0, 0.4]} />
-          <meshStandardMaterial color="#555555" metalness={0.6} roughness={0.4} />
+      {/* Simple house sign with text rendered on it - matching screenshot */}
+      <group position={[0, 4.5, 0]}>
+        {/* Sign with support */}
+        <mesh position={[0, 0, 0]} castShadow receiveShadow>
+          <boxGeometry args={[3.5, 1.2, 0.1]} />
+          <meshStandardMaterial>
+            {(() => {
+              // Create a canvas for the texture
+              const canvas = document.createElement('canvas');
+              canvas.width = 512;
+              canvas.height = 128;
+              const context = canvas.getContext('2d');
+              
+              if (context) {
+                // Orange background
+                context.fillStyle = '#FF7F00';
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Border
+                context.strokeStyle = '#000000';
+                context.lineWidth = 6;
+                context.strokeRect(3, 3, canvas.width - 6, canvas.height - 6);
+                
+                // Text
+                context.font = 'bold 36px Arial';
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                context.fillStyle = '#000000';
+                
+                // Adjust font size based on text length
+                let fontSize = 36;
+                if (project.title.length > 15) {
+                  fontSize = 28;
+                }
+                if (project.title.length > 20) {
+                  fontSize = 24;
+                }
+                
+                context.font = `bold ${fontSize}px Arial`;
+                
+                // Draw text with black fill - directly on the sign
+                context.fillText(project.title, canvas.width / 2, canvas.height / 2);
+                
+                // Create texture from canvas
+                const texture = new THREE.CanvasTexture(canvas);
+                texture.needsUpdate = true;
+                return <primitive attach="map" object={texture} />;
+              }
+              
+              return null;
+            })()}
+          </meshStandardMaterial>
         </mesh>
+        
+        {/* Sign post */}
+        <mesh position={[0, -1.5, 0]} castShadow>
+          <boxGeometry args={[0.2, 2.0, 0.2]} />
+          <meshStandardMaterial color="#4B3621" roughness={0.8} />
+        </mesh>
+        
+        {/* Small light to illuminate the sign */}
+        <pointLight 
+          position={[0, 0, 1]} 
+          intensity={15} 
+          distance={2} 
+          color="#FFFFFF" 
+          castShadow={false}
+        />
       </group>
       
       {/* Interactive indicator when player is nearby */}
