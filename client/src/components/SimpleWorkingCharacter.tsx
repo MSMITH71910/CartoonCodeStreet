@@ -46,13 +46,13 @@ const SimpleWorkingCharacter = () => {
       console.log(`Key pressed: ${event.code}`);
       
       // First update our tracking object
-      if (event.code === 'KeyZ') {
+      if (event.code === 'KeyZ' && typeof window !== 'undefined' && window.animationKeys) {
         window.animationKeys.Z = true;
         console.log("Z KEY DOWN DETECTED (dance)");
-      } else if (event.code === 'KeyQ') {
+      } else if (event.code === 'KeyQ' && typeof window !== 'undefined' && window.animationKeys) {
         window.animationKeys.Q = true;
         console.log("Q KEY DOWN DETECTED (wave left)");
-      } else if (event.code === 'KeyR') {
+      } else if (event.code === 'KeyR' && typeof window !== 'undefined' && window.animationKeys) {
         window.animationKeys.R = true;
         console.log("R KEY DOWN DETECTED (wave right)");
       }
@@ -79,13 +79,13 @@ const SimpleWorkingCharacter = () => {
       console.log(`Key released: ${event.code}`);
       
       // Update our tracking object first
-      if (event.code === 'KeyZ') {
+      if (event.code === 'KeyZ' && typeof window !== 'undefined' && window.animationKeys) {
         window.animationKeys.Z = false;
         console.log("Z KEY UP DETECTED (dance)");
-      } else if (event.code === 'KeyQ') {
+      } else if (event.code === 'KeyQ' && typeof window !== 'undefined' && window.animationKeys) {
         window.animationKeys.Q = false;
         console.log("Q KEY UP DETECTED (wave left)");
-      } else if (event.code === 'KeyR') {
+      } else if (event.code === 'KeyR' && typeof window !== 'undefined' && window.animationKeys) {
         window.animationKeys.R = false;
         console.log("R KEY UP DETECTED (wave right)");
       }

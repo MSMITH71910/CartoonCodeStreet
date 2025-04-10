@@ -59,6 +59,8 @@ const Experience = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+  
+  // Now removed as handleSignClick is moved to the FixedStreetSign component
 
   // Set up camera following logic
   useFrame(() => {
