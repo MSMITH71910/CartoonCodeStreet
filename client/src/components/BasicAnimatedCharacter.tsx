@@ -43,46 +43,15 @@ const BasicAnimatedCharacter = () => {
   const [moving, setMoving] = useState(false);
   const [animationTime, setAnimationTime] = useState(0);
   
-  // Animation flags from our new global controller
-  // This connects us directly to the new AnimationController
-  const [animState, setAnimState] = useState({
-    isDancing: false,
-    isWavingLeft: false,
-    isWavingRight: false,
-    isMoving: false
-  });
+  // Direct key press tracking with our custom hook
+  const isDancePressed = useDirectKeyPress('KeyZ');
+  const isWaveLeftPressed = useDirectKeyPress('KeyQ');
+  const isWaveRightPressed = useDirectKeyPress('KeyR');
   
-  // Update animation state from the global state
-  useEffect(() => {
-    const checkAnimations = () => {
-      // Check if global animation state is available
-      if ((window as any).characterAnimations) {
-        setAnimState((window as any).characterAnimations);
-      }
-    };
-    
-    // Check immediately
-    checkAnimations();
-    
-    // Set up interval to regularly check animation state
-    const interval = setInterval(checkAnimations, 100);
-    
-    // Listen for animation update events too
-    const handleAnimationUpdate = () => {
-      checkAnimations();
-    };
-    document.addEventListener('character-animation-update', handleAnimationUpdate);
-    
-    return () => {
-      clearInterval(interval);
-      document.removeEventListener('character-animation-update', handleAnimationUpdate);
-    };
-  }, []);
-  
-  // Use animation state from the global controller
-  const isDancing = animState.isDancing;
-  const isWavingLeft = animState.isWavingLeft;
-  const isWavingRight = animState.isWavingRight;
+  // Animation states derived from key presses and movement
+  const isDancing = isDancePressed && !moving;
+  const isWavingLeft = isWaveLeftPressed && !moving && !isDancing;
+  const isWavingRight = isWaveRightPressed && !moving && !isDancing && !isWavingLeft;
   
   // Store character ref in portfolio store
   useEffect(() => {

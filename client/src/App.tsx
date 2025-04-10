@@ -12,9 +12,6 @@ import { usePortfolio } from "./lib/stores/usePortfolio";
 import { useStreetSign } from "./lib/stores/useStreetSign";
 import { ControlName } from "./lib/constants";
 import StreetSignDOM from "./components/ui/StreetSignDOM";
-import KeyLogger from "./KeyLogger";
-import AnimationController from "./AnimationController";
-import AnimationButtons from "./components/ui/AnimationButtons";
 
 // Define control keys for the character movement - UPDATED FOR ANIMATIONS & ZOOM
 const keyboardMap = [
@@ -40,51 +37,6 @@ function App() {
   const { activeProject, closeProject } = usePortfolio();
   const { showAboutInfo, closeAboutInfo } = useStreetSign();
 
-  // BACKUP KEYBOARD EVENT LISTENERS FOR ANIMATIONS
-  useEffect(() => {
-    // These direct event listeners will handle animation keys as a backup
-    // in case the regular keyboard controls don't work
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Only handle our special animation keys
-      if (e.code === 'KeyZ' || e.code === 'KeyQ' || e.code === 'KeyR') {
-        console.log(`GLOBAL APP KEY DETECTED: ${e.code}`);
-        
-        // Store animation state in window for components to access
-        if (!window.animationKeys) {
-          window.animationKeys = {
-            Z: false,
-            Q: false,
-            R: false
-          };
-        }
-        
-        if (e.code === 'KeyZ') window.animationKeys.Z = true;
-        if (e.code === 'KeyQ') window.animationKeys.Q = true; 
-        if (e.code === 'KeyR') window.animationKeys.R = true;
-      }
-    };
-    
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'KeyZ' || e.code === 'KeyQ' || e.code === 'KeyR') {
-        if (!window.animationKeys) return;
-        
-        if (e.code === 'KeyZ') window.animationKeys.Z = false;
-        if (e.code === 'KeyQ') window.animationKeys.Q = false;
-        if (e.code === 'KeyR') window.animationKeys.R = false;
-      }
-    };
-    
-    // Add global event listeners
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    
-    // Clean up
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, []);
-  
   // Complete audio initialization
   useEffect(() => {
     console.log("AUDIO SYSTEM: Initializing all audio elements");
@@ -232,15 +184,6 @@ function App() {
         isOpen={showAboutInfo}
         onClose={closeAboutInfo}
       />
-      
-      {/* Keyboard diagnostics */}
-      <KeyLogger />
-      
-      {/* Animation controller and state debugger */}
-      <AnimationController />
-      
-      {/* Direct animation buttons for when keyboard controls don't work */}
-      <AnimationButtons />
     </div>
   );
 }
