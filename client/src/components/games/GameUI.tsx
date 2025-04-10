@@ -34,7 +34,7 @@ const GameUI = () => {
     
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showGameUI, interactionType, playActivityMusic, handleClose]);
+  }, [showGameUI, handleClose]);
   
   if (!showGameUI) return null;
   

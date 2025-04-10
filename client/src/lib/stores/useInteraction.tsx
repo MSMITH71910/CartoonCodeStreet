@@ -310,38 +310,34 @@ export const useInteraction = create<InteractionState>((set, get) => ({
     if (currentType !== "none") {
       console.log(`INTERACTION: Ending interaction of type ${currentType}`);
       
-      // Use our global helper function for playing background music
-      if (window.playBackgroundMusic) {
-        console.log("AUDIO CONTROL: Using global helper to restore background music");
-        window.playBackgroundMusic();
-      } else {
-        console.error("AUDIO ERROR: Global playBackgroundMusic function not available");
-        
-        // Fallback to original method
-        const audioStore = useAudio.getState();
-        
-        // First stop any activity music
-        if (audioStore.currentActivityMusic) {
-          console.log("AUDIO CONTROL: Stopping current activity music");
-          audioStore.currentActivityMusic.pause();
-          audioStore.currentActivityMusic.currentTime = 0;
-        }
-        
-        // Reset to background music
-        useAudio.setState({
-          currentActivityMusic: null,
-          currentTrack: "background"
-        });
-        
-        // Play background music if not muted
-        if (audioStore.backgroundMusic && !audioStore.isMuted && !audioStore.isMusicMuted) {
-          console.log("AUDIO CONTROL: Resuming background music");
-          audioStore.backgroundMusic.currentTime = 0;
-          audioStore.backgroundMusic.volume = 0.3;
+      // Get the audio store
+      const audioStore = useAudio.getState();
+      
+      // First stop any activity music
+      if (audioStore.currentActivityMusic) {
+        console.log("AUDIO CONTROL: Stopping current activity music");
+        audioStore.currentActivityMusic.pause();
+        audioStore.currentActivityMusic.currentTime = 0;
+      }
+      
+      // Reset to background music
+      useAudio.setState({
+        currentActivityMusic: null,
+        currentTrack: "background"
+      });
+      
+      // Play background music if not muted
+      if (audioStore.backgroundMusic && !audioStore.isMuted && !audioStore.isMusicMuted) {
+        console.log("AUDIO CONTROL: Resuming background music");
+        audioStore.backgroundMusic.currentTime = 0;
+        audioStore.backgroundMusic.volume = 0.3;
+        try {
           audioStore.backgroundMusic.play();
-        } else {
-          console.log("AUDIO CONTROL: Background music not resumed because audio is muted");
+        } catch (e) {
+          console.error("AUDIO ERROR: Failed to resume background music:", e);
         }
+      } else {
+        console.log("AUDIO CONTROL: Background music not resumed because audio is muted");
       }
     }
     
