@@ -115,7 +115,9 @@ function App() {
           <p>• Trees allow playing Checkers</p>
         </div>
         <div className="mt-2 border-t pt-2 border-gray-600">
-          <p>Different activities play unique music!</p>
+          <p className="font-semibold text-cyan-300">Audio Features:</p>
+          <p>• Different activities play unique music</p>
+          <p>• Toggle audio with the controls in top-right</p>
         </div>
       </div>
 

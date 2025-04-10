@@ -174,9 +174,10 @@ export const useInteraction = create<InteractionState>((set, get) => ({
             audioStore.backgroundMusic.pause();
           }
           
-          // Play chess music
+          // Play chess music (at a higher pitch by increasing playback rate)
           audioStore.chessMusicOrSimilar.currentTime = 0;
           audioStore.chessMusicOrSimilar.volume = 0.4;
+          audioStore.chessMusicOrSimilar.playbackRate = audioStore.chessPlaybackRate; // Makes it sound different
           
           // Update the state
           useAudio.setState({
@@ -244,6 +245,7 @@ export const useInteraction = create<InteractionState>((set, get) => ({
             console.log("AUDIO CONTROL: Playing seesaw music specifically");
             seesawAudioStore.seesawMusic.currentTime = 0;
             seesawAudioStore.seesawMusic.volume = 0.4;
+            seesawAudioStore.seesawMusic.playbackRate = seesawAudioStore.seesawPlaybackRate; // Make it sound different/faster
             
             // Update the state
             useAudio.setState({
@@ -289,6 +291,7 @@ export const useInteraction = create<InteractionState>((set, get) => ({
             console.log("AUDIO CONTROL: Playing fountain music specifically");
             fountainAudioStore.fountainMusic.currentTime = 0;
             fountainAudioStore.fountainMusic.volume = 0.4;
+            fountainAudioStore.fountainMusic.playbackRate = 0.85; // Make it sound different/slower
             
             // Update the state
             useAudio.setState({
@@ -341,6 +344,8 @@ export const useInteraction = create<InteractionState>((set, get) => ({
         console.log("AUDIO CONTROL: Stopping current activity music");
         audioStore.currentActivityMusic.pause();
         audioStore.currentActivityMusic.currentTime = 0;
+        // Reset playback rate to normal
+        audioStore.currentActivityMusic.playbackRate = 1.0;
       }
       
       // Reset to background music

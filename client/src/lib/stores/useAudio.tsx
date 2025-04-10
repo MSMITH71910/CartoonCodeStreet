@@ -23,6 +23,11 @@ interface AudioState {
   isMuted: boolean;
   isMusicMuted: boolean;  // Music can be muted separately from sound effects
   
+  // Mini-game audio configuration
+  chessPlaybackRate: number;
+  seesawPlaybackRate: number;
+  fountainPlaybackRate: number;
+  
   // Setter functions
   setBackgroundMusic: (music: HTMLAudioElement) => void;
   setHitSound: (sound: HTMLAudioElement) => void;
@@ -59,6 +64,11 @@ export const useAudio = create<AudioState>((set, get) => ({
   // Audio states
   isMuted: false,
   isMusicMuted: false,
+  
+  // Mini-game audio configuration (different playback rates make tracks sound different)
+  chessPlaybackRate: 1.25,
+  seesawPlaybackRate: 1.5,
+  fountainPlaybackRate: 0.85,
   
   // Setter functions
   setBackgroundMusic: (music) => {
