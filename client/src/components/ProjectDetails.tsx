@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Project } from "../lib/data/projects";
 import { cn } from "../lib/utils";
+import { ScreenshotService } from "../lib/services/screenshot-service";
 
 interface ProjectDetailsProps {
   project: Project;
@@ -8,6 +9,31 @@ interface ProjectDetailsProps {
 }
 
 const ProjectDetails = ({ project, onClose }: ProjectDetailsProps) => {
+  // State for storing the screenshot URL
+  const [screenshotUrl, setScreenshotUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Fetch screenshot when component mounts
+  useEffect(() => {
+    const fetchScreenshot = async () => {
+      setIsLoading(true);
+      try {
+        if (project.githubUrl) {
+          const screenshot = await ScreenshotService.getProjectScreenshot(project);
+          setScreenshotUrl(screenshot);
+        }
+      } catch (err) {
+        console.error("Error fetching screenshot:", err);
+        setError("Failed to load project screenshot");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchScreenshot();
+  }, [project]);
+  
   // Add escape key listener to close the project details
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -43,6 +69,45 @@ const ProjectDetails = ({ project, onClose }: ProjectDetailsProps) => {
         </div>
         
         <div className="space-y-4">
+          {/* Project Screenshot */}
+          {project.githubUrl && (
+            <div className="relative overflow-hidden rounded-lg shadow-md mb-6">
+              {isLoading ? (
+                <div className="flex items-center justify-center bg-gray-100 dark:bg-gray-700 h-64 w-full animate-pulse">
+                  <svg className="w-10 h-10 text-gray-300 dark:text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                    <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm4.376 10.481A1 1 0 0 1 16 15H4a1 1 0 0 1-.895-1.447l3.5-7A1 1 0 0 1 7.468 6a.965.965 0 0 1 .9.5l2.775 4.757 1.546-1.887a1 1 0 0 1 1.618.1l2.541 4a1 1 0 0 1 .028 1.011Z"/>
+                  </svg>
+                </div>
+              ) : error ? (
+                <div className="flex items-center justify-center bg-gray-100 dark:bg-gray-700 h-64 w-full">
+                  <div className="text-center text-gray-500 dark:text-gray-400">
+                    <svg className="w-10 h-10 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p>{error}</p>
+                  </div>
+                </div>
+              ) : screenshotUrl ? (
+                <a 
+                  href={project.githubUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block transition-transform duration-300 hover:scale-105"
+                >
+                  <img 
+                    src={screenshotUrl} 
+                    alt={`${project.title} GitHub repository screenshot`} 
+                    className="w-full h-auto object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white text-xs p-2 text-center">
+                    Click to view on GitHub
+                  </div>
+                </a>
+              ) : null}
+            </div>
+          )}
+        
           <div className="flex flex-wrap gap-2 mb-4">
             {project.technologies.map((tech, index) => (
               <span 
