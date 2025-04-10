@@ -15,7 +15,7 @@ const Experience = () => {
   const { setIsNearSign } = useStreetSign();
   const orbitRef = useRef(null);
   
-  // Use persistently stored zoom level instead of direct key handling
+  // Use a direct event listener for immediate zoom updates
   useEffect(() => {
     // Update camera zoom based on the current zoom level stored in window
     const updateCameraZoom = () => {
@@ -33,7 +33,7 @@ const Experience = () => {
       const zoomFactor = 3; // Units to change per zoom level
       const newDistance = Math.max(5, Math.min(100, baseDistance + (zoomLevel * zoomFactor)));
       
-      console.log("ZOOM SYSTEM: Updating camera zoom to level", zoomLevel, "distance:", newDistance);
+      console.log("ZOOM SYSTEM: Applying camera zoom level", zoomLevel, "distance:", newDistance);
       
       // @ts-ignore
       control.minDistance = 5;
@@ -50,10 +50,22 @@ const Experience = () => {
     // Run immediately
     updateCameraZoom();
     
-    // Also set up a listener for zoom level changes
-    const checkZoomInterval = setInterval(updateCameraZoom, 1000);
+    // Listen for the zoom change event
+    const handleZoomChange = () => {
+      console.log("ZOOM SYSTEM: Zoom change event received");
+      updateCameraZoom();
+    };
     
-    return () => clearInterval(checkZoomInterval);
+    // Add zoom change event listener for immediate updates
+    window.addEventListener('zoomchange', handleZoomChange);
+    
+    // Also check periodically to ensure consistency
+    const checkZoomInterval = setInterval(updateCameraZoom, 500);
+    
+    return () => {
+      clearInterval(checkZoomInterval);
+      window.removeEventListener('zoomchange', handleZoomChange);
+    };
   }, []);
 
   // Set up camera following logic
@@ -238,9 +250,6 @@ const Experience = () => {
       
       {/* Player character */}
       <BasicAnimatedCharacter />
-      
-      {/* Completely separate street sign component */}
-      <FixedStreetSign />
       
       {/* Camera controls - always enabled to allow viewing from different angles */}
       <OrbitControls 

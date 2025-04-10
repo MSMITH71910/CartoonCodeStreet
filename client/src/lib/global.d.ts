@@ -1,5 +1,13 @@
 // Global declarations for TypeScript
 
+interface ZoomChangeEventDetail {
+  level: number;
+}
+
+interface WindowEventMap {
+  'zoomchange': CustomEvent<ZoomChangeEventDetail>;
+}
+
 interface Window {
   isMouseRotating: boolean;
   currentZoomLevel?: number; // For persistent zoom level

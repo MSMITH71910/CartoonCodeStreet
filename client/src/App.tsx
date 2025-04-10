@@ -38,29 +38,49 @@ const useZoomState = () => {
   useEffect(() => {
     const storedZoom = localStorage.getItem('portfolioZoomLevel');
     if (storedZoom !== null) {
-      setZoomLevel(parseInt(storedZoom));
+      const parsed = parseInt(storedZoom);
+      setZoomLevel(parsed);
+      
+      // Immediately set on window for components to access
+      window.currentZoomLevel = parsed;
+      console.log("ZOOM SYSTEM: Loaded zoom level from storage:", parsed);
     }
   }, []);
   
-  // Save to localStorage when changed
+  // Update orbit controls directly when zoom level changes - this is the key improvement
   useEffect(() => {
-    localStorage.setItem('portfolioZoomLevel', zoomLevel.toString());
-    // Also expose to window for Experience component to access
-    window.currentZoomLevel = zoomLevel;
+    // Find the orbit controls in the DOM
+    const updateOrbitControls = () => {
+      // Save to localStorage for persistence between sessions
+      localStorage.setItem('portfolioZoomLevel', zoomLevel.toString());
+      
+      // Expose to window for direct access
+      window.currentZoomLevel = zoomLevel;
+      
+      // Directly dispatch an event to notify components of zoom change
+      window.dispatchEvent(new CustomEvent('zoomchange', { detail: { level: zoomLevel }}));
+      
+      console.log("ZOOM SYSTEM: Zoom level updated to", zoomLevel);
+    };
+    
+    // Run immediately when zoom level changes
+    updateOrbitControls();
   }, [zoomLevel]);
   
-  // Handle zoom keys
+  // Handle zoom keys with improved feedback
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Equal' || e.code === 'NumpadAdd') {
         // Zoom in (decrease level - smaller values are more zoomed in)
-        setZoomLevel(prev => Math.max(prev - 1, -5));
-        console.log("ZOOM SYSTEM: Zooming in to level", zoomLevel - 1);
+        const newLevel = Math.max(zoomLevel - 1, -5);
+        setZoomLevel(newLevel);
+        console.log("ZOOM SYSTEM: Zooming in to level", newLevel);
       }
       else if (e.code === 'Minus' || e.code === 'NumpadSubtract') {
         // Zoom out (increase level - larger values are more zoomed out)
-        setZoomLevel(prev => Math.min(prev + 1, 5)); 
-        console.log("ZOOM SYSTEM: Zooming out to level", zoomLevel + 1);
+        const newLevel = Math.min(zoomLevel + 1, 5);
+        setZoomLevel(newLevel);
+        console.log("ZOOM SYSTEM: Zooming out to level", newLevel);
       }
     };
     
