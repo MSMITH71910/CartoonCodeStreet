@@ -1,0 +1,101 @@
+🎚️
+🎵 Music: Game Music
+Controls & Interactions
+W/↑ - Move forward
+
+S/↓ - Move backward
+
+A/← - Turn left
+
+D/→ - Turn right
+
+E/Space - Interact with objects
+
+Click and hold left mouse button to look around
+
+Character Animations:
+
+Z - Make character dance
+
+Q - Wave left arm
+
+R - Wave right arm
+
+Interactions:
+
+• Click houses to view projects
+
+• Interact with seesaw for fun
+
+• Interact with mailbox for Hangman
+
+• Visit hydrants for Tic-Tac-Toe
+
+• Trees allow playing Checkers
+
+Different activities play unique music!
+
+Hangman
+
+Hangman
+_ _ _ _ _ _ _ _ _ _
+
+Attempts: 0/6
+
+A
+B
+C
+D
+E
+F
+G
+H
+I
+J
+K
+L
+M
+N
+O
+P
+Q
+R
+S
+T
+U
+V
+W
+X
+Y
+Z
+Game Controls:
+
+• Tic-Tac-Toe: Click to place your mark. You play as X against computer's O.
+
+• Hangman: Click letters to guess the word.
+
+• Checkers: Click your piece then click where to move it.
+
+Press ESC or the X button to close this window and return to the street.
+
+[plugin:runtime-error-plugin] The element has no supported sources.
+    at <anonymous> (/home/runner/workspace/node_modules/@replit/vite-plugin-runtime-error-modal/src/index.ts:29:37)
+    at <anonymous> (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-CHZK6zbr.js:59415:39)
+    at Set.forEach (<anonymous>)
+    at WebSocket.<anonymous> (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-CHZK6zbr.js:59415:17)
+    at WebSocket.emit (node:events:518:28)
+    at Receiver.receiverOnMessage (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-CHZK6zbr.js:58409:22)
+    at Receiver.emit (node:events:518:28)
+    at Receiver.dataMessage (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-CHZK6zbr.js:55989:14)
+    at Receiver.getData (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-CHZK6zbr.js:55889:10)
+    at Receiver.startLoop (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-CHZK6zbr.js:55560:16)
+    at Receiver._write (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-CHZK6zbr.js:55487:10)
+    at writeOrBuffer (node:internal/streams/writable:572:12)
+    at _write (node:internal/streams/writable:501:10)
+    at Writable.write (node:internal/streams/writable:510:10)
+    at Socket.socketOnData (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-CHZK6zbr.js:58544:37)
+    at Socket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TCP.onStreamRead (node:internal/stream_base_commons:191:23

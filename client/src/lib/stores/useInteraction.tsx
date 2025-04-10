@@ -184,11 +184,34 @@ export const useInteraction = create<InteractionState>((set, get) => ({
             currentTrack: "chess"
           });
           
-          // Play the music
+          // Play the music with error handling
           try {
-            audioStore.chessMusicOrSimilar.play();
+            if (!audioStore.chessMusicOrSimilar) {
+              throw new Error("Chess music not available");
+            }
+            
+            const playPromise = audioStore.chessMusicOrSimilar.play();
+            
+            // Modern browsers return a promise from play()
+            if (playPromise !== undefined) {
+              playPromise.catch(error => {
+                console.error("AUDIO ERROR: Failed to play chess music (promise):", error);
+                // If we can't play the specific music, fall back to background
+                if (audioStore.backgroundMusic) {
+                  audioStore.backgroundMusic.play().catch(err => 
+                    console.error("Failed to play fallback background music:", err)
+                  );
+                }
+              });
+            }
           } catch (e) {
             console.error("AUDIO ERROR: Failed to play chess music:", e);
+            // Use background music as fallback
+            if (audioStore.backgroundMusic) {
+              audioStore.backgroundMusic.play().catch(err => 
+                console.error("Failed to play fallback background music:", err)
+              );
+            }
           }
         } else {
           console.log("AUDIO CONTROL: Not playing mini-game music (muted or not available)");

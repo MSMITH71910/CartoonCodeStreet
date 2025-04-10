@@ -64,9 +64,10 @@ function App() {
       backgroundMusic: backgroundMusicElement,
       hitSound: hitSoundElement,
       successSound: successSoundElement,
-      chessMusicOrSimilar: boardGameMusicElement,
-      fountainMusic: fountainMusicElement,
-      seesawMusic: seesawMusicElement,
+      // If any of the mini-game music files don't load properly, we'll use the background music as fallback
+      chessMusicOrSimilar: boardGameMusicElement || backgroundMusicElement,
+      fountainMusic: fountainMusicElement || backgroundMusicElement,
+      seesawMusic: seesawMusicElement || backgroundMusicElement,
       
       // Start with music UNMUTED for better user experience
       isMusicMuted: false,
