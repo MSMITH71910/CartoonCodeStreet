@@ -27,6 +27,7 @@ const keyboardMap = [
 // Main App component
 function App() {
   const [showCanvas, setShowCanvas] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true); // State for collapsible instructions
   const { setBackgroundMusic, toggleMute, isMuted } = useAudio();
   const { activeProject, closeProject } = usePortfolio();
 
@@ -87,35 +88,51 @@ function App() {
       {/* Audio controls component */}
       <AudioControls />
 
-      {/* Instructions overlay */}
-      <div className="absolute top-5 left-5 z-50 bg-black bg-opacity-70 text-white p-3 rounded max-w-xs">
-        <h2 className="text-lg font-bold mb-2">Controls & Interactions</h2>
-        <p>W/↑ - Move forward</p>
-        <p>S/↓ - Move backward</p>
-        <p>A/← - Turn left</p>
-        <p>D/→ - Turn right</p>
-        <p>E/Space - Interact with objects</p>
-        <p className="text-yellow-300">Click and hold left mouse button to look around</p>
-        
-        <div className="mt-2 border-t pt-2 border-gray-600">
-          <p className="font-semibold text-green-300">Character Animations:</p>
-          <p>Z - Make character dance</p>
-          <p>Q - Wave left arm</p>
-          <p>R - Wave right arm</p>
-        </div>
-        
-        <div className="mt-2 border-t pt-2 border-gray-600">
-          <p className="font-semibold">Interactions:</p>
-          <p>• Click houses to view projects</p>
-          <p>• Interact with seesaw for fun</p>
-          <p>• Interact with mailbox for Hangman</p>
-          <p>• Visit hydrants for Tic-Tac-Toe</p>
-          <p>• Trees allow playing Checkers</p>
-        </div>
-        <div className="mt-2 border-t pt-2 border-gray-600">
-          <p className="font-semibold text-cyan-300">Audio Features:</p>
-          <p>• Background music plays during exploration</p>
-          <p>• Music pauses during interactive activities</p>
+      {/* Instructions overlay - COLLAPSIBLE */}
+      <div className="absolute top-5 left-5 z-50">
+        {/* Collapsible Instructions Panel */}
+        <div className="bg-black bg-opacity-70 text-white rounded max-w-xs">
+          {/* Header with toggle button */}
+          <div 
+            className="p-3 flex justify-between items-center cursor-pointer hover:bg-opacity-80 hover:bg-black" 
+            onClick={() => setShowInstructions(!showInstructions)}
+          >
+            <h2 className="text-lg font-bold">Controls & Interactions</h2>
+            <span className="text-xl font-bold">{showInstructions ? '−' : '+'}</span>
+          </div>
+          
+          {/* Collapsible content */}
+          {showInstructions && (
+            <div className="p-3 pt-0 border-t border-gray-600">
+              <p>W/↑ - Move forward</p>
+              <p>S/↓ - Move backward</p>
+              <p>A/← - Turn left</p>
+              <p>D/→ - Turn right</p>
+              <p>E/Space - Interact with objects</p>
+              <p className="text-yellow-300">Click and hold left mouse button to look around</p>
+              
+              <div className="mt-2 border-t pt-2 border-gray-600">
+                <p className="font-semibold text-green-300">Character Animations:</p>
+                <p>Z - Make character dance</p>
+                <p>Q - Wave left arm</p>
+                <p>R - Wave right arm</p>
+              </div>
+              
+              <div className="mt-2 border-t pt-2 border-gray-600">
+                <p className="font-semibold">Interactions:</p>
+                <p>• Click houses to view projects</p>
+                <p>• Interact with seesaw for fun</p>
+                <p>• Interact with mailbox for Hangman</p>
+                <p>• Visit hydrants for Tic-Tac-Toe</p>
+                <p>• Trees allow playing Checkers</p>
+              </div>
+              <div className="mt-2 border-t pt-2 border-gray-600">
+                <p className="font-semibold text-cyan-300">Audio Features:</p>
+                <p>• Background music plays during exploration</p>
+                <p>• Music pauses during interactive activities</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

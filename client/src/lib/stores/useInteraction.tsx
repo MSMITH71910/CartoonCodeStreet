@@ -260,7 +260,9 @@ export const useInteraction = create<InteractionState>((set, get) => ({
               .then(() => {
                 // Then gradually increase volume
                 setTimeout(() => {
-                  audioStore.backgroundMusic.volume = 0.3;
+                  if (audioStore.backgroundMusic) {
+                    audioStore.backgroundMusic.volume = 0.3;
+                  }
                 }, 300);
               })
               .catch(() => {

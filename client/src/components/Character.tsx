@@ -108,13 +108,19 @@ const Character = () => {
       setIsMoving(false);
     }
     
-    // COMPLETELY REWRITTEN ROTATION HANDLING
-    // Instead of incrementally updating, we'll just directly set rotation based on keys
+    // FIXED ROTATION HANDLING
+    // Use a more direct and forceful approach to rotation
     if (leftward) {
       // Left key pressed: rotate counter-clockwise (subtract from rotation)
       const newRotation = rotation - turnSpeed * delta;
       setRotation(newRotation);
-      characterRef.current.rotation.y = newRotation;
+      
+      // Force direct rotation update on the mesh
+      if (characterRef.current) {
+        characterRef.current.rotation.y = newRotation;
+      }
+      
+      // Verbose logging for debugging
       console.log(`LEFT key: New rotation = ${newRotation.toFixed(2)}`);
     } 
     
@@ -122,7 +128,13 @@ const Character = () => {
       // Right key pressed: rotate clockwise (add to rotation)
       const newRotation = rotation + turnSpeed * delta;
       setRotation(newRotation);
-      characterRef.current.rotation.y = newRotation;
+      
+      // Force direct rotation update on the mesh
+      if (characterRef.current) {
+        characterRef.current.rotation.y = newRotation;
+      }
+      
+      // Verbose logging for debugging
       console.log(`RIGHT key: New rotation = ${newRotation.toFixed(2)}`);
     }
     

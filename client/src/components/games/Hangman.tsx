@@ -18,12 +18,13 @@ const Hangman = () => {
     // Increment attempts if wrong guess
     const newAttempts = word.includes(letter) ? attempts : attempts + 1;
     
-    // Update game state
+    // Update game state with proper type safety
     updateGameState({
       hangman: {
-        ...gameState.hangman,
+        word: word,
         guessed: newGuessed,
-        attempts: newAttempts
+        attempts: newAttempts,
+        maxAttempts: maxAttempts
       }
     });
   };
