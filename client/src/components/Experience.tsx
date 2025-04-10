@@ -234,8 +234,8 @@ const Experience = () => {
             <meshStandardMaterial color={signHovered ? "#4285F4" : "#1E88E5"} side={THREE.DoubleSide} />
           </mesh>
 
-          {/* Front side - ALL text in one sprite */}
-          <sprite position={[0, 0, 0.2]} scale={[5, 3, 1]}>
+          {/* Front side - ALL text in one sprite with smaller text to fit */}
+          <sprite position={[0, 0, 0.2]} scale={[4.8, 2.8, 1]}>
             <spriteMaterial alphaTest={0.5}>
               <canvasTexture attach="map" args={[(() => {
                 const canvas = document.createElement('canvas');
@@ -253,15 +253,15 @@ const Experience = () => {
                   ctx.lineWidth = 12;
                   ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
                   
-                  // Header
-                  ctx.font = 'bold 95px Arial';
+                  // Header - smaller text
+                  ctx.font = 'bold 80px Arial';
                   ctx.fillStyle = 'yellow';
                   ctx.textAlign = 'center';
                   ctx.textBaseline = 'middle';
                   ctx.fillText('MICHAEL R. SMITH', canvas.width / 2, canvas.height * 0.25);
                   
-                  // Subheader
-                  ctx.font = 'bold 85px Arial';
+                  // Subheader - smaller text
+                  ctx.font = 'bold 75px Arial';
                   ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height * 0.5);
                   
                   // Bottom text - highlight
@@ -273,8 +273,8 @@ const Experience = () => {
                   ctx.lineWidth = 6;
                   ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
                   
-                  // Bottom text
-                  ctx.font = 'bold 76px Arial';
+                  // Bottom text - smaller text
+                  ctx.font = 'bold 68px Arial';
                   ctx.fillStyle = 'yellow';
                   ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height * 0.78);
                 }
@@ -284,8 +284,8 @@ const Experience = () => {
             </spriteMaterial>
           </sprite>
           
-          {/* Back side - EXACT same content */}
-          <sprite position={[0, 0, -0.2]} rotation={[0, Math.PI, 0]} scale={[5, 3, 1]}>
+          {/* Back side - EXACT same content but with smaller text to match front */}
+          <sprite position={[0, 0, -0.2]} rotation={[0, Math.PI, 0]} scale={[4.8, 2.8, 1]}>
             <spriteMaterial alphaTest={0.5}>
               <canvasTexture attach="map" args={[(() => {
                 const canvas = document.createElement('canvas');
@@ -303,15 +303,15 @@ const Experience = () => {
                   ctx.lineWidth = 12;
                   ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
                   
-                  // Header
-                  ctx.font = 'bold 95px Arial';
+                  // Header - smaller text
+                  ctx.font = 'bold 80px Arial';
                   ctx.fillStyle = 'yellow';
                   ctx.textAlign = 'center';
                   ctx.textBaseline = 'middle';
                   ctx.fillText('MICHAEL R. SMITH', canvas.width / 2, canvas.height * 0.25);
                   
-                  // Subheader
-                  ctx.font = 'bold 85px Arial';
+                  // Subheader - smaller text
+                  ctx.font = 'bold 75px Arial';
                   ctx.fillText('PORTFOLIO STREET', canvas.width / 2, canvas.height * 0.5);
                   
                   // Bottom text - highlight
@@ -323,8 +323,8 @@ const Experience = () => {
                   ctx.lineWidth = 6;
                   ctx.strokeRect(canvas.width * 0.1, canvas.height * 0.68, canvas.width * 0.8, canvas.height * 0.2);
                   
-                  // Bottom text
-                  ctx.font = 'bold 76px Arial';
+                  // Bottom text - smaller text
+                  ctx.font = 'bold 68px Arial';
                   ctx.fillStyle = 'yellow';
                   ctx.fillText('CLICK FOR INFO', canvas.width / 2, canvas.height * 0.78);
                 }

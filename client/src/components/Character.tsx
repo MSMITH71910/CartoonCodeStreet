@@ -123,8 +123,8 @@ const Character = () => {
     characterRef.current.rotation.y = newRotation;
     
     // Calculate forward direction based on character rotation
-    // Using (0, 0, 1) instead of (0, 0, -1) to move in the correct direction
-    const forwardDir = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), newRotation);
+    // Fix the vector direction to match the camera perspective
+    const forwardDir = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), newRotation);
     
     // Apply movement
     const newVelocity = forwardDir.multiplyScalar(movingForward * speed * delta);
