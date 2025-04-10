@@ -15,81 +15,49 @@ const Experience = () => {
   const { setIsNearSign } = useStreetSign();
   const orbitRef = useRef(null);
   
-  // Simplify the zoom system to prevent glitching
+  // Use camera FOV adjustments for zoom - much more reliable approach
   useEffect(() => {
-    if (!orbitRef.current) return;
+    // Default FOV value
+    const defaultFOV = 70;
+    const minFOV = 30;  // More zoomed in
+    const maxFOV = 90;  // More zoomed out
+    const zoomStep = 5; // Degrees to change per key press
     
-    // Just set the initial distances without forcing camera position
-    // @ts-ignore
-    const control = orbitRef.current;
+    // Get the current FOV preference or use default
+    let currentFOV = Number(localStorage.getItem('portfolioZoomFOV')) || defaultFOV;
     
-    // Set more reasonable min/max distance limits
-    // @ts-ignore
-    control.minDistance = 8;
-    // @ts-ignore
-    control.maxDistance = 30;
+    // Apply FOV to camera
+    const applyFOV = (fov: number) => {
+      if (camera instanceof THREE.PerspectiveCamera) {
+        camera.fov = fov;
+        camera.updateProjectionMatrix();
+        localStorage.setItem('portfolioZoomFOV', fov.toString());
+        console.log(`ZOOM: Applied FOV ${fov}`);
+      }
+    };
     
-    // Listen for the plus/minus keys directly here
+    // Apply initially
+    applyFOV(currentFOV);
+    
+    // Handle zoom keys
     const handleZoomKeys = (e: KeyboardEvent) => {
-      if (!orbitRef.current) return;
-      
-      // @ts-ignore
-      const control = orbitRef.current;
-      
-      // Get current distance
-      // @ts-ignore
-      const currentDistance = control.getDistance();
-      
       if (e.code === 'Equal' || e.code === 'NumpadAdd') {
-        // Zoom in - move camera closer to target
-        const newDistance = Math.max(8, currentDistance - 2);
-        
-        // Smoothly transition to the new distance
-        // @ts-ignore
-        control.object.position.copy(control.target);
-        // @ts-ignore
-        control.object.position.addScaledVector(control.object.position.clone().sub(control.target).normalize(), newDistance);
-        
-        // Store the new zoom level in localStorage
-        localStorage.setItem('portfolioZoomLevel', newDistance.toString());
-        console.log("ZOOM SYSTEM: Zoomed in to distance", newDistance);
+        // Zoom in - decrease FOV
+        currentFOV = Math.max(minFOV, currentFOV - zoomStep);
+        applyFOV(currentFOV);
+        e.preventDefault();
       }
       else if (e.code === 'Minus' || e.code === 'NumpadSubtract') {
-        // Zoom out - move camera further from target
-        const newDistance = Math.min(30, currentDistance + 2);
-        
-        // Smoothly transition to the new distance
-        // @ts-ignore
-        control.object.position.copy(control.target);
-        // @ts-ignore
-        control.object.position.addScaledVector(control.object.position.clone().sub(control.target).normalize(), newDistance);
-        
-        // Store the new zoom level in localStorage
-        localStorage.setItem('portfolioZoomLevel', newDistance.toString());
-        console.log("ZOOM SYSTEM: Zoomed out to distance", newDistance);
+        // Zoom out - increase FOV
+        currentFOV = Math.min(maxFOV, currentFOV + zoomStep);
+        applyFOV(currentFOV);
+        e.preventDefault();
       }
     };
     
-    // Apply any saved zoom level on start
-    const savedZoom = localStorage.getItem('portfolioZoomLevel');
-    if (savedZoom) {
-      const zoomDistance = parseFloat(savedZoom);
-      console.log("ZOOM SYSTEM: Applying saved zoom distance:", zoomDistance);
-      
-      // Set the camera distance without any animations
-      // @ts-ignore
-      control.object.position.copy(control.target);
-      // @ts-ignore
-      control.object.position.addScaledVector(control.object.position.clone().sub(control.target).normalize(), zoomDistance);
-    }
-    
-    // Add event listener
     window.addEventListener('keydown', handleZoomKeys);
-    
-    return () => {
-      window.removeEventListener('keydown', handleZoomKeys);
-    };
-  }, []);
+    return () => window.removeEventListener('keydown', handleZoomKeys);
+  }, [camera]);
 
   // Set up camera following logic
   useFrame(() => {
@@ -144,7 +112,7 @@ const Experience = () => {
       // Update the camera's far clipping plane to see objects at greater distances
       if (camera instanceof THREE.PerspectiveCamera) {
         camera.far = 1000; // Set a larger value to see farther
-        camera.fov = 70; // Wider field of view
+        // Don't reset FOV here - it's managed by the zoom system
         camera.updateProjectionMatrix();
       }
       

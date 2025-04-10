@@ -33,9 +33,51 @@ const BasicAnimatedCharacter = () => {
   const waveLeft = useKeyboardControls(state => state[ControlName.waveLeft]);
   const waveRight = useKeyboardControls(state => state[ControlName.waveRight]);
   
-  // Direct keyboard event handlers HARDCODED for animations
+  // Use an interval to check window.animationKeys (set in App.tsx)
   useEffect(() => {
-    // Handle direct DOM keyboard events for animations
+    console.log("Setting up global animation keys checker");
+    
+    // Function to check the global animation keys state
+    const checkAnimationKeys = () => {
+      if (!window.animationKeys) return;
+      
+      // Dance (Z key)
+      if (window.animationKeys.Z && !moving && !isDancing && !isWaving) {
+        console.log("GLOBAL Z KEY DETECTED - DANCE ANIMATION STARTING");
+        setIsDancing(true);
+        setIsWaving(false);
+      } else if (!window.animationKeys.Z && isDancing) {
+        console.log("GLOBAL Z KEY RELEASED - DANCE ANIMATION STOPPING");
+        setIsDancing(false);
+      }
+      
+      // Wave left (Q key)
+      if (window.animationKeys.Q && !moving && !isDancing && !isWaving) {
+        console.log("GLOBAL Q KEY DETECTED - WAVE LEFT ANIMATION STARTING");
+        setIsWaving(true);
+        setWaveArm('left');
+        setIsDancing(false);
+      } else if (!window.animationKeys.Q && isWaving && waveArm === 'left') {
+        console.log("GLOBAL Q KEY RELEASED - WAVE LEFT ANIMATION STOPPING");
+        setIsWaving(false);
+      }
+      
+      // Wave right (R key)
+      if (window.animationKeys.R && !moving && !isDancing && !isWaving) {
+        console.log("GLOBAL R KEY DETECTED - WAVE RIGHT ANIMATION STARTING");
+        setIsWaving(true);
+        setWaveArm('right');
+        setIsDancing(false);
+      } else if (!window.animationKeys.R && isWaving && waveArm === 'right') {
+        console.log("GLOBAL R KEY RELEASED - WAVE RIGHT ANIMATION STOPPING");
+        setIsWaving(false);
+      }
+    };
+    
+    // Run the check on an interval
+    const checkInterval = setInterval(checkAnimationKeys, 100);
+    
+    // Also add direct DOM event listeners as a backup
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'KeyZ' && !moving && !isDancing && !isWaving) {
         console.log("DIRECT Z KEY DETECTED - DANCE ANIMATION STARTING");
@@ -71,12 +113,11 @@ const BasicAnimatedCharacter = () => {
       }
     };
     
-    // Add listeners directly to the DOM
-    console.log("Setting up DIRECT DOM animation key listeners");
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     
     return () => {
+      clearInterval(checkInterval);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
