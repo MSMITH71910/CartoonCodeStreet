@@ -36,7 +36,22 @@ const Street = () => {
     // Generate deterministic positions for street objects
     const positions: StreetObjectData[] = [];
     
-    // Removed lampposts as requested
+    // Lamp posts along the street
+    for (let i = -45; i <= 45; i += 10) {
+      positions.push({
+        type: "lamppost",
+        position: [-5, 0, i],
+        rotation: [0, 0, 0],
+        scale: [1, 1, 1]
+      });
+      
+      positions.push({
+        type: "lamppost",
+        position: [5, 0, i],
+        rotation: [0, Math.PI, 0],
+        scale: [1, 1, 1]
+      });
+    }
     
     // Trees on the grass areas only
     for (let i = -48; i <= 48; i += 8) {
@@ -122,20 +137,7 @@ const Street = () => {
       scale: [1, 1, 1]
     });
     
-    // Add fountains on the sides of the street instead of in the center
-    positions.push({
-      type: "fountain",
-      position: [-14, 0, -25],
-      rotation: [0, 0, 0],
-      scale: [1.5, 1.5, 1.5]
-    });
-    
-    positions.push({
-      type: "fountain",
-      position: [14, 0, 25],
-      rotation: [0, 0, 0],
-      scale: [1.5, 1.5, 1.5]
-    });
+    // Fountains have been removed as requested
     
     return positions;
   }, []);
