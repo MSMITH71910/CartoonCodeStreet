@@ -15,56 +15,79 @@ const Experience = () => {
   const { setIsNearSign } = useStreetSign();
   const orbitRef = useRef(null);
   
-  // Use a direct event listener for immediate zoom updates
+  // Simplify the zoom system to prevent glitching
   useEffect(() => {
-    // Update camera zoom based on the current zoom level stored in window
-    const updateCameraZoom = () => {
+    if (!orbitRef.current) return;
+    
+    // Just set the initial distances without forcing camera position
+    // @ts-ignore
+    const control = orbitRef.current;
+    
+    // Set more reasonable min/max distance limits
+    // @ts-ignore
+    control.minDistance = 8;
+    // @ts-ignore
+    control.maxDistance = 30;
+    
+    // Listen for the plus/minus keys directly here
+    const handleZoomKeys = (e: KeyboardEvent) => {
       if (!orbitRef.current) return;
       
       // @ts-ignore
       const control = orbitRef.current;
-      // The window.currentZoomLevel is set in App.tsx (-5 to +5 range)
-      const zoomLevel = window.currentZoomLevel || 0;
       
-      // Base distance is 15 units, then adjust by zoom level
-      // Negative zoom levels (down to -5) are zoomed in
-      // Positive zoom levels (up to +5) are zoomed out
-      const baseDistance = 15;
-      const zoomFactor = 3; // Units to change per zoom level
-      const newDistance = Math.max(5, Math.min(100, baseDistance + (zoomLevel * zoomFactor)));
-      
-      console.log("ZOOM SYSTEM: Applying camera zoom level", zoomLevel, "distance:", newDistance);
-      
+      // Get current distance
       // @ts-ignore
-      control.minDistance = 5;
-      // @ts-ignore
-      control.maxDistance = 100;
+      const currentDistance = control.getDistance();
       
-      // Force the camera to zoom to this distance
+      if (e.code === 'Equal' || e.code === 'NumpadAdd') {
+        // Zoom in - move camera closer to target
+        const newDistance = Math.max(8, currentDistance - 2);
+        
+        // Smoothly transition to the new distance
+        // @ts-ignore
+        control.object.position.copy(control.target);
+        // @ts-ignore
+        control.object.position.addScaledVector(control.object.position.clone().sub(control.target).normalize(), newDistance);
+        
+        // Store the new zoom level in localStorage
+        localStorage.setItem('portfolioZoomLevel', newDistance.toString());
+        console.log("ZOOM SYSTEM: Zoomed in to distance", newDistance);
+      }
+      else if (e.code === 'Minus' || e.code === 'NumpadSubtract') {
+        // Zoom out - move camera further from target
+        const newDistance = Math.min(30, currentDistance + 2);
+        
+        // Smoothly transition to the new distance
+        // @ts-ignore
+        control.object.position.copy(control.target);
+        // @ts-ignore
+        control.object.position.addScaledVector(control.object.position.clone().sub(control.target).normalize(), newDistance);
+        
+        // Store the new zoom level in localStorage
+        localStorage.setItem('portfolioZoomLevel', newDistance.toString());
+        console.log("ZOOM SYSTEM: Zoomed out to distance", newDistance);
+      }
+    };
+    
+    // Apply any saved zoom level on start
+    const savedZoom = localStorage.getItem('portfolioZoomLevel');
+    if (savedZoom) {
+      const zoomDistance = parseFloat(savedZoom);
+      console.log("ZOOM SYSTEM: Applying saved zoom distance:", zoomDistance);
+      
+      // Set the camera distance without any animations
       // @ts-ignore
       control.object.position.copy(control.target);
       // @ts-ignore
-      control.object.position.addScaledVector(control.object.position.clone().sub(control.target).normalize(), newDistance);
-    };
+      control.object.position.addScaledVector(control.object.position.clone().sub(control.target).normalize(), zoomDistance);
+    }
     
-    // Run immediately
-    updateCameraZoom();
-    
-    // Listen for the zoom change event
-    const handleZoomChange = () => {
-      console.log("ZOOM SYSTEM: Zoom change event received");
-      updateCameraZoom();
-    };
-    
-    // Add zoom change event listener for immediate updates
-    window.addEventListener('zoomchange', handleZoomChange);
-    
-    // Also check periodically to ensure consistency
-    const checkZoomInterval = setInterval(updateCameraZoom, 500);
+    // Add event listener
+    window.addEventListener('keydown', handleZoomKeys);
     
     return () => {
-      clearInterval(checkZoomInterval);
-      window.removeEventListener('zoomchange', handleZoomChange);
+      window.removeEventListener('keydown', handleZoomKeys);
     };
   }, []);
 

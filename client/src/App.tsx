@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useState, useEffect, useRef } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { KeyboardControls } from "@react-three/drei";
 import { useAudio } from "./lib/stores/useAudio";
 import "@fontsource/inter";
@@ -29,84 +29,13 @@ const keyboardMap = [
   { name: ControlName.zoomOut, keys: ["Minus", "NumpadSubtract"] },  // - key to zoom out
 ];
 
-// Create a persistent zoom state using localStorage
-const useZoomState = () => {
-  // Default zoom level (0 = normal, negative = zoomed in, positive = zoomed out)
-  const [zoomLevel, setZoomLevel] = useState(0);
-  
-  // Initialize from localStorage if available
-  useEffect(() => {
-    const storedZoom = localStorage.getItem('portfolioZoomLevel');
-    if (storedZoom !== null) {
-      const parsed = parseInt(storedZoom);
-      setZoomLevel(parsed);
-      
-      // Immediately set on window for components to access
-      window.currentZoomLevel = parsed;
-      console.log("ZOOM SYSTEM: Loaded zoom level from storage:", parsed);
-    }
-  }, []);
-  
-  // Update orbit controls directly when zoom level changes - this is the key improvement
-  useEffect(() => {
-    // Find the orbit controls in the DOM
-    const updateOrbitControls = () => {
-      // Save to localStorage for persistence between sessions
-      localStorage.setItem('portfolioZoomLevel', zoomLevel.toString());
-      
-      // Expose to window for direct access
-      window.currentZoomLevel = zoomLevel;
-      
-      // Directly dispatch an event to notify components of zoom change
-      window.dispatchEvent(new CustomEvent('zoomchange', { detail: { level: zoomLevel }}));
-      
-      console.log("ZOOM SYSTEM: Zoom level updated to", zoomLevel);
-    };
-    
-    // Run immediately when zoom level changes
-    updateOrbitControls();
-  }, [zoomLevel]);
-  
-  // Handle zoom keys with improved feedback
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Equal' || e.code === 'NumpadAdd') {
-        // Zoom in (decrease level - smaller values are more zoomed in)
-        const newLevel = Math.max(zoomLevel - 1, -5);
-        setZoomLevel(newLevel);
-        console.log("ZOOM SYSTEM: Zooming in to level", newLevel);
-      }
-      else if (e.code === 'Minus' || e.code === 'NumpadSubtract') {
-        // Zoom out (increase level - larger values are more zoomed out)
-        const newLevel = Math.min(zoomLevel + 1, 5);
-        setZoomLevel(newLevel);
-        console.log("ZOOM SYSTEM: Zooming out to level", newLevel);
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [zoomLevel]);
-  
-  return zoomLevel;
-};
-
 // Main App component
 function App() {
   const [showCanvas, setShowCanvas] = useState(false);
   const [showInstructions, setShowInstructions] = useState(true); // State for collapsible instructions
   const { setBackgroundMusic, toggleMute, isMuted } = useAudio();
   const { activeProject, closeProject } = usePortfolio();
-  
-  // Initialize zoom system
-  const zoomLevel = useZoomState();
-  
-  // Make the zoom available globally
-  useEffect(() => {
-    // @ts-ignore - Adding custom property
-    window.currentZoomLevel = zoomLevel;
-    console.log("ZOOM SYSTEM: Current zoom level:", zoomLevel);
-  }, [zoomLevel]);
+  const { showAboutInfo, closeAboutInfo } = useStreetSign();
 
   // BACKUP KEYBOARD EVENT LISTENERS FOR ANIMATIONS
   useEffect(() => {
@@ -297,14 +226,9 @@ function App() {
       
       {/* About Info Dialog */}
       <AboutInfoDialog 
-        isOpen={useStreetSign(state => state.showAboutInfo)}
-        onClose={useStreetSign(state => state.closeAboutInfo)}
+        isOpen={showAboutInfo}
+        onClose={closeAboutInfo}
       />
-      
-      {/* Current zoom level display - visible for debugging */}
-      <div className="absolute bottom-4 left-4 bg-black bg-opacity-50 p-2 text-white rounded">
-        Zoom Level: {zoomLevel} {zoomLevel < 0 ? "(Zoomed In)" : zoomLevel > 0 ? "(Zoomed Out)" : "(Normal)"}
-      </div>
     </div>
   );
 }
