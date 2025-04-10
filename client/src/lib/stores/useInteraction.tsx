@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import * as THREE from "three";
 import { RefObject } from "react";
+import { useAudio } from "./useAudio"; // Import audio store
 
 export type InteractionType = 
   | "none" 
@@ -77,6 +78,7 @@ export const useInteraction = create<InteractionState>((set, get) => ({
     let gameState: GameState = {};
     let showGameUI = false;
     
+    // Play the appropriate activity music
     switch (type) {
       case "ticTacToe":
         gameState.ticTacToe = {
@@ -85,6 +87,9 @@ export const useInteraction = create<InteractionState>((set, get) => ({
           winner: null
         };
         showGameUI = true;
+        // Play board game music
+        useAudio.getState().playActivityMusic("ticTacToe");
+        console.log("AUDIO DEBUG: Playing tic-tac-toe music");
         break;
         
       case "hangman":
@@ -97,6 +102,9 @@ export const useInteraction = create<InteractionState>((set, get) => ({
           maxAttempts: 6
         };
         showGameUI = true;
+        // Play board game music
+        useAudio.getState().playActivityMusic("hangman");
+        console.log("AUDIO DEBUG: Playing hangman music");
         break;
         
       case "checkers":
@@ -126,6 +134,19 @@ export const useInteraction = create<InteractionState>((set, get) => ({
           selectedPiece: null
         };
         showGameUI = true;
+        // Play board game music
+        useAudio.getState().playActivityMusic("checkers");
+        console.log("AUDIO DEBUG: Playing checkers music");
+        break;
+        
+      case "seesaw":
+        // Play seesaw music
+        useAudio.getState().playActivityMusic("seesaw");
+        console.log("AUDIO DEBUG: Playing seesaw music");
+        break;
+        
+      case "lamp":
+        // No special music for lamp
         break;
     }
     
@@ -144,6 +165,15 @@ export const useInteraction = create<InteractionState>((set, get) => ({
   },
   
   endInteraction: () => {
+    // Get current interaction type before clearing it
+    const currentType = get().interactionType;
+    
+    // Stop any activity-specific music and return to background music
+    if (currentType !== "none") {
+      useAudio.getState().stopActivityMusic();
+      console.log("AUDIO DEBUG: Stopping activity music and returning to background music");
+    }
+    
     set({
       interactionType: "none",
       interactingWithId: null,
@@ -153,6 +183,7 @@ export const useInteraction = create<InteractionState>((set, get) => ({
       isOnSeesaw: false,
       showGameUI: false
     });
+    
     console.log("Ended interaction");
   },
   

@@ -113,7 +113,7 @@ function App() {
           <Canvas
             shadows
             camera={{
-              position: [0, 5, -10], // Changed Z from 10 to -10 to face the character
+              position: [0, 5, 10], // Reverted back to original position
               fov: 60,
               near: 0.1,
               far: 1000

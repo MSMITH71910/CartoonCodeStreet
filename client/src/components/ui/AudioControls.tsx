@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useAudio } from '../../lib/stores/useAudio';
 
+// COMPLETELY REWRITTEN AUDIO CONTROLS
 const AudioControls: React.FC = () => {
+  // Get audio state from store
   const { 
     isMuted, 
-    isMusicMuted, 
-    toggleMute, 
-    toggleMusicMute,
+    isMusicMuted,
     backgroundMusic,
     currentActivityMusic,
     chessMusicOrSimilar,
@@ -17,11 +17,112 @@ const AudioControls: React.FC = () => {
   // Track expanded state for controls panel
   const [isExpanded, setIsExpanded] = useState(false);
   
+  // DIRECT ACTION FUNCTIONS - Skip the store and work with audio elements directly
+  // This bypasses any potential issues with the store not updating correctly
+  
+  // Toggle all audio mute
+  const handleToggleMute = () => {
+    console.log("DIRECT MUTE: Toggling all audio mute");
+    
+    // Get current state
+    const currentlyMuted = useAudio.getState().isMuted;
+    const newMuteState = !currentlyMuted;
+    
+    // Update state via direct access
+    useAudio.setState({ isMuted: newMuteState });
+    
+    // Get all audio elements
+    const allAudio = [
+      backgroundMusic,
+      currentActivityMusic,
+      chessMusicOrSimilar,
+      fountainMusic,
+      seesawMusic
+    ].filter(Boolean) as HTMLAudioElement[];
+    
+    if (newMuteState) {
+      // Direct muting of all audio elements
+      allAudio.forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = 0;
+      });
+      console.log("DIRECT MUTE: All audio muted");
+    } else {
+      // Only restore if music is not separately muted
+      if (!useAudio.getState().isMusicMuted) {
+        console.log("DIRECT MUTE: Restoring audio");
+        // Set volumes
+        if (backgroundMusic) backgroundMusic.volume = 0.3;
+        if (chessMusicOrSimilar) chessMusicOrSimilar.volume = 0.4;
+        if (fountainMusic) fountainMusic.volume = 0.4;
+        if (seesawMusic) seesawMusic.volume = 0.4;
+        
+        // Play appropriate track
+        if (currentActivityMusic) {
+          currentActivityMusic.play().catch(e => console.error("Failed to play activity music:", e));
+        } else if (backgroundMusic) {
+          backgroundMusic.play().catch(e => console.error("Failed to play background music:", e));
+        }
+      }
+    }
+  };
+  
+  // Toggle just music mute
+  const handleToggleMusicMute = () => {
+    console.log("DIRECT MUTE: Toggling just music mute");
+    
+    // Get current state
+    const currentlyMusicMuted = useAudio.getState().isMusicMuted;
+    const newMusicMuteState = !currentlyMusicMuted;
+    
+    // Update state via direct access
+    useAudio.setState({ isMusicMuted: newMusicMuteState });
+    
+    // Get music elements
+    const musicElements = [
+      backgroundMusic,
+      currentActivityMusic,
+      chessMusicOrSimilar,
+      fountainMusic,
+      seesawMusic
+    ].filter(Boolean) as HTMLAudioElement[];
+    
+    if (newMusicMuteState) {
+      // Direct muting of music elements
+      musicElements.forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = 0;
+      });
+      console.log("DIRECT MUTE: All music muted");
+    } else if (!useAudio.getState().isMuted) {
+      // Only restore if all audio is not muted
+      console.log("DIRECT MUTE: Restoring music");
+      
+      // Set volumes
+      if (backgroundMusic) backgroundMusic.volume = 0.3;
+      if (chessMusicOrSimilar) chessMusicOrSimilar.volume = 0.4;
+      if (fountainMusic) fountainMusic.volume = 0.4;
+      if (seesawMusic) seesawMusic.volume = 0.4;
+      
+      // Play appropriate track
+      if (currentActivityMusic) {
+        currentActivityMusic.play().catch(e => console.error("Failed to play activity music:", e));
+      } else if (backgroundMusic) {
+        backgroundMusic.play().catch(e => console.error("Failed to play background music:", e));
+      }
+    }
+  };
+  
   // Force music to be muted on initial load
   useEffect(() => {
     // Make sure music is muted by default when app loads
-    if (!isMusicMuted) {
-      toggleMusicMute();
+    console.log("AUDIO CONTROLS: Initial setup");
+    
+    // Initialize with music muted (using direct approach)
+    if (!useAudio.getState().isMusicMuted) {
+      handleToggleMusicMute();
     }
   }, []);
   
@@ -61,7 +162,7 @@ const AudioControls: React.FC = () => {
           <div className="flex justify-between items-center">
             <span className="text-white text-sm">All Sounds:</span>
             <button 
-              onClick={toggleMute} 
+              onClick={handleToggleMute} 
               className={`text-white p-2 rounded-full ${isMuted ? 'bg-red-700' : 'bg-green-700'} hover:opacity-90 transition-all`}
               aria-label={isMuted ? "Unmute All" : "Mute All"}
               title={isMuted ? "Unmute All" : "Mute All"}
@@ -74,7 +175,7 @@ const AudioControls: React.FC = () => {
           <div className="flex justify-between items-center">
             <span className="text-white text-sm">Music:</span>
             <button 
-              onClick={toggleMusicMute} 
+              onClick={handleToggleMusicMute} 
               className={`text-white p-2 rounded-full ${isMusicMuted ? 'bg-red-700' : 'bg-green-700'} hover:opacity-90 transition-all`}
               aria-label={isMusicMuted ? "Unmute Music" : "Mute Music"}
               title={isMusicMuted ? "Unmute Music" : "Mute Music"}

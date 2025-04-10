@@ -82,10 +82,9 @@ const Character = () => {
     
     // Regular character movement logic
     const speed = 5; // Base speed
-    const turnSpeed = 2.5; // Rotation speed
+    const turnSpeed = 3.5; // Increased rotation speed for more responsive turning
     
     let movingForward = 0;
-    let rotating = 0;
     
     // Process keyboard inputs and update velocities
     if (forward) {
@@ -109,40 +108,39 @@ const Character = () => {
       setIsMoving(false);
     }
     
-    // Reverse the rotation direction since the previous approach wasn't working
+    // COMPLETELY REWRITTEN ROTATION HANDLING
+    // Instead of incrementally updating, we'll just directly set rotation based on keys
     if (leftward) {
-      rotating = -1; // Changed from 1 to -1
-    } else if (rightward) {
-      rotating = 1;  // Changed from -1 to 1
-    } else {
-      rotating = 0;
+      // Left key pressed: rotate counter-clockwise (subtract from rotation)
+      const newRotation = rotation - turnSpeed * delta;
+      setRotation(newRotation);
+      characterRef.current.rotation.y = newRotation;
+      console.log(`LEFT key: New rotation = ${newRotation.toFixed(2)}`);
+    } 
+    
+    if (rightward) {
+      // Right key pressed: rotate clockwise (add to rotation)
+      const newRotation = rotation + turnSpeed * delta;
+      setRotation(newRotation);
+      characterRef.current.rotation.y = newRotation;
+      console.log(`RIGHT key: New rotation = ${newRotation.toFixed(2)}`);
     }
     
-    // Log control inputs for debugging
-    if (leftward || rightward) {
-      console.log(`Rotating: ${rotating}, Left: ${leftward}, Right: ${rightward}`);
+    // Calculate forward direction based on character rotation
+    // The forward vector is in positive Z with our camera setup
+    const forwardDir = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), characterRef.current.rotation.y);
+    
+    // Apply movement along the forward direction
+    if (movingForward !== 0) {
+      const moveAmount = movingForward * speed * delta;
+      const movement = forwardDir.clone().multiplyScalar(moveAmount);
+      characterRef.current.position.add(movement);
+      
+      // Log movement for debugging
+      if (Math.random() < 0.05) {
+        console.log(`Moving: dir=[${forwardDir.x.toFixed(2)}, ${forwardDir.y.toFixed(2)}, ${forwardDir.z.toFixed(2)}], amount=${moveAmount.toFixed(2)}`);
+      }
     }
-    
-    // Update rotation
-    const newRotation = rotation + rotating * turnSpeed * delta;
-    setRotation(newRotation);
-    characterRef.current.rotation.y = newRotation;
-    
-    // Fix rotation direction by changing the vector
-    // Previous approach wasn't working correctly
-    const forwardDir = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), newRotation);
-    
-    // Debug the rotation to make sure it's working correctly
-    if (rotating !== 0) {
-      console.log(`Rotation: ${newRotation}, Direction: [${forwardDir.x.toFixed(2)}, ${forwardDir.y.toFixed(2)}, ${forwardDir.z.toFixed(2)}]`);
-    }
-    
-    // Apply movement
-    const newVelocity = forwardDir.multiplyScalar(movingForward * speed * delta);
-    characterRef.current.position.add(newVelocity);
-    
-    // Update character position
-    setVelocity(newVelocity);
     
     // Update animation time for skating motion
     if (isMoving) {
