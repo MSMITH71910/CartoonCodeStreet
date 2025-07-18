@@ -13,8 +13,8 @@ export interface Project {
 export const projects: Project[] = [
   {
     id: "1",
-    title: "Trip-App",
-    description: "A full-featured travel planning application with itinerary management, destination guides, and budget tracking.",
+    title: "crwn-clothing",
+    description: "An e-commerce web application for clothing, featuring a modern design and robust functionality.",
     technologies: ["React", "Node.js", "MongoDB", "Stripe", "Redux"],
     features: [
       "User authentication and profiles",
@@ -23,9 +23,9 @@ export const projects: Project[] = [
       "Budget tracking and expense management",
       "Travel recommendations and tips"
     ],
-    challenges: "Creating an intuitive user interface while handling complex trip planning scenarios and integration with multiple travel APIs.",
-    url: "https://example.com/tripapp",
-    githubUrl: "https://github.com/myusername/trip-app",
+    challenges: "Creating an intuitive user interface that allows users to easily maneuver through the online shopping experience. Ensuring smooth integration between the front-end and back-end systems was also challenging due to the complexity of managing inventory and payment gateways in a large online store.",
+    url: "https://crwn-clothing-msmith71910.netlify.app/",
+    githubUrl: "https://github.com/MSMITH71910/crwn-clothing",
     color: "#E53935" // Red
   },
   {
