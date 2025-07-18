@@ -73,7 +73,8 @@ export const projects: Project[] = [
       "Easy customization"
     ],
     challenges: "Creating a portfolio template that's both visually appealing and simple enough for developers to customize for their own needs.",
-    githubUrl: "https://github.com/myusername/simplefolio",
+    url: "https://smithmportfolio.netlify.app/#about",
+    githubUrl: "https://github.com/MSMITH71910/simplefolio",
     color: "#8E24AA" // Purple
   },
   {
