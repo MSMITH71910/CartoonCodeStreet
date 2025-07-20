@@ -5,6 +5,7 @@ import { useAudio } from "../lib/stores/useAudio";
 import { useInteraction } from "../lib/stores/useInteraction";
 import { useKeyboardControls, Text } from "@react-three/drei";
 import { ControlName } from "../lib/constants";
+import { useMobileControls } from "../hooks/useMobileControls";
 
 interface StreetObjectProps {
   type: "lamppost" | "tree" | "hydrant" | "mailbox" | "seesaw" | "fountain" | "sign";
@@ -26,6 +27,7 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
   const { startInteraction, endInteraction, interactingWithId } = useInteraction();
   const { playActivityMusic, stopActivityMusic } = useAudio();
   const interact = useKeyboardControls((state) => state[ControlName.interact]);
+  const { getControlState } = useMobileControls();
 
   // Generate a unique ID for this object
   const objectId = useMemo(() => `${type}-${position.join("-")}`, [type, position]);
@@ -162,6 +164,21 @@ const StreetObject = ({ type, position, rotation, scale }: StreetObjectProps) =>
     if (!objectRef.current) return;
     
     const time = state.clock.getElapsedTime() + animationOffset;
+    
+    // Handle mobile interaction
+    const mobileControls = getControlState();
+    if (mobileControls.isMobile && mobileControls.interact) {
+      // Check if character is near this object for mobile interaction
+      const { camera } = state;
+      const objectPosition = new THREE.Vector3(...position);
+      const cameraPosition = camera.position.clone();
+      const distance = cameraPosition.distanceTo(objectPosition);
+      
+      // If close enough, trigger interaction (similar to keyboard E press)
+      if (distance < 5) {
+        handleClick({ stopPropagation: () => {} });
+      }
+    }
     
     // Different animations based on object type
     switch (type) {

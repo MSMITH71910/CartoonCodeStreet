@@ -6,6 +6,7 @@ import { ControlName } from "../lib/constants";
 import { Project } from "../lib/data/projects";
 import { usePortfolio } from "../lib/stores/usePortfolio";
 import { useAudio } from "../lib/stores/useAudio";
+import { useMobileControls } from "../hooks/useMobileControls";
 
 interface HouseProps {
   position: [number, number, number];
@@ -18,6 +19,7 @@ const House = ({ position, rotation, project }: HouseProps) => {
   const { raycaster, camera } = useThree();
   const { characterRef, setActiveProject, isViewingProject } = usePortfolio();
   const interact = useKeyboardControls((state) => state[ControlName.interact]);
+  const { getControlState } = useMobileControls();
   
   const [isNearby, setIsNearby] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -85,8 +87,11 @@ const House = ({ position, rotation, project }: HouseProps) => {
         console.log(`Player entered proximity of ${project.title} house`);
       }
       
-      // Check for interaction
-      if (newIsNearby && interact && !isViewingProject) {
+      // Check for interaction (keyboard or mobile)
+      const mobileControls = getControlState();
+      const shouldInteract = (interact || (mobileControls.isMobile && mobileControls.interact)) && !isViewingProject;
+      
+      if (newIsNearby && shouldInteract) {
         console.log(`Interaction with house ${project.title}`);
         setDoorOpen(true);
         playSuccess();

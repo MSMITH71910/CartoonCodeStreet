@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useAudio } from '../../lib/stores/useAudio';
+import { useIsMobile } from '../../hooks/use-is-mobile';
 
 // COMPLETELY REWRITTEN AUDIO CONTROLS
 const AudioControls: React.FC = () => {
+  const isMobile = useIsMobile();
+  
   // Get audio state from store
   const { 
     isMuted, 
@@ -145,11 +148,11 @@ const AudioControls: React.FC = () => {
   };
 
   return (
-    <div className="absolute top-5 right-5 z-50 flex flex-col gap-2">
+    <div className={`absolute ${isMobile ? 'top-2 right-2' : 'top-5 right-5'} z-50 flex flex-col gap-2`}>
       {/* Panel toggle button */}
       <button 
         onClick={togglePanel}
-        className="bg-black bg-opacity-70 text-white p-2 rounded-full hover:bg-opacity-80 transition-all self-end"
+        className={`bg-black bg-opacity-70 text-white ${isMobile ? 'p-1.5 text-sm' : 'p-2'} rounded-full hover:bg-opacity-80 transition-all self-end`}
         aria-label={isExpanded ? "Close audio controls" : "Open audio controls"}
         title={isExpanded ? "Close audio controls" : "Open audio controls"}
       >
@@ -158,15 +161,15 @@ const AudioControls: React.FC = () => {
       
       {/* Expanded controls panel */}
       {isExpanded && (
-        <div className="bg-black bg-opacity-80 p-4 rounded-lg shadow-lg flex flex-col gap-3 min-w-[180px] border border-gray-700">
-          <h3 className="text-white font-bold text-center border-b border-gray-600 pb-2">Audio Controls</h3>
+        <div className={`bg-black bg-opacity-80 ${isMobile ? 'p-3' : 'p-4'} rounded-lg shadow-lg flex flex-col gap-3 ${isMobile ? 'min-w-[160px]' : 'min-w-[180px]'} border border-gray-700`}>
+          <h3 className={`text-white font-bold text-center border-b border-gray-600 pb-2 ${isMobile ? 'text-sm' : ''}`}>Audio Controls</h3>
           
           {/* Main audio controls */}
           <div className="flex justify-between items-center">
-            <span className="text-white text-sm">All Sounds:</span>
+            <span className={`text-white ${isMobile ? 'text-xs' : 'text-sm'}`}>All Sounds:</span>
             <button 
               onClick={handleToggleMute} 
-              className={`text-white p-2 rounded-full ${isMuted ? 'bg-red-700' : 'bg-green-700'} hover:opacity-90 transition-all`}
+              className={`text-white ${isMobile ? 'p-1.5 text-sm' : 'p-2'} rounded-full ${isMuted ? 'bg-red-700' : 'bg-green-700'} hover:opacity-90 transition-all`}
               aria-label={isMuted ? "Unmute All" : "Mute All"}
               title={isMuted ? "Unmute All" : "Mute All"}
             >
@@ -176,10 +179,10 @@ const AudioControls: React.FC = () => {
           
           {/* Music-specific controls */}
           <div className="flex justify-between items-center">
-            <span className="text-white text-sm">Music:</span>
+            <span className={`text-white ${isMobile ? 'text-xs' : 'text-sm'}`}>Music:</span>
             <button 
               onClick={handleToggleMusicMute} 
-              className={`text-white p-2 rounded-full ${isMusicMuted ? 'bg-red-700' : 'bg-green-700'} hover:opacity-90 transition-all`}
+              className={`text-white ${isMobile ? 'p-1.5 text-sm' : 'p-2'} rounded-full ${isMusicMuted ? 'bg-red-700' : 'bg-green-700'} hover:opacity-90 transition-all`}
               aria-label={isMusicMuted ? "Unmute Music" : "Mute Music"}
               title={isMusicMuted ? "Unmute Music" : "Mute Music"}
             >
@@ -188,7 +191,7 @@ const AudioControls: React.FC = () => {
           </div>
           
           {/* Current music indicator */}
-          <div className="text-gray-300 text-xs border-t border-gray-600 pt-2 mt-2">
+          <div className={`text-gray-300 ${isMobile ? 'text-xs' : 'text-xs'} border-t border-gray-600 pt-2 mt-2`}>
             <p className="mb-1">Current Music:</p>
             <p className={`font-bold ${!isMuted && !isMusicMuted ? 'text-green-400' : 'text-red-400'}`}>
               {isMuted || isMusicMuted ? 'Muted' : getCurrentMusicType()}
@@ -202,7 +205,7 @@ const AudioControls: React.FC = () => {
       
       {/* Simple indicator when not expanded */}
       {!isExpanded && (
-        <div className="bg-black bg-opacity-70 text-white py-1 px-2 rounded text-xs whitespace-nowrap">
+        <div className={`bg-black bg-opacity-70 text-white py-1 px-2 rounded ${isMobile ? 'text-xs' : 'text-xs'} whitespace-nowrap`}>
           {isMuted ? '🔇 All muted' : (isMusicMuted ? '🔊 SFX only' : '🎵 Music: ' + getCurrentMusicType())}
         </div>
       )}

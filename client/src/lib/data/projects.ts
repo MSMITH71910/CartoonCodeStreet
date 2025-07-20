@@ -30,34 +30,35 @@ export const projects: Project[] = [
   },
   {
     id: "2",
-    title: "Link-Plant",
-    description: "A modern link organization tool that allows users to create visually appealing link collections for sharing multiple resources.",
-    technologies: ["JavaScript", "Node.js", "MongoDB", "Express"],
+    title: "Clips Angular Gamer Site",
+    description: "A gaming video sharing platform built with Angular, allowing gamers to upload, share, and discover gaming clips and highlights.",
+    technologies: ["Angular", "TypeScript", "Firebase", "RxJS", "Angular Material"],
     features: [
-      "Custom link organization",
-      "Shareable profile pages",
-      "Analytics and click tracking",
-      "Customizable themes",
-      "Mobile-friendly design"
+      "Video upload and streaming",
+      "User authentication and profiles",
+      "Gaming clip categorization",
+      "Social features and comments",
+      "Responsive design for all devices"
     ],
-    challenges: "Designing a fast, responsive application that handles thousands of links while maintaining a simple user experience.",
-    githubUrl: "https://github.com/myusername/link-plant",
+    challenges: "Implementing efficient video streaming and handling large file uploads while maintaining smooth user experience across different devices and network conditions.",
+    url: "https://clipsangulargamersite.netlify.app/",
+    githubUrl: "https://github.com/MSMITH71910/Clips_Angular_Gamer_site",
     color: "#1E88E5" // Blue
   },
   {
     id: "3",
-    title: "My_Link_Shortener_Web-app",
-    description: "A URL shortening service that creates compact, trackable links from long URLs with comprehensive analytics.",
-    technologies: ["React", "Firebase", "Express", "Node.js"],
+    title: "Itch.IO - MS71910.io",
+    description: "I craft immersive, interactive experiences that blend technical skill with playful creativity. My Game Portfolio showcases a range of Projects- from nostalgic arcade-style games to experimental prototypes—each built to solve unique design challenges and deliver joy to players.",
+    technologies: ["React", "Node.js", "Express", "MongoDB", "Tailwind CSS", "Unity", "Godot Engine","Game Development"],
     features: [
-      "URL shortening",
-      "QR code generation",
-      "Click analytics and tracking",
-      "Custom short links",
-      "Link expiration options"
+      "Professional portfolio showcase",
+      "Playable game demos",
+      "Technical Diversity",
+      "Responsive design",
+      "Creative game projects"
     ],
-    url: "https://example.com/linkshortener",
-    githubUrl: "https://github.com/myusername/link-shortener",
+    challenges: "Creating a professional online presence that effectively communicates skills and services while maintaining fast loading times and excellent user experience.",
+    url: "https://ms71910.itch.io/",
     color: "#43A047" // Green
   },
   {
@@ -79,18 +80,19 @@ export const projects: Project[] = [
   },
   {
     id: "5",
-    title: "Movies-App",
-    description: "A movie discovery application that helps users find, explore, and track films across multiple streaming platforms.",
-    technologies: ["Vue.js", "Express", "PostgreSQL", "Movie Database API"],
+    title: "Joke Teller App",
+    description: "An interactive web application that delivers jokes using text-to-speech technology, providing entertainment with voice narration.",
+    technologies: ["JavaScript", "HTML5", "CSS3", "Web Speech API", "Joke API"],
     features: [
-      "Movie search and discovery",
-      "Watchlist management",
-      "Ratings and reviews",
-      "Streaming service availability",
-      "Personalized recommendations"
+      "Random joke generation",
+      "Text-to-speech functionality",
+      "Interactive user interface",
+      "Responsive design",
+      "Voice controls and settings"
     ],
-    url: "https://example.com/moviesapp",
-    githubUrl: "https://github.com/myusername/movies-app",
+    challenges: "Integrating the Web Speech API effectively while ensuring cross-browser compatibility and creating an engaging user experience with smooth voice narration.",
+    url: "https://msmith71910.github.io/joke-teller/",
+    githubUrl: "https://github.com/MSMITH71910/joke-teller",
     color: "#FB8C00" // Orange
   }
 ];

@@ -8,11 +8,13 @@ import FixedStreetSign from "./FixedStreetSign";
 import { usePortfolio } from "../lib/stores/usePortfolio";
 import { useAudio } from "../lib/stores/useAudio";
 import { useStreetSign } from "../lib/stores/useStreetSign";
+import { useMobileControls } from "../hooks/useMobileControls";
 
 const Experience = () => {
   const { camera } = useThree();
   const { characterRef, cameraTarget, isViewingProject } = usePortfolio();
   const { setIsNearSign } = useStreetSign();
+  const { getControlState, resetLookDelta } = useMobileControls();
   const orbitRef = useRef(null);
   
   // Use camera FOV adjustments for zoom - much more reliable approach
@@ -61,6 +63,33 @@ const Experience = () => {
 
   // Set up camera following logic
   useFrame(() => {
+    // Handle mobile look controls
+    const mobileControls = getControlState();
+    if (mobileControls.isMobile && orbitRef.current) {
+      const orbitControls = orbitRef.current as any;
+      
+      // Apply mobile look delta to orbit controls
+      if (Math.abs(mobileControls.lookDelta.x) > 0.001 || Math.abs(mobileControls.lookDelta.y) > 0.001) {
+        // Apply horizontal rotation (azimuth)
+        orbitControls.azimuthalAngle += mobileControls.lookDelta.x * 2;
+        
+        // Apply vertical rotation (polar) with limits
+        orbitControls.polarAngle = Math.max(
+          0.1,
+          Math.min(
+            Math.PI / 2 - 0.1,
+            orbitControls.polarAngle + mobileControls.lookDelta.y * 2
+          )
+        );
+        
+        // Update the controls
+        orbitControls.update();
+        
+        // Reset the look delta after consuming it
+        resetLookDelta();
+      }
+    }
+    
     if (characterRef && characterRef.current && !isViewingProject) {
       // Get character position
       const characterPosition = characterRef.current.position;
@@ -85,9 +114,12 @@ const Experience = () => {
         .add(characterDirection.multiplyScalar(cameraDistance))
         .add(new THREE.Vector3(0, cameraHeight, 0));
       
-      // Only interpolate camera position if not actively rotating with mouse
-      // This allows the OrbitControls to take over during mouse rotation
-      if (!window.isMouseRotating) {
+      // Only interpolate camera position if not actively rotating with mouse or mobile
+      // This allows the OrbitControls to take over during rotation
+      const isRotating = window.isMouseRotating || (mobileControls.isMobile && 
+        (Math.abs(mobileControls.lookDelta.x) > 0.001 || Math.abs(mobileControls.lookDelta.y) > 0.001));
+      
+      if (!isRotating) {
         // Faster lerp for smoother camera movement
         camera.position.lerp(cameraIdealPosition, 0.08);
       }
@@ -105,7 +137,7 @@ const Experience = () => {
       cameraTarget.copy(lookTarget);
       
       // Only update lookAt if not currently using orbit controls
-      if (!window.isMouseRotating) {
+      if (!isRotating) {
         camera.lookAt(lookTarget);
       }
       

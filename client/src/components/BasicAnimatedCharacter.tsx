@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { useKeyboardControls } from "@react-three/drei";
 import { ControlName, PHYSICS, STREET } from "../lib/constants";
 import { usePortfolio } from "../lib/stores/usePortfolio";
+import { useMobileControls } from "../hooks/useMobileControls";
 
 // Ultra-direct animation tracking
 const useDirectKeyPress = (targetKey: string) => {
@@ -43,6 +44,9 @@ const BasicAnimatedCharacter = () => {
   const [moving, setMoving] = useState(false);
   const [animationTime, setAnimationTime] = useState(0);
   
+  // Mobile controls integration
+  const { getControlState, resetLookDelta } = useMobileControls();
+  
   // Direct key press tracking with our custom hook
   const isDancePressed = useDirectKeyPress('KeyZ');
   const isWaveLeftPressed = useDirectKeyPress('KeyQ');
@@ -70,33 +74,53 @@ const BasicAnimatedCharacter = () => {
   useFrame((state, delta) => {
     if (!characterRef.current) return;
     
+    // Get mobile control state
+    const mobileControls = getControlState();
+    
     // Handle movement
     const speed = PHYSICS.CHARACTER_SPEED;
     const turnSpeed = PHYSICS.CHARACTER_TURN_SPEED;
     
-    // Rotation
-    if (leftward) {
-      characterRef.current.rotation.y -= turnSpeed * delta;
+    // Combine keyboard and mobile controls for rotation
+    let rotationInput = 0;
+    if (leftward) rotationInput -= 1;
+    if (rightward) rotationInput += 1;
+    
+    // Add mobile rotation input
+    if (mobileControls.isMobile && Math.abs(mobileControls.movement.x) > 0.1) {
+      rotationInput += mobileControls.movement.x;
     }
     
-    if (rightward) {
-      characterRef.current.rotation.y += turnSpeed * delta;
+    // Apply rotation
+    if (Math.abs(rotationInput) > 0.01) {
+      characterRef.current.rotation.y += rotationInput * turnSpeed * delta;
     }
     
-    // Forward/backward movement
-    const isMovingNow = forward || backward;
+    // Combine keyboard and mobile controls for forward/backward movement
+    let movementInput = 0;
+    if (forward) movementInput += 1;
+    if (backward) movementInput -= 0.5;
+    
+    // Add mobile movement input
+    if (mobileControls.isMobile && Math.abs(mobileControls.movement.y) > 0.1) {
+      movementInput += mobileControls.movement.y;
+    }
+    
+    // Update movement state
+    const isMovingNow = Math.abs(movementInput) > 0.01;
     if (isMovingNow !== moving) {
       setMoving(isMovingNow);
     }
     
-    if (forward || backward) {
+    // Apply movement
+    if (Math.abs(movementInput) > 0.01) {
       // Calculate direction
       const direction = new THREE.Vector3();
-      direction.set(0, 0, forward ? 1 : -1);
+      direction.set(0, 0, 1);
       direction.applyQuaternion(characterRef.current.quaternion);
       
       // Apply movement
-      const moveAmount = speed * delta * (forward ? 1 : 0.5);
+      const moveAmount = speed * delta * movementInput;
       direction.multiplyScalar(moveAmount);
       characterRef.current.position.add(direction);
     }

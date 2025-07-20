@@ -27,4 +27,39 @@ canvas {
   width: 100% !important;
   height: 100% !important;
   touch-action: none;
+  /* Mobile optimizations */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  body {
+    /* Prevent zoom on double tap */
+    touch-action: manipulation;
+    /* Improve scrolling performance */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Optimize button interactions for mobile */
+  button, .mobile-control {
+    /* Increase touch target size */
+    min-height: 44px;
+    min-width: 44px;
+    /* Improve touch response */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Prevent text selection on mobile controls */
+  .mobile-controls * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
 }

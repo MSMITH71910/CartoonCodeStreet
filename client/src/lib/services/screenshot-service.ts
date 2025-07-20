@@ -1,6 +1,5 @@
 import { Project } from "../data/projects";
 
-// Define the interfaces for the screenshot data
 interface ScreenshotResponse {
   url: string;
   status: "success" | "error";
@@ -20,21 +19,13 @@ interface GithubRepoInfo {
   homepage: string;
 }
 
-// Service for generating and retrieving screenshots of GitHub repositories
 export class ScreenshotService {
-  // Base URL for GitHub API
   private static readonly GITHUB_API_BASE = "https://api.github.com";
-  
-  // Service to generate screenshot of repository
-  private static readonly SCREENSHOT_API = "https://screenshot-api.replit-example.com"; // Will be replaced with actual service
-  
-  // Local cache for screenshots to avoid redundant fetches
+  private static readonly SCREENSHOT_API = "https://screenshot-api.example.com"; // Replace with actual screenshot service
   private static screenshotCache: Map<string, string> = new Map();
-  
+
   /**
    * Extract repository owner and name from GitHub URL
-   * @param githubUrl GitHub repository URL
-   * @returns Object containing owner and repo name, or null if invalid URL
    */
   static parseGithubUrl(githubUrl: string): { owner: string; repo: string } | null {
     if (!githubUrl) {
@@ -65,12 +56,9 @@ export class ScreenshotService {
       return null;
     }
   }
-  
+
   /**
    * Get repository information from GitHub API
-   * @param owner Repository owner
-   * @param repo Repository name
-   * @returns Promise resolving to repository information
    */
   static async getRepositoryInfo(owner: string, repo: string): Promise<GithubRepoInfo | null> {
     try {
@@ -99,11 +87,9 @@ export class ScreenshotService {
       return null;
     }
   }
-  
+
   /**
    * Generate a screenshot of a GitHub repository
-   * @param githubUrl GitHub repository URL
-   * @returns Promise resolving to screenshot URL
    */
   static async generateScreenshot(githubUrl: string): Promise<string | null> {
     // Check if screenshot is already in cache
@@ -120,9 +106,6 @@ export class ScreenshotService {
     }
     
     try {
-      // For now, we'll use a placeholder image generation service
-      // In a real implementation, this would call a screenshot API
-      
       // GitHub repository screenshot placeholder
       const placeholderUrl = `https://opengraph.githubassets.com/1/${repoInfo.owner}/${repoInfo.repo}`;
       
@@ -135,44 +118,65 @@ export class ScreenshotService {
       return null;
     }
   }
-  
+
   /**
-   * Get screenshot for a project
-   * @param project Project object containing GitHub URL
-   * @returns Promise resolving to screenshot URL
+   * Generate a screenshot of a live website
    */
-  static async getProjectScreenshot(project: Project): Promise<string | null> {
-    if (!project.githubUrl) {
+  static async generateLiveScreenshot(url: string): Promise<string | null> {
+    if (!url) return null;
+
+    // Check cache first
+    if (this.screenshotCache.has(url)) {
+      return this.screenshotCache.get(url) || null;
+    }
+
+    try {
+      // For now, using a free screenshot service
+      const placeholderUrl = `https://image.thum.io/get/width/1200/crop/800/noanimate/${encodeURIComponent(url)}`;
+      
+      this.screenshotCache.set(url, placeholderUrl);
+      return placeholderUrl;
+    } catch (error) {
+      console.error(`Error generating screenshot for ${url}:`, error);
       return null;
     }
-    
-    return this.generateScreenshot(project.githubUrl);
   }
-  
+
+  /**
+   * Get screenshot for a project (prioritizes URL over GitHub URL)
+   */
+  static async getProjectScreenshot(project: Project): Promise<string | null> {
+    // Try to get live URL first
+    if (project.url) {
+      return this.generateLiveScreenshot(project.url);
+    }
+
+    // Fall back to GitHub screenshot if no URL available
+    if (project.githubUrl) {
+      return this.generateScreenshot(project.githubUrl);
+    }
+
+    return null;
+  }
+
   /**
    * Get screenshots for multiple projects
-   * @param projects Array of project objects
-   * @returns Promise resolving to map of project IDs to screenshot URLs
    */
   static async getProjectScreenshots(projects: Project[]): Promise<Map<string, string>> {
     const screenshotMap = new Map<string, string>();
     
-    // Process projects in parallel using Promise.all
     const screenshotPromises = projects.map(async (project) => {
-      if (project.githubUrl) {
-        const screenshot = await this.generateScreenshot(project.githubUrl);
-        if (screenshot) {
-          screenshotMap.set(project.id, screenshot);
-        }
+      const screenshot = await this.getProjectScreenshot(project);
+      if (screenshot) {
+        screenshotMap.set(project.id, screenshot);
       }
     });
     
-    // Wait for all screenshots to be generated
     await Promise.all(screenshotPromises);
     
     return screenshotMap;
   }
-  
+
   /**
    * Clear the screenshot cache
    */

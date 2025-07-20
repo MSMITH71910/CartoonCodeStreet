@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import { useAudio } from "../lib/stores/useAudio";
+import * as THREE from "three";
 
 const DirectStreetSign = () => {
   const signRef = useRef<THREE.Group>(null);
