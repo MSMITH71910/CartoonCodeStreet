@@ -21,10 +21,22 @@ const ProjectDetails = ({ project, onClose }: ProjectDetailsProps) => {
 useEffect(() => {
   const fetchScreenshot = async () => {
     setIsLoading(true);
+    setError(null);
+    
+    console.log(`Fetching screenshot for project: ${project.title}`);
+    console.log(`Project URL: ${project.url}`);
+    console.log(`Project GitHub URL: ${project.githubUrl}`);
+    
     try {
       // Try to get screenshot for the project (will prioritize URL over GitHub URL)
       const screenshot = await ScreenshotService.getProjectScreenshot(project);
-      setScreenshotUrl(screenshot);
+      console.log(`Screenshot result for ${project.title}:`, screenshot);
+      
+      if (screenshot) {
+        setScreenshotUrl(screenshot);
+      } else {
+        setError("No screenshot available");
+      }
     } catch (err) {
       console.error("Error fetching screenshot:", err);
       setError("Failed to load project screenshot");
@@ -101,6 +113,14 @@ useEffect(() => {
           alt={`${project.title} screenshot`} 
           className="w-full h-auto object-cover"
           loading="lazy"
+          onError={(e) => {
+            console.error(`Failed to load screenshot image: ${screenshotUrl}`);
+            setError("Screenshot failed to load");
+            setScreenshotUrl(null);
+          }}
+          onLoad={() => {
+            console.log(`Screenshot loaded successfully: ${screenshotUrl}`);
+          }}
         />
         <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white text-xs p-2 text-center">
           Click to view {project.url ? "Live Site" : "on GitHub"}

@@ -94,5 +94,24 @@ export const projects: Project[] = [
     url: "https://msmith71910.github.io/joke-teller/",
     githubUrl: "https://github.com/MSMITH71910/joke-teller",
     color: "#FB8C00" // Orange
+  },
+  {
+    id: "6",
+    title: "Trip Planner",
+    description: "Create detailed trip plans, organize your itinerary, manage your budget, and share your travels with friends and family. Everything you need to plan the perfect trip.",
+    technologies: ["React", "TypeScript", "Tailwind CSS", "Vite", "Vercel"],
+    features: [
+      "Smart trip planning with dates and destinations",
+      "Dynamic itinerary organization by day and time",
+      "Budget tracking by category",
+      "Social sharing capabilities",
+      "Email updates and notifications",
+      "PDF export for printable trip plans",
+      "Responsive design for all devices"
+    ],
+    challenges: "Creating an intuitive user interface that allows users to easily plan complex trips while managing multiple aspects like itineraries, budgets, and sharing features. Ensuring seamless data synchronization and providing a smooth user experience across different devices.",
+    url: "https://trip-app-gules.vercel.app/",
+    githubUrl: "https://github.com/MSMITH71910/trip-app",
+    color: "#00BCD4" // Cyan
   }
 ];

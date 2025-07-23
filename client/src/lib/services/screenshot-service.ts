@@ -120,9 +120,111 @@ export class ScreenshotService {
   }
 
   /**
+   * Generate a placeholder image with project info
+   */
+  static generatePlaceholderImage(url: string, title: string): string {
+    // Create a data URL for a simple placeholder image
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 800;
+    const ctx = canvas.getContext('2d');
+    
+    if (ctx) {
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, 1200, 800);
+      gradient.addColorStop(0, '#1E40AF');
+      gradient.addColorStop(0.5, '#3B82F6');
+      gradient.addColorStop(1, '#60A5FA');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 1200, 800);
+      
+      // Add some decorative elements
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.beginPath();
+      ctx.arc(200, 150, 100, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.arc(1000, 650, 150, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Main container background
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      if (ctx.roundRect) {
+        ctx.roundRect(100, 200, 1000, 400, 20);
+      } else {
+        ctx.fillRect(100, 200, 1000, 400);
+      }
+      ctx.fill();
+      
+      // Title text
+      ctx.fillStyle = '#1F2937';
+      ctx.font = 'bold 56px system-ui, -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(title, 600, 320);
+      
+      // "Live Site Preview" text
+      ctx.fillStyle = '#6B7280';
+      ctx.font = '28px system-ui, -apple-system, sans-serif';
+      ctx.fillText('🌐 Live Site Preview', 600, 380);
+      
+      // URL text
+      ctx.fillStyle = '#3B82F6';
+      ctx.font = '24px system-ui, -apple-system, sans-serif';
+      const displayUrl = url.length > 50 ? url.substring(0, 47) + '...' : url;
+      ctx.fillText(displayUrl, 600, 430);
+      
+      // Click instruction
+      ctx.fillStyle = '#9CA3AF';
+      ctx.font = '20px system-ui, -apple-system, sans-serif';
+      ctx.fillText('Click to visit the live site', 600, 500);
+      
+      // Browser-like frame
+      ctx.strokeStyle = '#E5E7EB';
+      ctx.lineWidth = 2;
+      if (ctx.roundRect) {
+        ctx.roundRect(100, 200, 1000, 400, 20);
+      } else {
+        ctx.strokeRect(100, 200, 1000, 400);
+      }
+      ctx.stroke();
+      
+      // Browser dots
+      ctx.fillStyle = '#EF4444';
+      ctx.beginPath();
+      ctx.arc(130, 230, 8, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillStyle = '#F59E0B';
+      ctx.beginPath();
+      ctx.arc(155, 230, 8, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillStyle = '#10B981';
+      ctx.beginPath();
+      ctx.arc(180, 230, 8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    return canvas.toDataURL('image/png');
+  }
+
+  /**
+   * Test if a screenshot service URL works
+   */
+  static async testScreenshotService(screenshotUrl: string): Promise<boolean> {
+    try {
+      const response = await fetch(screenshotUrl, { method: 'HEAD' });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * Generate a screenshot of a live website
    */
-  static async generateLiveScreenshot(url: string): Promise<string | null> {
+  static async generateLiveScreenshot(url: string, title: string = 'Project'): Promise<string | null> {
     if (!url) return null;
 
     // Check cache first
@@ -131,11 +233,16 @@ export class ScreenshotService {
     }
 
     try {
-      // For now, using a free screenshot service
-      const placeholderUrl = `https://image.thum.io/get/width/1200/crop/800/noanimate/${encodeURIComponent(url)}`;
+      console.log(`Generating screenshot for: ${url}`);
       
-      this.screenshotCache.set(url, placeholderUrl);
-      return placeholderUrl;
+      // For now, generate a placeholder image with project info
+      // This ensures screenshots always work while we can implement real screenshot services later
+      const placeholderImage = this.generatePlaceholderImage(url, title);
+      
+      console.log(`Generated placeholder image for: ${title}`);
+      
+      this.screenshotCache.set(url, placeholderImage);
+      return placeholderImage;
     } catch (error) {
       console.error(`Error generating screenshot for ${url}:`, error);
       return null;
@@ -148,7 +255,7 @@ export class ScreenshotService {
   static async getProjectScreenshot(project: Project): Promise<string | null> {
     // Try to get live URL first
     if (project.url) {
-      return this.generateLiveScreenshot(project.url);
+      return this.generateLiveScreenshot(project.url, project.title);
     }
 
     // Fall back to GitHub screenshot if no URL available
