@@ -12,6 +12,7 @@ export default defineConfig({
   plugins: [
     react(),
     glsl()
+    // Note: Excluding @replit/vite-plugin-runtime-error-modal for Netlify deployment
   ],
   resolve: {
     alias: {
@@ -20,18 +21,23 @@ export default defineConfig({
     }
   },
   root: path.resolve(__dirname, 'client'),
-  server: {
-    host: '0.0.0.0',
-    port: 3000,
-    strictPort: true,
-    hmr: {
-      clientPort: 443,
-    }
-  },
   build: {
     outDir: path.resolve(__dirname, 'dist/client'), // Output client-only files for Netlify
-    emptyOutDir: true
+    emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          three: ['three', '@react-three/fiber', '@react-three/drei']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
   },
   // Add support for large models and audio files
-  assetsInclude: ['**/*.gltf', '**/*.glb', '**/*.mp3', '**/*.ogg', '**/*.wav']
+  assetsInclude: ['**/*.gltf', '**/*.glb', '**/*.mp3', '**/*.ogg', '**/*.wav'],
+  // Optimize dependencies
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'three', '@react-three/fiber', '@react-three/drei']
+  }
 });

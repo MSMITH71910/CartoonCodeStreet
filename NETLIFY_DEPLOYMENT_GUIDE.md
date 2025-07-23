@@ -135,12 +135,54 @@ Netlify automatically deploys your site when you push changes to your GitHub rep
 
 ## Troubleshooting Common Issues
 
-### Issue: Build Fails
+### Issue: Build Fails with "dependency_installation script returned non-zero exit code: 1"
+
+This is a common issue with complex React/Three.js projects. Here are the solutions:
+
+#### Solution 1: Update Node.js Version
+Make sure your `netlify.toml` specifies Node.js 18:
+```toml
+[build.environment]
+  NODE_VERSION = "18"
+```
+
+#### Solution 2: Use Legacy Peer Dependencies
+Add these environment variables to your `netlify.toml`:
+```toml
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_CONFIG_LEGACY_PEER_DEPS = "true"
+  NODE_OPTIONS = "--max-old-space-size=4096"
+  SKIP_PREFLIGHT_CHECK = "true"
+  CI = "false"
+```
+
+#### Solution 3: Update Build Command
+Use this build command in your `netlify.toml`:
+```toml
+[build]
+  command = "npm install --legacy-peer-deps && npm run build:netlify"
+  publish = "dist/client"
+```
+
+#### Solution 4: Clear Netlify Cache
+1. Go to your Netlify site dashboard
+2. Go to "Site settings" > "Build & deploy" > "Environment"
+3. Click "Clear cache and retry deploy"
+
+### Issue: Build Fails with Vite/Plugin Errors
+
+If you get errors related to Vite plugins:
+1. Make sure you're using the Netlify-specific Vite config (`vite.config.netlify.reference.ts`)
+2. The Netlify config excludes Replit-specific plugins that won't work on Netlify
+3. Verify your build script uses: `vite build --config vite.config.netlify.reference.ts`
+
+### Issue: General Build Failures
 
 If your build fails, check:
 1. The Netlify build logs for specific errors
 2. That all dependencies are listed in your `package.json`
-3. That your build command works locally
+3. That your build command works locally by running: `npm run build:netlify`
 
 ### Issue: Pages Not Found (404 errors)
 
